@@ -1,0 +1,20 @@
+{% load django_vite %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>{% block title %}MySite{% endblock %}</title>
+
+  {% vite_hmr_client %}
+  {% vite_asset 'js/main.js' %}
+</head>
+<body class="bg-red-500">
+  {% block content %}
+  <!-- Page content goes here -->
+  {% endblock %}
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>
