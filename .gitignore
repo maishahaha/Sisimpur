@@ -58,9 +58,6 @@ pytestdebug.log
 !**/migrations/__init__.py
 
 # Bootstrap static frontend (basic use)
-static/css/
-static/js/
-static/vendor/
 *.map
 node_modules/
 
