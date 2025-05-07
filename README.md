@@ -62,7 +62,13 @@ Sisimpur is an open-source, AI-driven tool that instantly converts PDFs, Word do
 git clone https://github.com/udbhabon/sisimpur.git && cd sisimpur
 
 # Create virtual environment
-python -m venv venv && source venv/bin/activate
+python -m venv venv
+
+# Active virtual environment (If Linux) 
+source venv/bin/activate
+
+# Active virtual environment (If Windows) 
+venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
