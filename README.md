@@ -22,7 +22,7 @@ Sisimpur is an open-source, AI-driven tool that instantly converts PDFs, Word do
 | Layer       | Tech Used                                                    |
 | ----------- | ------------------------------------------------------------ |
 | Backend     | Django · PostgreSQL · REST Framework                         |
-| Frontend    | Tailwind CSS · Alpine.js / React (TBD)                       |
+| Frontend    | HTML · CSS . JS                       |
 | AI Models   | HuggingFace Transformers · Langchain · OpenAI API (fallback) |
 | DevOps      | Docker · GitHub Actions · Heroku/Render Deployment           |
 | PDF Parsing | PyMuPDF · Docx2txt · PDFPlumber                              |
