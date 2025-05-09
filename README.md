@@ -2,8 +2,11 @@
 
 Sisimpur is an open-source, AI-driven tool that instantly converts PDFs, Word documents, and notes into exam-style questions — from multiple-choice questions (MCQs) to flashcards — helping students revise smarter and educators automate question creation.
 
-🚀 **Try it now** → [sisimpur.onrender.com](https://sisimpur.onrender.com/)
-📚 **Built with**: Django · PostgreSQL · Tailwind · Langchain · HuggingFace Transformers
+  🚀 **Try it now** →
+   [sisimpur.onrender.com](https://sisimpur.onrender.com/)
+   
+  📚 **Built with**: Django · PostgreSQL · Tailwind · Langchain ·
+   HuggingFace Transformers
 
 ---
 
