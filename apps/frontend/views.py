@@ -7,13 +7,27 @@ import os
 from dotenv import load_dotenv
 from .utils import MailchimpService
 from pathlib import Path
+import requests
 
 load_dotenv()
 env_path = Path(__file__).resolve().parent.parent / '.env'
 # Load the .env from the root directory
 load_dotenv(dotenv_path=env_path)
 
-# Create your views here.
+def is_valid_email(email):
+    url = "http://apilayer.net/api/check"
+    params = {
+        "access_key": "6cb1b53c3055ade26f8a5f739fd774a2",
+        "email": email,
+        "smtp": 1,
+        "format": 1,
+    }
+    try:
+        response = requests.get(url, params=params, timeout=10)
+        data = response.json()
+        return data.get("smtp_check", False)  # Returns True if email is deliverable
+    except requests.RequestException:
+        return False
 
 def index(request):
     return render(request, 'index.html')
@@ -32,6 +46,11 @@ def subscribe_to_mailchimp(request):
 
         if not email:
             return JsonResponse({'success': False, 'error': 'Email is required'}, status=400)
+
+        #check if email is valid
+        if not is_valid_email(email):
+            return JsonResponse({'success': False, 'error': 'Invalid email address'}, status=400)
+
 
         # Initialize Mailchimp service
         api_key = os.getenv("MAILCHIMP_API_KEY")  # Your Mailchimp API key
