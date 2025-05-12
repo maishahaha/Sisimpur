@@ -76,6 +76,9 @@ venv\Scripts\activate
 # Install dependencies
 python.exe -m pip install --upgrade pip && pip install -r requirements.txt
 
+# Copy .env.example to .env and fill in your credentials
+cp .env.example .env
+
 # Setup DB
 python manage.py migrate
 
