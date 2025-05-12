@@ -109,7 +109,7 @@ python-bidi==0.6.6
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.0
 python-pptx==1.0.2
-pywin32>=306,<307
+pywin32>=306,<307; sys_platform == "win32"
 PyYAML==6.0.2
 pyzmq==26.4.0
 RapidFuzz==3.13.0
