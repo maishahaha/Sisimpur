@@ -4,7 +4,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import json
 import os
+from dotenv import load_dotenv
 from .utils import MailchimpService
+from pathlib import Path
+
+load_dotenv()
+env_path = Path(__file__).resolve().parent.parent / '.env'
+# Load the .env from the root directory
+load_dotenv(dotenv_path=env_path)
 
 # Create your views here.
 
@@ -27,7 +34,7 @@ def subscribe_to_mailchimp(request):
             return JsonResponse({'success': False, 'error': 'Email is required'}, status=400)
 
         # Initialize Mailchimp service
-        api_key = 'c142e8c1d822a5f26d36f3e2ef6bc60e-us13'  # Your Mailchimp API key
+        api_key = os.getenv("MAILCHIMP_API_KEY")  # Your Mailchimp API key
         server_prefix = 'us13'  # Extract from API key
 
         # In production, you should store these in settings or environment variables
