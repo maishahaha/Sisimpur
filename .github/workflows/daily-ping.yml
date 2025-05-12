@@ -1,0 +1,15 @@
+# Simulated daily request to your render project so that the service doesn't go down
+name: Daily render ping
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  curl-website:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run cURL on Website
+        run: curl -I https://sisimpur.onrender.com
