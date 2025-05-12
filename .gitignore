@@ -27,7 +27,6 @@ static_collected/
 
 # Environment variables
 .env
-.env.*
 
 # VS Code / IDEs
 .vscode/
