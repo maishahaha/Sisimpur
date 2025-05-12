@@ -7,11 +7,13 @@ cryptography==44.0.3
 Django==5.2
 gunicorn==23.0.0
 joblib==1.5.0
+mailchimp-marketing==3.0.80
 nltk==3.9.1
 packaging==25.0
 pdfminer.six==20250506
 pycparser==2.22
 regex==2024.11.6
+requests==2.31.0
 sqlparse==0.5.3
 tqdm==4.67.1
 tzdata==2025.2

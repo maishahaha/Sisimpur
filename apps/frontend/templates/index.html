@@ -8,18 +8,18 @@
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
     <div class="particles" id="particles"></div>
-    
+
     <!-- Main Content -->
     <div class="container py-5">
         <header class="text-center mb-5">
             <h1 class="logo">SISIMPUR</h1>
             <p class="tagline">Transform any study material into customized exam questions with AI</p>
-            
+
             <div class="typing-container d-none d-md-block mx-auto mb-4">
                 <div class="typing-text">Revolutionizing the way you prepare for exams</div>
             </div>
         </header>
-        
+
         <div class="row justify-content-center mb-5">
             <div class="col-lg-10">
                 <div class="glass-card">
@@ -27,7 +27,7 @@
                         <div class="col-lg-6 mb-4 mb-lg-0">
                             <h2 class="mb-4">Launching Soon</h2>
                             <p class="mb-4">SISIMPUR is an AI-powered platform that converts any PDF or document into customized exam-style questions for rapid and effective exam preparation.</p>
-                            
+
                             <!-- Countdown -->
                             <div class="d-flex gap-3 mb-4 countdown-container">
                                 <div class="countdown-item">
@@ -47,16 +47,18 @@
                                     <div class="countdown-label">Secs</div>
                                 </div>
                             </div>
-                            
+
                             <!-- Subscribe Form -->
                             <div class="mb-4">
-                                <form class="d-flex">
-                                    <input type="email" class="form-control me-2" placeholder="Enter your email" required>
+                                <form id="subscribe-form-1" class="d-flex subscribe-form">
+                                    {% csrf_token %}
+                                    <input type="email" name="email" class="form-control me-2" placeholder="Enter your email" required>
                                     <button type="submit" class="btn btn-glow">Notify Me</button>
                                 </form>
+                                <div class="form-response mt-2"></div>
                                 <small class="text-white mt-2">Get notified when we launch. No spam, we promise!</small>
                             </div>
-                            
+
                             <!-- Social Links -->
                             <div class="social-icons d-flex">
                                 <a href="#" class="me-2"><i class="fab fa-twitter"></i></a>
@@ -82,14 +84,14 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Features Section -->
         <div class="row mb-5">
             <div class="col-12 text-center mb-4">
                 <h2>Key Features</h2>
                 <p class="text-white">Experience the future of exam preparation</p>
             </div>
-            
+
             <div class="col-md-4 mb-4">
                 <div class="features-item">
                     <div class="features-icon">
@@ -99,7 +101,7 @@
                     <p class="feature-desc">Upload any PDF, Word or text document and instantly generate custom exam questions.</p>
                 </div>
             </div>
-            
+
             <div class="col-md-4 mb-4">
                 <div class="features-item">
                     <div class="features-icon">
@@ -109,7 +111,7 @@
                     <p class="feature-desc">Advanced AI algorithms that understand context and create relevant test questions.</p>
                 </div>
             </div>
-            
+
             <div class="col-md-4 mb-4">
                 <div class="features-item">
                     <div class="features-icon">
@@ -119,7 +121,7 @@
                     <p class="feature-desc">Quick flash mode for rapid revision when you're short on time.</p>
                 </div>
             </div>
-            
+
             <div class="col-md-4 mb-4">
                 <div class="features-item">
                     <div class="features-icon">
@@ -129,7 +131,7 @@
                     <p class="feature-desc">Choose from MCQs, one-word answers, short answers, and flashcards.</p>
                 </div>
             </div>
-            
+
             <div class="col-md-4 mb-4">
                 <div class="features-item">
                     <div class="features-icon">
@@ -139,7 +141,7 @@
                     <p class="feature-desc">Monitor your performance and identify areas that need improvement.</p>
                 </div>
             </div>
-            
+
             <div class="col-md-4 mb-4">
                 <div class="features-item">
                     <div class="features-icon">
@@ -150,25 +152,27 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Newsletter -->
         <div class="row justify-content-center mb-5">
             <div class="col-lg-8">
                 <div class="glass-card text-center">
                     <h2 class="mb-3">Join Our Waitlist</h2>
                     <p class="mb-4">Be among the first to experience SISIMPUR and revolutionize your exam preparation.</p>
-                    <form class="row g-3 justify-content-center">
+                    <form id="subscribe-form-2" class="row g-3 justify-content-center subscribe-form">
+                        {% csrf_token %}
                         <div class="col-md-8">
-                            <input type="email" class="form-control" placeholder="Your email address" required>
+                            <input type="email" name="email" class="form-control" placeholder="Your email address" required>
                         </div>
                         <div class="col-md-4">
                             <button type="submit" class="btn btn-glow w-100">Join Waitlist</button>
                         </div>
+                        <div class="col-12 form-response mt-2"></div>
                     </form>
                 </div>
             </div>
         </div>
-        
+
         <!-- Footer -->
         <footer class="footer text-center">
             <p>&copy; 2025 SISIMPUR. All rights reserved.</p>
