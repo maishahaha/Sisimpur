@@ -55,7 +55,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .blob-2 {
     bottom: 0px;
-    right: -150px;
+    right: 0px;
     width: 600px;
     height: 600px;
     background: var(--secondary);

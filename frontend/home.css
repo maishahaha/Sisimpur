@@ -710,24 +710,41 @@ footer {
 }
 
 /* Typing animation */
-.typing-demo {
-    width: 22ch;
-    animation: typing 2s steps(22), blink .5s step-end infinite alternate;
+.typing-container {
+    width: 100%;
+    max-width: 600px;
+    overflow: hidden;
+}
+
+.typing-text {
+    display: inline-block;
     white-space: nowrap;
     overflow: hidden;
     border-right: 3px solid var(--secondary);
+    animation: typing 3.5s steps(40, end),
+               blink-caret .75s step-end infinite;
     margin: 0 auto;
+    font-size: 1.2rem;
 }
 
 @keyframes typing {
-    from {
-        width: 0;
-    }
+    from { width: 0 }
+    to { width: 100% }
 }
-    
-@keyframes blink {
-    50% {
-        border-color: transparent;
+
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: var(--secondary) }
+}
+
+@media (max-width: 767px) {
+    .typing-text {
+        font-size: 1rem;
+        white-space: normal;
+        text-align: center;
+        border-right: none;
+        animation: none;
+        width: 100%;
     }
 }
 
@@ -787,5 +804,26 @@ footer {
     
     .pricing-card.highlighted:hover {
         transform: translateY(-10px);
+    }
+
+    .features-item {
+        padding: 15px;
+    }
+
+    .feature-title {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+
+    .feature-desc {
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+
+    .features-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.4rem;
+        margin-bottom: 15px;
     }
 } 
