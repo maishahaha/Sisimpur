@@ -1,0 +1,17 @@
+# Core dependencies
+numpy>=1.24.0
+Pillow>=10.0.0
+opencv-python>=4.8.0
+pytesseract>=0.3.10
+pdf2image>=1.16.3
+PyMuPDF>=1.22.5  # fitz
+
+# LLM and text processing
+google-generativeai>=0.3.0
+langchain>=0.1.0
+langchain-community>=0.0.10
+faiss-cpu>=1.7.4
+sentence-transformers>=2.2.2
+
+# Utilities
+tqdm>=4.66.1
