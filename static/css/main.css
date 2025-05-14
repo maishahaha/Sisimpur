@@ -367,11 +367,14 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Text typing animation */
 .typing-container {
-    height: 40px;
+    min-height: 40px;
     overflow: hidden;
     position: relative;
     max-width: 100%;
     padding: 0 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .typing-text {
@@ -381,6 +384,7 @@ h1, h2, h3, h4, h5, h6 {
     border-right: 3px solid var(--secondary);
     animation: typing 4s steps(47) infinite, blink 0.75s step-end infinite;
     font-size: 0.95rem;
+    text-align: center;
 }
 
 @keyframes typing {
@@ -444,11 +448,20 @@ h1, h2, h3, h4, h5, h6 {
     }
 
     .typing-container {
-        height: 35px;
+        min-height: 35px;
     }
-    
+
     .typing-text {
         font-size: 0.85rem;
+    }
+
+    @keyframes typing {
+        0%, 100% {
+            width: 0;
+        }
+        50%, 90% {
+            width: 30ch;
+        }
     }
 }
 
@@ -471,11 +484,36 @@ h1, h2, h3, h4, h5, h6 {
     }
 
     .typing-container {
-        height: 30px;
+        min-height: 60px; /* Increased height for two lines */
     }
-    
+
     .typing-text {
         font-size: 0.8rem;
+        white-space: normal; /* Allow text to wrap */
+        display: block;
+        width: 100% !important; /* Override animation width */
+        animation: blink 0.75s step-end infinite;
+        text-align: center;
+        border-right: none; /* Remove cursor on small screens */
+    }
+
+    .typing-text::after {
+        content: '|';
+        color: var(--secondary);
+        animation: blink 0.75s step-end infinite;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 400px) {
+    .typing-container {
+        min-height: 70px; /* Even more height for smaller screens */
+    }
+
+    .typing-text {
+        font-size: 0.75rem;
+        line-height: 1.4;
+        padding: 0 5px;
     }
 }
 
