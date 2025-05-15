@@ -18,8 +18,8 @@ def is_valid_email(email):
     )
     return email_validator.is_valid_check_01(email) or email_validator.is_valid_check_02(email)
 
-def index(request):
-    return render(request, 'index.html')
+def coming_soon(request):
+    return render(request, 'coming_soon.html')
 
 @csrf_exempt
 def subscribe_to_mailchimp(request):
