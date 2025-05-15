@@ -63,7 +63,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .blob-3 {
     top: 30%;
-    right: -100px;
+    right: 0px;
     width: 400px;
     height: 400px;
     background: var(--primary-light);
@@ -97,6 +97,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: 1px;
 }
@@ -183,13 +184,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .hero {
-    padding: 100px 0 50px;
+    padding-top: 20px;
+    padding-bottom: 40px;
     position: relative;
     overflow: hidden;
 }
 
 .hero-title {
-    padding-top: 20px;
     font-size: 3.5rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
@@ -199,7 +200,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .hero-title span {
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-    -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -213,7 +214,7 @@ h1, h2, h3, h4, h5, h6 {
 .hero-image-container {
     position: relative;
     padding: 20px;
-    padding-top: 50px;
+    padding-top: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -246,7 +247,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .features-section {
-    padding: 80px 0;
+    padding: 30px 0;
 }
 
 .section-title {
@@ -508,6 +509,7 @@ footer {
     font-weight: 700;
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: 1px;
     display: inline-block;
@@ -544,6 +546,7 @@ footer {
 .social-icons {
     display: flex;
     margin-top: 20px;
+    justify-content: center;
 }
 
 .social-icons a {
@@ -555,7 +558,7 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 10px;
+    margin: 0 5px;
     color: var(--light);
     transition: all 0.3s ease;
 }
@@ -572,6 +575,7 @@ footer {
     padding-top: 20px;
     font-size: 0.9rem;
     opacity: 0.7;
+    text-align: center;
 }
 
 /* Animated elements */
@@ -773,8 +777,7 @@ footer {
         font-size: 1.4rem;
         margin-bottom: 15px;
     }
-} 
-
+}
 
 .particles {
     position: fixed;
@@ -817,4 +820,46 @@ footer {
     0% { transform: translateY(0px); }
     50% { transform: translateY(-20px); }
     100% { transform: translateY(0px); }
+}
+
+@media (max-width: 767px) {
+    footer {
+        padding: 40px 0 20px;
+    }
+
+    .footer-logo {
+        font-size: 1.8rem;
+        text-align: center;
+        display: block;
+    }
+
+    .footer-links {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .footer-links h5 {
+        margin-bottom: 15px;
+    }
+
+    .footer-links ul {
+        margin-bottom: 0;
+    }
+
+    .footer-links li {
+        margin-bottom: 8px;
+    }
+
+    .social-icons {
+        margin: 20px 0;
+    }
+
+    .copyright {
+        margin-top: 30px;
+        padding-top: 15px;
+    }
+
+    .copyright p {
+        font-size: 0.8rem;
+    }
 }
