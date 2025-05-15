@@ -116,6 +116,7 @@ class ImageExtractor(BaseExtractor):
                 "Extract all text from this image. Preserve original formatting and language. "
                 "If the text is in Bengali, maintain the Bengali script. "
                 "Return only the extracted text, no additional comments."
+                "Generate questions from the text"
             )
 
         try:

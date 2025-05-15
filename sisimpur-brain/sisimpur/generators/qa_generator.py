@@ -210,7 +210,7 @@ class QAGenerator:
             except Exception as e:
                 logger.warning(f"Error with primary model, trying fallback: {e}")
                 logger.info("Sending request to fallback model")
-                response = api.generate_content(prompt, model_name=QA_GEMINI_MODEL)
+                response = api.generate_content(prompt, model_name=FALLBACK_GEMINI_MODEL)
 
             # Extract JSON from response
             json_str = response.text

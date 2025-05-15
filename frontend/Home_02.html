@@ -1,425 +1,503 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SISIMPUR - AI-Powered Exam Prep</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="home.css" rel="stylesheet">
-    <style>
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
-        .particle {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            background: rgba(0, 255, 255, 0.7); /* Vibrant cyan color with higher opacity */
-            border-radius: 50%;
-            animation: float 15s linear infinite;
-        }
-        @keyframes float {
-            0% {
-                transform: translate(0, 0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.5;
-            }
-            90% {
-                opacity: 0.5;
-            }
-            100% {
-                transform: translate(var(--tx), var(--ty));
-                opacity: 0;
-            }
-        }
-        .floating {
-            animation: floating 3s ease-in-out infinite;
-        }
-        @keyframes floating {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
-        }
-    </style>
-</head>
-<body>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link href="home.css" rel="stylesheet" />
+  </head>
+  <body>
     <!-- Background Elements -->
     <div class="bg-grid"></div>
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
     <div class="particles" id="particles"></div>
-    
+
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="#">SISIMPUR</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#features">Features</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#how-it-works">How It Works</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#pricing">Pricing</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#testimonials">Testimonials</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#faq">FAQ</a>
-                    </li>
-                    <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
-                        <a class="btn btn-glow" href="#signup">Get Started</a>
-                    </li>
-                </ul>
-            </div>
+      <div class="container">
+        <a class="navbar-brand" href="#">SISIMPUR</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#features">Features</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#how-it-works">How It Works</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#pricing">Pricing</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#testimonials">Testimonials</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#faq">FAQ</a>
+            </li>
+            <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+              <a class="btn btn-glow" href="#signup">Get Started</a>
+            </li>
+          </ul>
         </div>
+      </div>
     </nav>
-    
+
     <!-- Hero Section -->
     <section class="hero">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6 mb-5 mb-lg-0">
-                    <h1 class="hero-title">Transform Any Document Into <span>Exam Questions</span> With AI</h1>
-                    <p class="hero-subtitle">SISIMPUR converts your study materials into personalized practice tests for effective exam preparation. Upload once, practice anytime, ace your exams.</p>
-                    <div class="d-flex gap-3">
-                        <a href="#signup" class="btn btn-glow">Start For Free</a>
-                        <a href="#how-it-works" class="btn btn-outline">Learn More</a>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="hero-image-container">
-                        <img src="images/img1.png" alt="SISIMPUR Dashboard" class="hero-image floating" />
-                    </div>
-                </div>
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6 mb-5 mb-lg-0">
+            <h1 class="hero-title">
+              Transform Any Document Into <span>Exam Questions</span> With AI
+            </h1>
+            <p class="hero-subtitle">
+              SISIMPUR converts your study materials into personalized practice
+              tests for effective exam preparation. Upload once, practice
+              anytime, ace your exams.
+            </p>
+            <div class="d-flex gap-3 justify-content-center">
+              <a href="#signup" class="btn btn-glow">Start For Free</a>
+              <a href="#how-it-works" class="btn btn-outline">Learn More</a>
             </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="hero-image-container">
+              <img
+                src="images/img1.png"
+                alt="SISIMPUR Dashboard"
+                class="hero-image floating"
+              />
+            </div>
+          </div>
         </div>
+      </div>
     </section>
-    
+
     <!-- Features Section -->
     <section class="features-section py-5 my-5" id="features">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="section-title">Revolutionize Your Exam Preparation</h2>
-                <p class="section-subtitle">Our AI-powered platform offers innovative features to boost your learning experience</p>
-            </div>
-            
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-file-upload"></i>
-                        </div>
-                        <h3 class="feature-title">Upload Any Document</h3>
-                        <p>Support for PDF, Word, and plain text files up to 20MB. Simply upload your study materials and let our AI do the rest.</p>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-brain"></i>
-                        </div>
-                        <h3 class="feature-title">AI Question Generator</h3>
-                        <p>Advanced algorithms create relevant and challenging questions from your uploaded content, saving hours of manual preparation.</p>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-sliders-h"></i>
-                        </div>
-                        <h3 class="feature-title">Multiple Question Formats</h3>
-                        <p>Choose from MCQs, one-word answers, short answers, and flashcards to customize your learning experience.</p>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-trophy"></i>
-                        </div>
-                        <h3 class="feature-title">Global Leaderboard</h3>
-                        <p>Compete with peers worldwide, track your ranking, and stay motivated with our interactive leaderboard system.</p>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <h3 class="feature-title">Progress Tracking</h3>
-                        <p>Comprehensive dashboard to monitor your performance, identify strengths and weaknesses, and track improvement over time.</p>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-bolt"></i>
-                        </div>
-                        <h3 class="feature-title">10-Minute Memory Boost</h3>
-                        <p>Quick flash-style sessions for rapid revision when you're short on time. Perfect for last-minute preparation.</p>
-                    </div>
-                </div>
-            </div>
+      <div class="container">
+        <div class="text-center mb-5">
+          <h2 class="section-title">Revolutionize Your Exam Preparation</h2>
+          <p class="section-subtitle">
+            Our AI-powered platform offers innovative features to boost your
+            learning experience
+          </p>
         </div>
+
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="fas fa-file-upload"></i>
+              </div>
+              <h3 class="feature-title">Upload Any Document</h3>
+              <p>
+                Support for PDF, Word, and plain text files up to 20MB. Simply
+                upload your study materials and let our AI do the rest.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="fas fa-brain"></i>
+              </div>
+              <h3 class="feature-title">AI Question Generator</h3>
+              <p>
+                Advanced algorithms create relevant and challenging questions
+                from your uploaded content, saving hours of manual preparation.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="fas fa-sliders-h"></i>
+              </div>
+              <h3 class="feature-title">Multiple Question Formats</h3>
+              <p>
+                Choose from MCQs, one-word answers, short answers, and
+                flashcards to customize your learning experience.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="fas fa-trophy"></i>
+              </div>
+              <h3 class="feature-title">Global Leaderboard</h3>
+              <p>
+                Compete with peers worldwide, track your ranking, and stay
+                motivated with our interactive leaderboard system.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <h3 class="feature-title">Progress Tracking</h3>
+              <p>
+                Comprehensive dashboard to monitor your performance, identify
+                strengths and weaknesses, and track improvement over time.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="fas fa-bolt"></i>
+              </div>
+              <h3 class="feature-title">10-Minute Memory Boost</h3>
+              <p>
+                Quick flash-style sessions for rapid revision when you're short
+                on time. Perfect for last-minute preparation.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
-    
+
     <!-- How It Works Section -->
     <section class="how-it-works-section py-5 my-5" id="how-it-works">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="section-title">How It Works</h2>
-                <p class="section-subtitle">Get started with SISIMPUR in three simple steps</p>
-            </div>
-            
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="step-card">
-                        <div class="step-number">1</div>
-                        <h3>Upload Your Materials</h3>
-                        <p>Upload your study materials in PDF, Word, or text format. Our system accepts files up to 20MB.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="step-card">
-                        <div class="step-number">2</div>
-                        <h3>AI Processing</h3>
-                        <p>Our AI analyzes your content and generates relevant questions based on the material.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="step-card">
-                        <div class="step-number">3</div>
-                        <h3>Start Practicing</h3>
-                        <p>Begin practicing with AI-generated questions and track your progress in real-time.</p>
-                    </div>
-                </div>
-            </div>
+      <div class="container">
+        <div class="text-center mb-5">
+          <h2 class="section-title">How It Works</h2>
+          <p class="section-subtitle">
+            Get started with SISIMPUR in three simple steps
+          </p>
         </div>
+
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="step-card">
+              <div class="step-number">1</div>
+              <h3>Upload Your Materials</h3>
+              <p>
+                Upload your study materials in PDF, Word, or text format. Our
+                system accepts files up to 20MB.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="step-card">
+              <div class="step-number">2</div>
+              <h3>AI Processing</h3>
+              <p>
+                Our AI analyzes your content and generates relevant questions
+                based on the material.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="step-card">
+              <div class="step-number">3</div>
+              <h3>Start Practicing</h3>
+              <p>
+                Begin practicing with AI-generated questions and track your
+                progress in real-time.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Testimonials Section -->
     <section class="testimonials-section py-5 my-5" id="testimonials">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="section-title">What Our Users Say</h2>
-                <p class="section-subtitle">Join thousands of successful students who transformed their exam preparation</p>
-            </div>
-            
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="testimonial-card">
-                        <div class="testimonial-content">
-                            <p>"SISIMPUR helped me ace my medical entrance exam. The AI-generated questions were spot on!"</p>
-                        </div>
-                        <div class="testimonial-author">
-                            <div class="author-info">
-                                <h4>Sarah Johnson</h4>
-                                <p>Medical Student</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="testimonial-card">
-                        <div class="testimonial-content">
-                            <p>"The 10-minute memory boost feature is a game-changer for quick revision before exams."</p>
-                        </div>
-                        <div class="testimonial-author">
-                            <div class="author-info">
-                                <h4>Michael Chen</h4>
-                                <p>Engineering Student</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="testimonial-card">
-                        <div class="testimonial-content">
-                            <p>"The progress tracking feature helped me identify my weak areas and improve significantly."</p>
-                        </div>
-                        <div class="testimonial-author">
-                            <div class="author-info">
-                                <h4>Emma Davis</h4>
-                                <p>Law Student</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <div class="container">
+        <div class="text-center mb-5">
+          <h2 class="section-title">What Our Users Say</h2>
+          <p class="section-subtitle">
+            Join thousands of successful students who transformed their exam
+            preparation
+          </p>
         </div>
+
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="testimonial-card">
+              <div class="testimonial-content">
+                <p>
+                  "SISIMPUR helped me ace my medical entrance exam. The
+                  AI-generated questions were spot on!"
+                </p>
+              </div>
+              <div class="testimonial-author">
+                <div class="author-info">
+                  <h4>Sarah Johnson</h4>
+                  <p>Medical Student</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="testimonial-card">
+              <div class="testimonial-content">
+                <p>
+                  "The 10-minute memory boost feature is a game-changer for
+                  quick revision before exams."
+                </p>
+              </div>
+              <div class="testimonial-author">
+                <div class="author-info">
+                  <h4>Michael Chen</h4>
+                  <p>Engineering Student</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="testimonial-card">
+              <div class="testimonial-content">
+                <p>
+                  "The progress tracking feature helped me identify my weak
+                  areas and improve significantly."
+                </p>
+              </div>
+              <div class="testimonial-author">
+                <div class="author-info">
+                  <h4>Emma Davis</h4>
+                  <p>Law Student</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- FAQ Section -->
     <section class="faq-section py-5 my-5" id="faq">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="section-title text-white">Frequently Asked Questions</h2>
-                <p class="section-subtitle text-white">Find answers to common questions about SISIMPUR</p>
-            </div>
-            
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="accordion" id="faqAccordion">
-                        <div class="accordion-item">
-                            <h3 class="accordion-header">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                    How accurate are the AI-generated questions?
-                                </button>
-                            </h3>
-                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-white">
-                                    Our AI has been trained on millions of exam questions and academic content to generate highly accurate and relevant questions. The system continuously learns and improves based on user feedback.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item">
-                            <h3 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                    What file formats are supported?
-                                </button>
-                            </h3>
-                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-white">
-                                    We support PDF, Word documents (.doc, .docx), and plain text files (.txt). Files must be under 20MB in size.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item">
-                            <h3 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                    Can I cancel my subscription anytime?
-                                </button>
-                            </h3>
-                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-white">
-                                    Yes, you can cancel your subscription at any time. You'll continue to have access to premium features until the end of your billing period.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <div class="container">
+        <div class="text-center mb-5">
+          <h2 class="section-title text-white">Frequently Asked Questions</h2>
+          <p class="section-subtitle text-white">
+            Find answers to common questions about SISIMPUR
+          </p>
         </div>
+
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            <div class="accordion" id="faqAccordion">
+              <div class="accordion-item">
+                <h3 class="accordion-header">
+                  <button
+                    class="accordion-button"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#faq1"
+                  >
+                    How accurate are the AI-generated questions?
+                  </button>
+                </h3>
+                <div
+                  id="faq1"
+                  class="accordion-collapse collapse show"
+                  data-bs-parent="#faqAccordion"
+                >
+                  <div class="accordion-body text-white">
+                    Our AI has been trained on millions of exam questions and
+                    academic content to generate highly accurate and relevant
+                    questions. The system continuously learns and improves based
+                    on user feedback.
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h3 class="accordion-header">
+                  <button
+                    class="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#faq2"
+                  >
+                    What file formats are supported?
+                  </button>
+                </h3>
+                <div
+                  id="faq2"
+                  class="accordion-collapse collapse"
+                  data-bs-parent="#faqAccordion"
+                >
+                  <div class="accordion-body text-white">
+                    We support PDF, Word documents (.doc, .docx), and plain text
+                    files (.txt). Files must be under 20MB in size.
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h3 class="accordion-header">
+                  <button
+                    class="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#faq3"
+                  >
+                    Can I cancel my subscription anytime?
+                  </button>
+                </h3>
+                <div
+                  id="faq3"
+                  class="accordion-collapse collapse"
+                  data-bs-parent="#faqAccordion"
+                >
+                  <div class="accordion-body text-white">
+                    Yes, you can cancel your subscription at any time. You'll
+                    continue to have access to premium features until the end of
+                    your billing period.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Call to Action Section -->
     <section class="cta-section py-5 my-5" id="signup">
-        <div class="container">
-            <div class="cta-content text-center">
-                <h2>Ready to Transform Your Exam Preparation?</h2>
-                <p>Join thousands of students who are already using SISIMPUR to ace their exams</p>
-                <div class="cta-buttons">
-                    <a href="#signup" class="btn btn-glow btn-lg">Get Started</a>
-                </div>
-            </div>
+      <div class="container">
+        <div class="cta-content text-center">
+          <h2>Ready to Transform Your Exam Preparation?</h2>
+          <p>
+            Join thousands of students who are already using SISIMPUR to ace
+            their exams
+          </p>
+          <div class="cta-buttons">
+            <a href="#signup" class="btn btn-glow btn-lg">Get Started</a>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- Footer -->
     <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4 mb-lg-0">
-                    <div class="footer-logo">SISIMPUR</div>
-                    <p class="text-light opacity-75">Empowering students with AI-driven exam preparation tools to achieve academic excellence.</p>
-                    <div class="social-icons">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 mb-4 mb-md-0">
-                    <div class="footer-links">
-                        <h5>Product</h5>
-                        <ul>
-                            <li><a href="#features">Features</a></li>
-                            <li><a href="#pricing">Pricing</a></li>
-                            <li><a href="#testimonials">Testimonials</a></li>
-                            <li><a href="#faq">FAQ</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 mb-4 mb-md-0">
-                    <div class="footer-links">
-                        <h5>Company</h5>
-                        <ul>
-                            <li><a href="#">About Us</a></li>
-                            <li><a href="#">Careers</a></li>
-                            <li><a href="#">Blog</a></li>
-                            <li><a href="#">Contact</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-4">
-                    <div class="footer-links">
-                        <h5>Newsletter</h5>
-                        <p class="text-light opacity-75">Subscribe to get updates on new features and learning tips.</p>
-                        <form class="mt-3">
-                            <div class="input-group">
-                                <input type="email" class="form-control" placeholder="Enter your email">
-                                <button class="btn btn-glow" type="submit">Subscribe</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4 mb-4 mb-lg-0 text-center">
+            <div class="footer-logo">SISIMPUR</div>
+            <p class="text-light opacity-75">
+              Empowering students with AI-driven exam preparation tools to
+              achieve academic excellence.
+            </p>
+            <div class="social-icons">
+              <a href="#"><i class="fab fa-facebook-f"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-linkedin-in"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
             </div>
-            <div class="copyright text-center">
-                <p>&copy; 2024 SISIMPUR. All rights reserved. | <a href="#" class="text-light opacity-75">Privacy Policy</a> | <a href="#" class="text-light opacity-75">Terms of Service</a></p>
+          </div>
+          <div class="col-lg-2 col-md-4 mb-4 mb-md-0">
+            <div class="footer-links">
+              <h5>Product</h5>
+              <ul>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#testimonials">Testimonials</a></li>
+                <li><a href="#faq">FAQ</a></li>
+              </ul>
             </div>
+          </div>
+          <div class="col-lg-2 col-md-4 mb-4 mb-md-0">
+            <div class="footer-links">
+              <h5>Company</h5>
+              <ul>
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">Careers</a></li>
+                <li><a href="#">Blog</a></li>
+                <li><a href="#">Contact</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-4">
+            <div class="footer-links">
+              <h5>Newsletter</h5>
+              <p class="text-light opacity-75">
+                Subscribe to get updates on new features and learning tips.
+              </p>
+              <form class="mt-3">
+                <div class="input-group">
+                  <input
+                    type="email"
+                    class="form-control"
+                    placeholder="Enter your email"
+                  />
+                  <button class="btn btn-glow" type="submit">Subscribe</button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
+        <div class="copyright text-center">
+          <p>
+            &copy; 2024 SISIMPUR. All rights reserved. |
+            <a href="#" class="text-light opacity-75">Privacy Policy</a> |
+            <a href="#" class="text-light opacity-75">Terms of Service</a>
+          </p>
+        </div>
+      </div>
     </footer>
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Random particle animation
-        const particlesContainer = document.getElementById('particles');
-        for (let i = 0; i < 50; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            
-            // Random starting position
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.top = Math.random() * 100 + '%';
-            
-            // Random movement direction
-            const tx = (Math.random() - 0.5) * 200; // Random X movement (-100px to 100px)
-            const ty = (Math.random() - 0.5) * 200; // Random Y movement (-100px to 100px)
-            particle.style.setProperty('--tx', `${tx}px`);
-            particle.style.setProperty('--ty', `${ty}px`);
-            
-            // Random duration and delay
-            particle.style.animationDuration = (Math.random() * 5 + 3) + 's'; // Faster movement (3-8 seconds)
-            particle.style.animationDelay = Math.random() * 2 + 's'; // Shorter delay (0-2 seconds)
-            
-            particlesContainer.appendChild(particle);
-        }
+      // Random particle animation
+      const particlesContainer = document.getElementById("particles");
+      for (let i = 0; i < 50; i++) {
+        const particle = document.createElement("div");
+        particle.className = "particle";
+
+        // Random starting position
+        particle.style.left = Math.random() * 100 + "%";
+        particle.style.top = Math.random() * 100 + "%";
+
+        // Random movement direction
+        const tx = (Math.random() - 0.5) * 200; // Random X movement (-100px to 100px)
+        const ty = (Math.random() - 0.5) * 200; // Random Y movement (-100px to 100px)
+        particle.style.setProperty("--tx", `${tx}px`);
+        particle.style.setProperty("--ty", `${ty}px`);
+
+        // Random duration and delay
+        particle.style.animationDuration = Math.random() * 5 + 3 + "s"; // Faster movement (3-8 seconds)
+        particle.style.animationDelay = Math.random() * 2 + "s"; // Shorter delay (0-2 seconds)
+
+        particlesContainer.appendChild(particle);
+      }
     </script>
-</body>
+  </body>
 </html>

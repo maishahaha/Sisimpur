@@ -1,6 +1,6 @@
 {
-  "source_document": "test_data\\physics_bangla.pdf",
-  "generated_at": "2025-05-14T04:31:05.855186",
+  "source_document": "/home/lucifer-morningstar/Sisimpur/Sisimpur/sisimpur-brain/test_data/physics_bangla.pdf",
+  "generated_at": "2025-05-15T22:21:05.581975",
   "questions": [
     {
       "question": "In what year was it discovered that the nucleus is fissionable?",
@@ -28,19 +28,19 @@
       "options": [
         {
           "label": "A",
-          "text": "Graph A"
+          "text": "Graph A (Not provided in text, needs image)"
         },
         {
           "label": "B",
-          "text": "Graph B"
+          "text": "Graph B (Not provided in text, needs image)"
         },
         {
           "label": "C",
-          "text": "Graph C"
+          "text": "Graph C (Not provided in text, needs image)"
         },
         {
           "label": "D",
-          "text": "Graph D"
+          "text": "Graph D (Not provided in text, needs image)"
         }
       ]
     },
@@ -95,41 +95,20 @@
         },
         {
           "label": "B",
+          "text": "ML⁻¹T⁻²"
+        },
+        {
+          "label": "C",
           "text": "ML⁻³"
         },
         {
-          "label": "C",
-          "text": "ML⁻³T⁻¹"
-        },
-        {
           "label": "D",
-          "text": "ML⁻¹T⁻²"
+          "text": "ML⁻²T⁻²"
         }
       ]
     },
     {
-      "question": "If 1520J of heat is required to raise the temperature of a 5 × 10² kg object from 20°C to 100°C, what is the specific heat of the object?",
-      "options": [
-        {
-          "label": "A",
-          "text": "308 Jkg⁻¹K⁻¹"
-        },
-        {
-          "label": "B",
-          "text": "380 Jkg⁻¹K⁻¹"
-        },
-        {
-          "label": "C",
-          "text": "380 Jkg"
-        },
-        {
-          "label": "D",
-          "text": "380 Jk⁻¹"
-        }
-      ]
-    },
-    {
-      "question": "Which relationship is correct if frequency is f and period is T?",
+      "question": "If the frequency is f and the period is T, which of the following relationships is correct?",
       "options": [
         {
           "label": "A",
@@ -141,7 +120,7 @@
         },
         {
           "label": "C",
-          "text": "f = 1/T"
+          "text": "f = T⁻¹"
         },
         {
           "label": "D",
@@ -150,7 +129,7 @@
       ]
     },
     {
-      "question": "At what position in front of a concave mirror will the magnification m = 1?",
+      "question": "At what position in front of a concave mirror should an object be placed so that the magnification m = 1?",
       "options": [
         {
           "label": "A",
@@ -171,7 +150,7 @@
       ]
     },
     {
-      "question": "What type of lens is used for myopia?",
+      "question": "What type of lens is used in the case of myopia?",
       "options": [
         {
           "label": "A",
@@ -192,44 +171,65 @@
       ]
     },
     {
-      "question": "If the magnitude of each of two charges and the distance between them are tripled, what will be the change in the force between them?",
+      "question": "If the amount of each of two charges and the distance between them are tripled, what change will occur in the force between them?",
       "options": [
         {
           "label": "A",
-          "text": "Triple"
+          "text": "It will be tripled"
         },
         {
           "label": "B",
-          "text": "One-third"
+          "text": "It will be one-third"
         },
         {
           "label": "C",
-          "text": "Nine times"
+          "text": "It will be nine times"
         },
         {
           "label": "D",
-          "text": "Unchanged"
+          "text": "It will remain unchanged"
         }
       ]
     },
     {
-      "question": "What is the abbreviated form of electrocardiogram?",
+      "question": "A 220V bulb has a filament resistance of 660Ω. What is the current flowing through the bulb?",
       "options": [
         {
           "label": "A",
-          "text": "X-ray"
+          "text": "3A"
         },
         {
           "label": "B",
-          "text": "ECG"
+          "text": "2A"
         },
         {
           "label": "C",
-          "text": "MRI"
+          "text": "0.33A"
         },
         {
           "label": "D",
-          "text": "Ultrasonography"
+          "text": "0.22A"
+        }
+      ]
+    },
+    {
+      "question": "The mass of which particle is 9.11 × 10⁻³¹ kg?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Alpha particle"
+        },
+        {
+          "label": "B",
+          "text": "Gamma particle"
+        },
+        {
+          "label": "C",
+          "text": "Beta particle"
+        },
+        {
+          "label": "D",
+          "text": "Radioactive ray"
         }
       ]
     }

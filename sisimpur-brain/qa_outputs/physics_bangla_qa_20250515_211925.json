@@ -1,0 +1,1035 @@
+{
+  "source_document": "/home/lucifer-morningstar/Sisimpur/Sisimpur/sisimpur-brain/test_data/physics_bangla.pdf",
+  "generated_at": "2025-05-15T21:19:25.397290",
+  "questions": [
+    {
+      "question": "In what year was it discovered that the nucleus is fissionable?",
+      "options": [
+        {
+          "label": "A",
+          "text": "1918"
+        },
+        {
+          "label": "B",
+          "text": "1938"
+        },
+        {
+          "label": "C",
+          "text": "1958"
+        },
+        {
+          "label": "D",
+          "text": "1968"
+        }
+      ]
+    },
+    {
+      "question": "Which of the following distance-time graphs indicates uniform velocity?",
+      "options": [
+        {
+          "label": "A",
+          "text": ""
+        },
+        {
+          "label": "B",
+          "text": ""
+        },
+        {
+          "label": "C",
+          "text": ""
+        },
+        {
+          "label": "D",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "question": "What is the dimension of weight?",
+      "options": [
+        {
+          "label": "A",
+          "text": "MLT⁻¹"
+        },
+        {
+          "label": "B",
+          "text": "MLT⁻²"
+        },
+        {
+          "label": "C",
+          "text": "ML²T⁻¹"
+        },
+        {
+          "label": "D",
+          "text": "ML²T⁻²"
+        }
+      ]
+    },
+    {
+      "question": "Which country generates electricity from tides?",
+      "options": [
+        {
+          "label": "A",
+          "text": "France"
+        },
+        {
+          "label": "B",
+          "text": "Germany"
+        },
+        {
+          "label": "C",
+          "text": "USA"
+        },
+        {
+          "label": "D",
+          "text": "UK"
+        }
+      ]
+    },
+    {
+      "question": "Which is the dimension of pressure?",
+      "options": [
+        {
+          "label": "A",
+          "text": "ML⁻¹T⁻²"
+        },
+        {
+          "label": "B",
+          "text": "ML⁻³T⁻²"
+        },
+        {
+          "label": "C",
+          "text": "ML⁻¹T⁻¹"
+        },
+        {
+          "label": "D",
+          "text": "ML⁻³"
+        }
+      ]
+    },
+    {
+      "question": "1520J of heat is required to raise the temperature of a 5 × 10² kg mass from 20°C to 100°C. What is the specific heat of the object?",
+      "options": [
+        {
+          "label": "A",
+          "text": "308 Jkg⁻¹K⁻¹"
+        },
+        {
+          "label": "B",
+          "text": "340 Jkg⁻¹K⁻¹"
+        },
+        {
+          "label": "C",
+          "text": "380 Jkg⁻¹"
+        },
+        {
+          "label": "D",
+          "text": "380 Jk⁻¹"
+        }
+      ]
+    },
+    {
+      "question": "If frequency is f and time period is T, which of the following relations is correct?",
+      "options": [
+        {
+          "label": "A",
+          "text": "fT = 1"
+        },
+        {
+          "label": "B",
+          "text": "f = T⁻¹"
+        },
+        {
+          "label": "C",
+          "text": "f = T²"
+        },
+        {
+          "label": "D",
+          "text": "fT⁻¹ = 1"
+        }
+      ]
+    },
+    {
+      "question": "At what position in front of a concave mirror should the object be placed to have magnification m = 1?",
+      "options": [
+        {
+          "label": "A",
+          "text": "At point F"
+        },
+        {
+          "label": "B",
+          "text": "At point C"
+        },
+        {
+          "label": "C",
+          "text": "Between C and F"
+        },
+        {
+          "label": "D",
+          "text": "Between F and P"
+        }
+      ]
+    },
+    {
+      "question": "What type of lens is used in the case of myopia?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Concave"
+        },
+        {
+          "label": "B",
+          "text": "Convex"
+        },
+        {
+          "label": "C",
+          "text": "Plane"
+        },
+        {
+          "label": "D",
+          "text": "Plano-concave"
+        }
+      ]
+    },
+    {
+      "question": "If the amount and distance between two charges are tripled, what will be the change in the force between them?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Triple"
+        },
+        {
+          "label": "B",
+          "text": "One-third"
+        },
+        {
+          "label": "C",
+          "text": "Nine times"
+        },
+        {
+          "label": "D",
+          "text": "Unchanged"
+        }
+      ]
+    },
+    {
+      "question": "At a given temperature, if the length of a conductor of a specific material remains constant, the resistance of the conductor is-",
+      "options": [
+        {
+          "label": "A",
+          "text": "directly proportional to"
+        },
+        {
+          "label": "B",
+          "text": "inversely proportional to the square of"
+        },
+        {
+          "label": "C",
+          "text": "inversely proportional to"
+        },
+        {
+          "label": "D",
+          "text": "directly proportional to the square of"
+        }
+      ]
+    },
+    {
+      "question": "How many types of generators are there?",
+      "options": [
+        {
+          "label": "A",
+          "text": "1"
+        },
+        {
+          "label": "B",
+          "text": "2"
+        },
+        {
+          "label": "C",
+          "text": "3"
+        },
+        {
+          "label": "D",
+          "text": "4"
+        }
+      ]
+    },
+    {
+      "question": "9.11 × 10⁻³¹ kg is the mass of which particle?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Alpha particle"
+        },
+        {
+          "label": "B",
+          "text": "Gamma particle"
+        },
+        {
+          "label": "C",
+          "text": "Beta particle"
+        },
+        {
+          "label": "D",
+          "text": "Radioactive ray"
+        }
+      ]
+    },
+    {
+      "question": "What is the abbreviation of electrocardiogram?",
+      "options": [
+        {
+          "label": "A",
+          "text": "X-ray"
+        },
+        {
+          "label": "B",
+          "text": "ECG"
+        },
+        {
+          "label": "C",
+          "text": "MRI"
+        },
+        {
+          "label": "D",
+          "text": "Ultrasonography"
+        }
+      ]
+    },
+    {
+      "question": "A freely falling object-",
+      "options": [
+        {
+          "label": "A",
+          "text": "covers equal distance in equal time"
+        },
+        {
+          "label": "B",
+          "text": "depends on mass"
+        },
+        {
+          "label": "C",
+          "text": "velocity is directly proportional to time"
+        },
+        {
+          "label": "D",
+          "text": "Answer i & ii"
+        }
+      ]
+    },
+    {
+      "question": "The unit Nm⁻² is applicable-",
+      "options": [
+        {
+          "label": "A",
+          "text": "in case of pressure"
+        },
+        {
+          "label": "B",
+          "text": "in case of stress"
+        },
+        {
+          "label": "C",
+          "text": "in case of elastic modulus"
+        },
+        {
+          "label": "D",
+          "text": "Answer i & ii"
+        }
+      ]
+    },
+    {
+      "question": "The heat capacity of an object depends on the object's",
+      "options": [
+        {
+          "label": "A",
+          "text": "material"
+        },
+        {
+          "label": "B",
+          "text": "amount of substance"
+        },
+        {
+          "label": "C",
+          "text": "surrounding environment"
+        },
+        {
+          "label": "D",
+          "text": "Answer i & ii"
+        }
+      ]
+    },
+    {
+      "question": "The image formed in a plane mirror-",
+      "options": [
+        {
+          "label": "A",
+          "text": "is equal in size to the object"
+        },
+        {
+          "label": "B",
+          "text": "can be formed on a screen"
+        },
+        {
+          "label": "C",
+          "text": "is formed at a distance equal to the distance of the object from the mirror"
+        },
+        {
+          "label": "D",
+          "text": "Answer i & ii"
+        }
+      ]
+    },
+    {
+      "question": "The focal length of a convex lens is 20 cm. If an object is placed 25 cm in front of the lens, the image formed by the lens will be-",
+      "options": [
+        {
+          "label": "A",
+          "text": "virtual"
+        },
+        {
+          "label": "B",
+          "text": "inverted"
+        },
+        {
+          "label": "C",
+          "text": "magnified"
+        },
+        {
+          "label": "D",
+          "text": "Answer i & ii"
+        }
+      ]
+    },
+    {
+      "question": "When multiple electric cells are connected in series in a circuit-",
+      "options": [
+        {
+          "label": "A",
+          "text": "electric current increases"
+        },
+        {
+          "label": "B",
+          "text": "voltage increases"
+        },
+        {
+          "label": "C",
+          "text": "electric current decreases"
+        },
+        {
+          "label": "D",
+          "text": "Answer i & ii"
+        }
+      ]
+    },
+    {
+      "question": "In the case of a step-down transformer-",
+      "options": [
+        {
+          "label": "A",
+          "text": "ns < np"
+        },
+        {
+          "label": "B",
+          "text": "Ip > Is"
+        },
+        {
+          "label": "C",
+          "text": "Es > Ep"
+        },
+        {
+          "label": "D",
+          "text": "Answer i & ii"
+        }
+      ]
+    },
+    {
+      "question": "What will be the shape of the image of the object OA?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Magnified"
+        },
+        {
+          "label": "B",
+          "text": "Highly magnified"
+        },
+        {
+          "label": "C",
+          "text": "Diminished"
+        },
+        {
+          "label": "D",
+          "text": "Highly diminished"
+        }
+      ]
+    },
+    {
+      "question": "Where will the image of the object OA be located?",
+      "options": [
+        {
+          "label": "A",
+          "text": "At infinite distance"
+        },
+        {
+          "label": "B",
+          "text": "Between focus and pole"
+        },
+        {
+          "label": "C",
+          "text": "At principal focus"
+        },
+        {
+          "label": "D",
+          "text": "At center of curvature"
+        }
+      ]
+    },
+    {
+      "question": "What amount of current will flow through the bulb?",
+      "options": [
+        {
+          "label": "A",
+          "text": "3A"
+        },
+        {
+          "label": "B",
+          "text": "2A"
+        },
+        {
+          "label": "C",
+          "text": "0.33A"
+        },
+        {
+          "label": "D",
+          "text": "0.22A"
+        }
+      ]
+    },
+    {
+      "question": "If the resistance of the filament is halved, what will be the current?",
+      "options": [
+        {
+          "label": "A",
+          "text": "1 times"
+        },
+        {
+          "label": "B",
+          "text": "3 times"
+        },
+        {
+          "label": "C",
+          "text": "2 times"
+        },
+        {
+          "label": "D",
+          "text": "2 times"
+        }
+      ]
+    },
+    {
+      "question": "Which device uses X-ray?",
+      "options": [
+        {
+          "label": "A",
+          "text": "MRI"
+        },
+        {
+          "label": "B",
+          "text": "CT Scan"
+        },
+        {
+          "label": "C",
+          "text": "ETT"
+        },
+        {
+          "label": "D",
+          "text": "ECG"
+        }
+      ]
+    },
+    {
+      "question": "What is the range of frequency of sound used in ultrasonography?",
+      "options": [
+        {
+          "label": "A",
+          "text": "1-5 MHz"
+        },
+        {
+          "label": "B",
+          "text": "1-10 MHz"
+        },
+        {
+          "label": "C",
+          "text": "5-10 MHz"
+        },
+        {
+          "label": "D",
+          "text": "5-15 MHz"
+        }
+      ]
+    },
+    {
+      "question": "Digital signal is i. Audio video voltage ii. Binary code iii. Specific value Which one is correct?",
+      "options": [
+        {
+          "label": "A",
+          "text": "i & ii"
+        },
+        {
+          "label": "B",
+          "text": "i & iii"
+        },
+        {
+          "label": "C",
+          "text": "ii & iii"
+        },
+        {
+          "label": "D",
+          "text": "i, ii & iii"
+        }
+      ]
+    },
+    {
+      "question": "What is the voltage between A and B?",
+      "options": [
+        {
+          "label": "A",
+          "text": "2V"
+        },
+        {
+          "label": "B",
+          "text": "3V"
+        },
+        {
+          "label": "C",
+          "text": "4V"
+        },
+        {
+          "label": "D",
+          "text": "6V"
+        }
+      ]
+    },
+    {
+      "question": "In the current of the circuit of the stimulus- i. I=I₁ = I₂ ii. I₁ = I₂ iii. I > I₁ Which one is correct?",
+      "options": [
+        {
+          "label": "A",
+          "text": "i"
+        },
+        {
+          "label": "B",
+          "text": "i & iii"
+        },
+        {
+          "label": "C",
+          "text": "ii & iii"
+        },
+        {
+          "label": "D",
+          "text": "i, ii & iii"
+        }
+      ]
+    },
+    {
+      "question": "If the critical angle of glass with respect to air is 45°, what is the refractive index of glass?",
+      "options": [
+        {
+          "label": "A",
+          "text": "√2"
+        },
+        {
+          "label": "B",
+          "text": "1/√2"
+        },
+        {
+          "label": "C",
+          "text": "1"
+        },
+        {
+          "label": "D",
+          "text": "1/2"
+        }
+      ]
+    },
+    {
+      "question": "Which scientist used the Edison effect to invent the vacuum tube?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Becquerel"
+        },
+        {
+          "label": "B",
+          "text": "Newton"
+        },
+        {
+          "label": "C",
+          "text": "Madam Curie"
+        },
+        {
+          "label": "D",
+          "text": "Fleming"
+        }
+      ]
+    },
+    {
+      "question": "Which one is based on the principle of electromagnetic effect of electricity?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Electric motor"
+        },
+        {
+          "label": "B",
+          "text": "Transformer"
+        },
+        {
+          "label": "C",
+          "text": "Generator"
+        },
+        {
+          "label": "D",
+          "text": "Amplifier"
+        }
+      ]
+    },
+    {
+      "question": "The current in the primary and secondary coils of a transformer are 10 A and 2A respectively. If the voltage in the primary coil is 220 V, what is the voltage in the secondary coil?",
+      "options": [
+        {
+          "label": "A",
+          "text": "40 V"
+        },
+        {
+          "label": "B",
+          "text": "100 V"
+        },
+        {
+          "label": "C",
+          "text": "500 V"
+        },
+        {
+          "label": "D",
+          "text": "1000 V"
+        }
+      ]
+    },
+    {
+      "question": "How many types of inks are used for color printing?",
+      "options": [
+        {
+          "label": "A",
+          "text": "1"
+        },
+        {
+          "label": "B",
+          "text": "2"
+        },
+        {
+          "label": "C",
+          "text": "3"
+        },
+        {
+          "label": "D",
+          "text": "4"
+        }
+      ]
+    },
+    {
+      "question": "What is the intensity of the electric field at a point 5C from 50 cm?",
+      "options": [
+        {
+          "label": "A",
+          "text": "1.8 × 10¹¹ NC⁻¹"
+        },
+        {
+          "label": "B",
+          "text": "2.5 × 10⁻¹¹ NC⁻¹"
+        },
+        {
+          "label": "C",
+          "text": "1.8 × 10⁹ NC⁻¹"
+        },
+        {
+          "label": "D",
+          "text": "1.2 × 10⁹ NC⁻¹"
+        }
+      ]
+    },
+    {
+      "question": "How much heat is needed to increase the temperature of 10g of water by 1K?",
+      "options": [
+        {
+          "label": "A",
+          "text": "42 J"
+        },
+        {
+          "label": "B",
+          "text": "4.2 x 10³ J"
+        },
+        {
+          "label": "C",
+          "text": "4.2 x 10¹ J"
+        },
+        {
+          "label": "D",
+          "text": "4.2 x 10² J"
+        }
+      ]
+    },
+    {
+      "question": "What happens to the melting point of wax when pressure increases?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Decreases"
+        },
+        {
+          "label": "B",
+          "text": "Increases"
+        },
+        {
+          "label": "C",
+          "text": "Remains unchanged"
+        },
+        {
+          "label": "D",
+          "text": "Does not depend on pressure"
+        }
+      ]
+    },
+    {
+      "question": "What is the volume of a circle with a radius of 2 m?",
+      "options": [
+        {
+          "label": "A",
+          "text": "8π"
+        },
+        {
+          "label": "B",
+          "text": "6π"
+        },
+        {
+          "label": "C",
+          "text": "8π"
+        },
+        {
+          "label": "D",
+          "text": "32π/3"
+        }
+      ]
+    },
+    {
+      "question": "One teragram is equal to how many grams?",
+      "options": [
+        {
+          "label": "A",
+          "text": "10⁹"
+        },
+        {
+          "label": "B",
+          "text": "10¹¹"
+        },
+        {
+          "label": "C",
+          "text": "10¹²"
+        },
+        {
+          "label": "D",
+          "text": "10¹⁵"
+        }
+      ]
+    },
+    {
+      "question": "Which is a vector quantity?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Speed"
+        },
+        {
+          "label": "B",
+          "text": "Electric intensity"
+        },
+        {
+          "label": "C",
+          "text": "Work"
+        },
+        {
+          "label": "D",
+          "text": "Temperature"
+        }
+      ]
+    },
+    {
+      "question": "Energy loss occurs due to which?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Friction"
+        },
+        {
+          "label": "B",
+          "text": "Ball"
+        },
+        {
+          "label": "C",
+          "text": "Gravitational acceleration"
+        },
+        {
+          "label": "D",
+          "text": "Mass"
+        }
+      ]
+    },
+    {
+      "question": "Which is the correct relationship between the kinetic energy and momentum of an object?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Ek = P²/2m"
+        },
+        {
+          "label": "B",
+          "text": "Ek = 2P²/m"
+        },
+        {
+          "label": "C",
+          "text": "Ek = 2m²/P²"
+        },
+        {
+          "label": "D",
+          "text": "Ek = m²/2P²"
+        }
+      ]
+    },
+    {
+      "question": "What is the atmospheric pressure at the peak of Mount Everest?",
+      "options": [
+        {
+          "label": "A",
+          "text": "10⁵ cm mercury pressure"
+        },
+        {
+          "label": "B",
+          "text": "76 cm mercury pressure"
+        },
+        {
+          "label": "C",
+          "text": "30 cm mercury pressure"
+        },
+        {
+          "label": "D",
+          "text": "22.8 cm mercury pressure"
+        }
+      ]
+    },
+    {
+      "question": "In which of the following is a convex mirror used?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Radar"
+        },
+        {
+          "label": "B",
+          "text": "Car"
+        },
+        {
+          "label": "C",
+          "text": "Torchlight"
+        },
+        {
+          "label": "D",
+          "text": "Solar furnace"
+        }
+      ]
+    },
+    {
+      "question": "How many secondary axes are there in a spherical mirror?",
+      "options": [
+        {
+          "label": "A",
+          "text": "1"
+        },
+        {
+          "label": "B",
+          "text": "2"
+        },
+        {
+          "label": "C",
+          "text": "3"
+        },
+        {
+          "label": "D",
+          "text": "Infinite"
+        }
+      ]
+    },
+    {
+      "question": "What is the minimum distance required to hear the echo of sound at 40°C?",
+      "options": [
+        {
+          "label": "A",
+          "text": "17.8 m"
+        },
+        {
+          "label": "B",
+          "text": "17.6 m"
+        },
+        {
+          "label": "C",
+          "text": "17.4 m"
+        },
+        {
+          "label": "D",
+          "text": "16.6 m"
+        }
+      ]
+    },
+    {
+      "question": "What is the characteristic of a musical sound?",
+      "options": [
+        {
+          "label": "A",
+          "text": "Speed of sound"
+        },
+        {
+          "label": "B",
+          "text": "Sharpness of sound"
+        },
+        {
+          "label": "C",
+          "text": "Frequency of sound"
+        },
+        {
+          "label": "D",
+          "text": "Wavelength of sound"
+        }
+      ]
+    },
+    {
+      "question": "If the volume of an object is 0.5 m³ and its mass is 10 kg, what is the density of the object?",
+      "options": [
+        {
+          "label": "A",
+          "text": "20 kgm⁻³"
+        },
+        {
+          "label": "B",
+          "text": "0.05 kgm⁻³"
+        },
+        {
+          "label": "C",
+          "text": "0.005 kgm⁻³"
+        },
+        {
+          "label": "D",
+          "text": "5 kgm⁻³"
+        }
+      ]
+    }
+  ]
+}
