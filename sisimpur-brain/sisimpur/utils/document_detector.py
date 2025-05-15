@@ -219,6 +219,8 @@ def detect_document_type(file_path: str) -> Dict[str, Any]:
         metadata["doc_type"] = "image"
 
         # Attempt to detect language (Bengali vs English)
+
+        # Need More fine tuning here
         try:
             img = Image.open(file_path)
             # Use pytesseract to detect script
