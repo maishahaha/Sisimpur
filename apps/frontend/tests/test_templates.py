@@ -26,9 +26,9 @@ class TemplateTest(TestCase):
         
     def test_index_template_extends_base(self):
         """Test that the index template extends the base template"""
-        rendered = render_to_string('index.html')
+        rendered = render_to_string('coming_soon.html')
         
-        # Check for content specific to index.html
+        # Check for content specific to coming_soon.html
         self.assertIn('SISIMPUR', rendered)
         self.assertIn('Launching Soon', rendered)
         self.assertIn('Key Features', rendered)
