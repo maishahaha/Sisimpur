@@ -370,6 +370,8 @@ h1, h2, h3, h4, h5, h6 {
     height: 40px;
     overflow: hidden;
     position: relative;
+    max-width: 100%;
+    padding: 0 15px;
 }
 
 .typing-text {
@@ -378,6 +380,7 @@ h1, h2, h3, h4, h5, h6 {
     white-space: nowrap;
     border-right: 3px solid var(--secondary);
     animation: typing 4s steps(47) infinite, blink 0.75s step-end infinite;
+    font-size: 0.95rem;
 }
 
 @keyframes typing {
@@ -439,6 +442,14 @@ h1, h2, h3, h4, h5, h6 {
     .features-item {
         margin-bottom: 20px;
     }
+
+    .typing-container {
+        height: 35px;
+    }
+    
+    .typing-text {
+        font-size: 0.85rem;
+    }
 }
 
 @media (max-width: 576px) {
@@ -457,6 +468,18 @@ h1, h2, h3, h4, h5, h6 {
 
     .countdown-number {
         font-size: 1.3rem;
+    }
+
+    .typing-container {
+        height: 30px;
+    }
+    
+    .typing-text {
+        font-size: 0.8rem;
+    }
+
+    .ai-brain-container {
+        display: none;
     }
 }
 

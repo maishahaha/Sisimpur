@@ -26,7 +26,7 @@ TEMP_DIR.mkdir(exist_ok=True)
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 # API Keys
-GEMINI_API_KEY = os.environ.get("GOOGLE_API_KEY")
+GEMINI_API_KEY = "AIzaSyDNh6ag0_LtAnqqARTSyGv2HVoI1A1he_g"
 if not GEMINI_API_KEY:
     logger.warning("GOOGLE_API_KEY not found in environment variables. Gemini features will not work.")
 
@@ -39,11 +39,12 @@ RATE_LIMIT_COOLDOWN = 10  # seconds between batches
 
 # Model settings
 DEFAULT_GEMINI_MODEL = "models/gemini-1.5-flash"
-QA_GEMINI_MODEL = "models/gemini-1.5-pro"
-FALLBACK_GEMINI_MODEL = "models/gemini-1.0-pro"  # Fallback to older model if rate limited
+QA_GEMINI_MODEL = "models/gemini-1.5-flash"
+FALLBACK_GEMINI_MODEL = "models/gemini-1.5-flash"  # Fallback to older model if rate limited
 
 # Document processing settings
 MIN_TEXT_LENGTH = 100  # Minimum text length to consider a PDF as text-based
-CHUNK_SIZE = 800  # Characters per chunk for text splitting
-CHUNK_OVERLAP = 150  # Overlap between chunks
-MIN_WORDS_PER_CHUNK = 20  # Minimum words required for a chunk to be processed
+
+# Question type settings
+QUESTION_TYPE = "MULTIPLECHOICE"  # Options: "SHORT" or "MULTIPLECHOICE"
+ANSWER_OPTIONS = 4  # Number of options for multiple choice questions

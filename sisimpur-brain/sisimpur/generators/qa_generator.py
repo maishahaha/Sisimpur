@@ -6,20 +6,12 @@ This module provides functionality to generate question-answer pairs from text.
 
 import json
 import logging
-import time
-from typing import Dict, List, Any, Optional
-
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from typing import Dict, List, Optional
 
 from ..utils.api_utils import api
 from ..config import (
     QA_GEMINI_MODEL,
     FALLBACK_GEMINI_MODEL,
-    CHUNK_SIZE,
-    CHUNK_OVERLAP,
-    MIN_WORDS_PER_CHUNK,
-    RATE_LIMIT_BATCH_SIZE,
-    RATE_LIMIT_COOLDOWN,
 )
 
 logger = logging.getLogger("sisimpur.generators.qa")
@@ -52,17 +44,12 @@ class QAGenerator:
             List of question-answer pairs
         """
         try:
-            # Split text into chunks for processing
-            chunks = self._split_text(text)
-            logger.info(f"Split text into {len(chunks)} chunks")
-
-            # Determine optimal number of questions per chunk based on content density
-            # More complex/dense chunks get more questions
-            total_words = sum(len(chunk.split()) for chunk in chunks)
+            # Determine optimal number of questions based on content length
+            total_words = len(text.split())
 
             # Estimate optimal question count: roughly 1 question per 100-150 words
-            # with a minimum of 1 question per chunk and a reasonable maximum
-            optimal_total = min(max(len(chunks), total_words // 120), 100)
+            # with a reasonable minimum and maximum
+            optimal_total = min(max(5, total_words // 120), 100)
 
             if max_questions is not None:
                 optimal_total = min(optimal_total, max_questions)
@@ -88,139 +75,146 @@ class QAGenerator:
             List of question-answer pairs
         """
         try:
-            # Split text into chunks for processing
-            chunks = self._split_text(text)
-            logger.info(f"Split text into {len(chunks)} chunks")
+            logger.info(f"Generating {num_questions} Q&A pairs from full text")
 
-            # Process chunks to generate Q&A pairs
-            all_qa_pairs = []
-            questions_per_chunk = max(1, num_questions // len(chunks))
+            # Generate Q&A pairs from the entire text at once
+            qa_pairs = self._generate_qa_from_text(text, num_questions)
 
-            # Process chunks in batches with rate limiting
-            for i, chunk in enumerate(chunks):
-                if len(all_qa_pairs) >= num_questions:
-                    break
+            if qa_pairs:
+                logger.info(f"Successfully generated {len(qa_pairs)} Q&A pairs")
+            else:
+                logger.warning("Failed to generate Q&A pairs")
 
-                logger.info(f"Processing chunk {i+1}/{len(chunks)}")
-
-                # Apply rate limiting between batches
-                if i > 0 and i % RATE_LIMIT_BATCH_SIZE == 0:
-                    logger.info(f"Rate limit cooldown: sleeping for {RATE_LIMIT_COOLDOWN} seconds")
-                    time.sleep(RATE_LIMIT_COOLDOWN)
-
-                # Generate Q&A pairs for this chunk
-                chunk_qa_pairs = self._generate_qa_for_chunk(
-                    chunk,
-                    min(questions_per_chunk, num_questions - len(all_qa_pairs))
-                )
-
-                if chunk_qa_pairs:
-                    all_qa_pairs.extend(chunk_qa_pairs)
-                    logger.info(f"Generated {len(chunk_qa_pairs)} Q&A pairs from chunk {i+1}")
-                else:
-                    logger.warning(f"Failed to generate Q&A pairs from chunk {i+1}")
-
-            # Limit to requested number of questions
-            all_qa_pairs = all_qa_pairs[:num_questions]
-            logger.info(f"Generated a total of {len(all_qa_pairs)} Q&A pairs")
-
-            return all_qa_pairs
+            return qa_pairs
 
         except Exception as e:
             logger.error(f"Error generating Q&A pairs: {e}")
             raise
 
-    def _split_text(self, text: str) -> List[str]:
+    def _generate_qa_from_text(self, text: str, num_questions: int) -> List[Dict[str, str]]:
         """
-        Split text into chunks for processing.
+        Generate Q&A pairs from the entire text.
 
         Args:
-            text: The text to split
-
-        Returns:
-            List of text chunks
-        """
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=CHUNK_SIZE,
-            chunk_overlap=CHUNK_OVERLAP,
-            separators=["\n\n", "\n", ". ", " ", ""]
-        )
-        chunks = text_splitter.split_text(text)
-
-        # Filter out chunks that are too short or contain little information
-        chunks = [chunk for chunk in chunks if len(chunk.split()) > MIN_WORDS_PER_CHUNK]
-
-        return chunks
-
-    def _generate_qa_for_chunk(self, chunk: str, num_questions: int) -> List[Dict[str, str]]:
-        """
-        Generate Q&A pairs for a single chunk of text.
-
-        Args:
-            chunk: The text chunk
+            text: The full text to process
             num_questions: Number of Q&A pairs to generate
 
         Returns:
             List of question-answer pairs
         """
-        # Prepare prompt based on language
-        if self.language == "bengali":
-            prompt_template = (
-                "আমি তোমাকে একটি পাঠ্য দিচ্ছি। এই পাঠ্য থেকে {num_questions}টি প্রশ্ন ও উত্তর তৈরি করো। "
-                "প্রশ্নগুলি বিভিন্ন ধরনের হতে পারে: বহুনির্বাচনী, সংক্ষিপ্ত উত্তর, বা দীর্ঘ উত্তর। "
-                "প্রতিটি প্রশ্ন ও উত্তর বাংলায় লিখতে হবে। "
-                "উত্তরগুলি সম্পূর্ণ ও সঠিক হতে হবে। "
-                "JSON ফরম্যাটে উত্তর দাও: "
-                "```json\n"
-                "{{\n"
-                "  \"questions\": [\n"
-                "    {{\n"
-                "      \"question\": \"প্রশ্ন\",\n"
-                "      \"answer\": \"উত্তর\"\n"
-                "    }},\n"
-                "    ...\n"
-                "  ]\n"
-                "}}\n"
-                "```\n\n"
-                "পাঠ্য:\n{text}"
-            )
-        else:
-            prompt_template = (
-                "I'll provide you with a text. Generate {num_questions} question-answer pairs from this text. "
-                "The questions can be of various types: multiple-choice, short answer, or long answer. "
-                "Each question and answer should be in English. "
-                "The answers should be comprehensive and accurate. "
-                "Respond in JSON format: "
-                "```json\n"
-                "{{\n"
-                "  \"questions\": [\n"
-                "    {{\n"
-                "      \"question\": \"Question\",\n"
-                "      \"answer\": \"Answer\"\n"
-                "    }},\n"
-                "    ...\n"
-                "  ]\n"
-                "}}\n"
-                "```\n\n"
-                "Text:\n{text}"
-            )
+        # Prepare prompt based on language and configuration
+        from ..config import QUESTION_TYPE, ANSWER_OPTIONS
 
-        # Prepare prompt for this chunk
+        if self.language == "bengali":
+            if QUESTION_TYPE == "MULTIPLECHOICE":
+                option_count = ANSWER_OPTIONS
+                option_labels = "ক, খ, গ, ঘ" if option_count == 4 else "ক, খ, গ, ঘ, ঙ" if option_count == 5 else "ক, খ, গ, ঘ, ঙ, চ"
+
+                prompt_template = (
+                    "আমি তোমাকে একটি বাংলা পাঠ্য দিচ্ছি। এই পাঠ্য থেকে {num_questions}টি বহুনির্বাচনী প্রশ্ন তৈরি করো। "
+                    f"প্রতিটি প্রশ্নের {option_count}টি অপশন থাকবে ({option_labels})। "
+                    "প্রতিটি প্রশ্ন ও অপশন বাংলায় লিখতে হবে। "
+                    "নিম্নলিখিত JSON ফরম্যাটে উত্তর দাও: "
+                    "```json\n"
+                    "{{\n"
+                    "  \"questions\": [\n"
+                    "    {{\n"
+                    "      \"question\": \"প্রশ্ন\",\n"
+                    "      \"options\": [\n"
+                    "        {{ \"label\": \"ক\", \"text\": \"অপশন ১\" }},\n"
+                    "        {{ \"label\": \"খ\", \"text\": \"অপশন ২\" }},\n"
+                    "        {{ \"label\": \"গ\", \"text\": \"অপশন ৩\" }},\n"
+                    "        {{ \"label\": \"ঘ\", \"text\": \"অপশন ৪\" }}\n"
+                    "      ]\n"
+                    "    }},\n"
+                    "    ...\n"
+                    "  ]\n"
+                    "}}\n"
+                    "```\n\n"
+                    "পাঠ্য:\n{text}"
+                )
+            else:  # SHORT
+                prompt_template = (
+                    "আমি তোমাকে একটি বাংলা পাঠ্য দিচ্ছি। এই পাঠ্য থেকে {num_questions}টি সংক্ষিপ্ত প্রশ্ন তৈরি করো। "
+                    "প্রতিটি প্রশ্ন বাংলায় লিখতে হবে। "
+                    "নিম্নলিখিত JSON ফরম্যাটে উত্তর দাও: "
+                    "```json\n"
+                    "{{\n"
+                    "  \"questions\": [\n"
+                    "    {{\n"
+                    "      \"question\": \"প্রশ্ন\"\n"
+                    "    }},\n"
+                    "    ...\n"
+                    "  ]\n"
+                    "}}\n"
+                    "```\n\n"
+                    "পাঠ্য:\n{text}"
+                )
+        else:  # English
+            if QUESTION_TYPE == "MULTIPLECHOICE":
+                option_count = ANSWER_OPTIONS
+                option_labels = "A, B, C, D" if option_count == 4 else "A, B, C, D, E" if option_count == 5 else "A, B, C, D, E, F"
+
+                prompt_template = (
+                    "I'll provide you with a text. Generate {num_questions} multiple-choice questions from this text. "
+                    f"Each question should have {option_count} options ({option_labels}). "
+                    "Each question and option should be in English. "
+                    "Respond in the following JSON format: "
+                    "```json\n"
+                    "{{\n"
+                    "  \"questions\": [\n"
+                    "    {{\n"
+                    "      \"question\": \"Question text\",\n"
+                    "      \"options\": [\n"
+                    "        {{ \"label\": \"A\", \"text\": \"Option 1\" }},\n"
+                    "        {{ \"label\": \"B\", \"text\": \"Option 2\" }},\n"
+                    "        {{ \"label\": \"C\", \"text\": \"Option 3\" }},\n"
+                    "        {{ \"label\": \"D\", \"text\": \"Option 4\" }}\n"
+                    "      ]\n"
+                    "    }},\n"
+                    "    ...\n"
+                    "  ]\n"
+                    "}}\n"
+                    "```\n\n"
+                    "Text:\n{text}"
+                )
+            else:  # SHORT
+                prompt_template = (
+                    "I'll provide you with a text. Generate {num_questions} short-answer questions from this text. "
+                    "Each question should be in English. "
+                    "Respond in the following JSON format: "
+                    "```json\n"
+                    "{{\n"
+                    "  \"questions\": [\n"
+                    "    {{\n"
+                    "      \"question\": \"Question text\"\n"
+                    "    }},\n"
+                    "    ...\n"
+                    "  ]\n"
+                    "}}\n"
+                    "```\n\n"
+                    "Text:\n{text}"
+                )
+
+        # Prepare prompt with the full text
         prompt = prompt_template.format(
             num_questions=num_questions,
-            text=chunk
+            text=text
         )
 
         try:
             # Try with primary model first
             try:
+                logger.info("Sending request to primary model")
                 response = api.generate_content(prompt, model_name=QA_GEMINI_MODEL)
             except Exception as e:
                 logger.warning(f"Error with primary model, trying fallback: {e}")
+                logger.info("Sending request to fallback model")
                 response = api.generate_content(prompt, model_name=FALLBACK_GEMINI_MODEL)
 
             # Extract JSON from response
             json_str = response.text
+            logger.info("Received response from model")
 
             # Clean up the response to extract just the JSON part
             if "```json" in json_str:
@@ -233,10 +227,10 @@ class QAGenerator:
             # Validate and return Q&A pairs
             if "questions" in qa_data and isinstance(qa_data["questions"], list):
                 return qa_data["questions"]
-            else:
-                logger.warning(f"Invalid response format: {qa_data}")
-                return []
+
+            logger.warning(f"Invalid response format: {qa_data}")
+            return []
 
         except Exception as e:
-            logger.error(f"Error generating Q&A pairs for chunk: {e}")
+            logger.error(f"Error generating Q&A pairs from text: {e}")
             return []
