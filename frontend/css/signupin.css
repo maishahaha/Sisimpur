@@ -1,0 +1,329 @@
+:root {
+  --primary: #5e17eb;
+  --primary-light: #7c3aed;
+  --secondary: #00d4ff;
+  --dark: #0a0a19;
+  --darker: #050510;
+  --light: #f8f9fa;
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+*{
+  box-sizing: border-box;
+}
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+/* content*/
+.container{
+  position: relative;
+  width: 850px;
+  height: 550px;
+  background-color: rgba(10, 10, 25, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 30px;
+  margin: 20px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.form-box{
+  position: absolute;
+  height: 100%;
+  width: 50%;
+  background: #ffffff00;
+  right: 0;
+  display: flex;
+  align-items: center;
+  color: #ffffff;
+  text-align: center;
+  padding: 40px; 
+  z-index: 1;
+  transition: 0.5s ease-in-out 1s, visibility 0s 1s;
+}
+
+.container.active .form-box{
+  right: 50%;
+}
+.form-box.register{
+  visibility: hidden;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: 0.5s ease-in-out, visibility 0s 0.5s, opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
+.container.active .form-box.register{
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(0);
+  transition: 0.5s ease-in-out 0.5s, visibility 0s, opacity 0.5s ease-in-out 0.5s, transform 0.5s ease-in-out 0.5s;
+}
+
+
+.form-box.login {
+  transition: 0.5s ease-in-out, visibility 0s, opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
+.container.active .form-box.login {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: 0.5s ease-in-out, visibility 0s 0.5s, opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
+
+form{
+  width: 100%;
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.container h1{
+  font-size: 33px;
+  margin: -10px 0;
+}
+
+.input-box{
+  position: relative;
+  margin: 30px 0;
+}
+
+.input-box input{
+  width: 100%;
+  padding: 13px 50px 13px 20px;
+  background: var(--glass);
+  backdrop-filter: blur(5px);
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  outline: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--light);
+}
+.input-box input::placeholder{
+  color:  rgba(255, 255, 255, 0.6);
+  font-weight: 400;
+}
+
+.input-box i{
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: var(--secondary);
+}
+
+.forget-link{
+  margin: -15px 0 15px;
+}
+
+.forget-link a{
+  font-size: 12.5px;
+  color: var(--light);
+  text-decoration: none;
+}
+
+.forget-link a:hover {
+  color: var(--secondary);
+}
+
+.btn{
+  width: 100%;
+  height: 48px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgb(0, 0, 0, 0.1);
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  color: #ffffff;
+  font-weight: 600;
+  transition: 0.4s ease;
+}
+
+.btn:hover {
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+  transform: translateY(-3px);
+}
+
+.container p{
+  font-size: 12.5px;
+  margin: 15px 0;
+  color: var(--light)
+}
+
+.social-icons{
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.social-icons a{
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  font-size: 18px;
+  color: var(--light);
+  text-decoration: none;
+  background: var(--glass);
+  transition: all 0.3s ease;
+
+}
+.social-icons a:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-3px);
+  border-color: var(--primary);
+}
+
+.toggle-box{
+  position: absolute;
+  width: 100%; 
+  height: 100%;
+}
+
+.toggle-box::before{
+  content: '';
+  position: absolute;
+  width: 300%;
+  height: 100%;
+  left: -250%;
+  border-radius: 100px;
+  background-color: rgba(94, 23, 235, 0.1);
+  backdrop-filter: blur(15px);
+  z-index: 2;
+  transition: 1.4s ease-in-out;
+}
+
+.container.active .toggle-box::before{
+  left: 50%;
+}
+
+.toggle-panel{
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  color: var(--light); 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 3;
+  transition: 0.5s ease-in-out;
+  padding: 0 40px;
+  text-align: center;
+}
+
+.toggle-panel.toggle-left{
+  left: 0;
+  transition-delay: 1s;
+}
+
+.container.active .toggle-panel.toggle-left{
+  left: -50%;
+  transition-delay: 0.5s;
+}
+
+.toggle-panel.toggle-right{
+  right: -50%;
+  transition-delay: 0.5s;
+}
+
+.container.active .toggle-panel.toggle-right{
+  right: 0;
+  transition-delay: 1s;
+}
+
+.toggle-panel p{
+  margin-bottom: 20px ;
+}
+
+.toggle-panel .btn{
+  width: 160px;
+  height: 46px;
+  background: transparent;
+  border: 2px solid var(--light);
+  color: var(--light);
+  box-shadow: none;
+  transition: all 0.5s ease;
+}
+.toggle-panel .btn:hover {
+  background:  linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  transform: translateY(-3px);
+  border-color: transparent;
+}
+@media screen and (max-width: 650px){
+  .container{
+      height: calc(100vh - 40px);
+  }
+  .form-box{
+      /* background-color: purple; */
+      width: 100%;
+      height: 70%;
+      bottom: 0;
+
+  }
+  .container.active .form-box{
+      right: 0;
+      bottom: 30%;
+  }
+  .toggle-box::before{
+      left: 0;
+      top: -270%;
+      width: 100%;
+      height: 300%;
+      border-radius: 20vw;
+  }
+  .container.active .toggle-box::before{
+     left: 0;
+     top: 70%;
+  }
+  .toggle-panel{
+      width: 100%;
+      height: 30%;
+  }
+  .toggle-panel.toggle-left{
+      top: 0;
+  }
+  .container.active .toggle-panel.toggle-left{
+      left: 0;
+      top: -30%;
+  }
+  .toggle-panel.toggle-right{
+      right: 0;
+      bottom: -30%;
+  }
+  .container.active .toggle-panel.toggle-right{
+      bottom: 0;
+  }
+}
+
+@media screen and (max-width: 400px){
+  .form-box{
+      padding: 20px;
+  }
+  .toggle-panel h1{
+      font-size: 30px;
+  }
+}

@@ -9,56 +9,10 @@
     --glass-border: rgba(255, 255, 255, 0.1);
 }
 
-body {
-    background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
-    color: var(--light);
-    font-family: 'Poppins', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-}
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Grotesk', sans-serif;
     font-weight: 700;
-}
-
-.bg-grid {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-        linear-gradient(var(--glass-border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--glass-border) 1px, transparent 1px);
-    background-size: 40px 40px;
-    z-index: -1;
-    opacity: 0.3;
-}
-
-.blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    z-index: -1;
-    opacity: 0.3;
-}
-
-.blob-1 {
-    top: -150px;
-    left: -150px;
-    width: 500px;
-    height: 500px;
-    background: var(--primary);
-}
-
-.blob-2 {
-    bottom: 0px;
-    right: 0px;
-    width: 600px;
-    height: 600px;
-    background: var(--secondary);
 }
 
 .blob-3 {
@@ -578,26 +532,6 @@ footer {
     text-align: center;
 }
 
-/* Animated elements */
-.particles {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    overflow: hidden;
-}
-
-.particle {
-    position: absolute;
-    width: 3px;
-    height: 3px;
-    background: var(--secondary);
-    border-radius: 50%;
-    opacity: 0.3;
-}
-
 /* AI animation */
 .brain-animation {
     position: relative;
@@ -779,48 +713,6 @@ footer {
     }
 }
 
-.particles {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-}
-.particle {
-    position: absolute;
-    width: 3px;
-    height: 3px;
-    background: rgba(0, 255, 255, 0.7); /* Vibrant cyan color with higher opacity */
-    border-radius: 50%;
-    animation: float 15s linear infinite;
-}
-@keyframes float {
-    0% {
-        transform: translate(0, 0);
-        opacity: 0;
-    }
-    10% {
-        opacity: 0.5;
-    }
-    90% {
-        opacity: 0.5;
-    }
-    100% {
-        transform: translate(var(--tx), var(--ty));
-        opacity: 0;
-    }
-}
-.floating {
-    animation: floating 3s ease-in-out infinite;
-}
-@keyframes floating {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
-    100% { transform: translateY(0px); }
-}
 
 @media (max-width: 767px) {
     footer {
