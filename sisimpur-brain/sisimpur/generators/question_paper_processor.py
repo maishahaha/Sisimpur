@@ -229,5 +229,3 @@ class QuestionPaperProcessor:
         except Exception as e:
             logger.error(f"Error processing question paper: {e}")
             return []
-
-

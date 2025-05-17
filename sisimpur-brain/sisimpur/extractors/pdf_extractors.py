@@ -18,6 +18,7 @@ from ..utils.api_utils import api
 from ..config import DEFAULT_GEMINI_MODEL
 
 logger = logging.getLogger("sisimpur.extractors.pdf")
+pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract" 
 
 class TextPDFExtractor(BaseExtractor):
     """Extractor for text-based PDF documents"""

@@ -84,6 +84,9 @@ python manage.py migrate
 
 # Run server
 python manage.py runserver
+
+#Run test_harness.py:
+python3 test_harness.py "your-path-to-document" "your-path-to-question-and-answer-doc" --runs "number-of-trials"
 ```
 
 ---

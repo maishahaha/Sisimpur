@@ -16,6 +16,7 @@ from ..utils.api_utils import api
 from ..config import DEFAULT_GEMINI_MODEL
 
 logger = logging.getLogger("sisimpur.extractors.image")
+pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract" 
 
 class ImageExtractor(BaseExtractor):
     """Extractor for image documents"""
@@ -115,6 +116,7 @@ class ImageExtractor(BaseExtractor):
                 "Extract all text from this image. Preserve original formatting and language. "
                 "If the text is in Bengali, maintain the Bengali script. "
                 "Return only the extracted text, no additional comments."
+                "Generate questions from the text"
             )
 
         try:
