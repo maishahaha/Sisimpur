@@ -26,7 +26,7 @@ TEMP_DIR.mkdir(exist_ok=True)
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 # API Keys
-GEMINI_API_KEY = "AIzaSyCWgBa4Im7qrwWokurAKNG0pffBHXNNlRo"
+GEMINI_API_KEY = "your-api-key"
 if not GEMINI_API_KEY:
     logger.warning("GOOGLE_API_KEY not found in environment variables. Gemini features will not work.")
 
