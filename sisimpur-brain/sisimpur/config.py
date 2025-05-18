@@ -26,7 +26,15 @@ TEMP_DIR.mkdir(exist_ok=True)
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 # API Keys
-GEMINI_API_KEY = "your-api-key"
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+dotenv_path = BASE_DIR / '.env'
+load_dotenv(dotenv_path=dotenv_path)
+
+# Get API key from environment variable
+GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
 if not GEMINI_API_KEY:
     logger.warning("GOOGLE_API_KEY not found in environment variables. Gemini features will not work.")
 
