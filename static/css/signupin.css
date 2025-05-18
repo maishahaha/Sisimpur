@@ -17,13 +17,11 @@ body {
   align-items: center;
 }
 
-
-
 /* content*/
 .container{
   position: relative;
   width: 850px;
-  height: 550px;
+  height: 650px;
   background-color: rgba(10, 10, 25, 0.7);
   backdrop-filter: blur(10px);
   border: 1px solid var(--glass-border);
@@ -89,14 +87,13 @@ form{
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 1.5rem;
   text-align: center;
   letter-spacing: 1px;
 }
 
-.container h1{
-  font-size: 33px;
-  margin: -10px 0;
+.container h4{
+  margin-top: 15px;
+  margin-bottom:30px ;
 }
 
 .input-box{
@@ -172,7 +169,7 @@ form{
 .social-icons{
   display: flex;
   justify-content: center;
-  gap: 15px;
+  gap: 10px;
 }
 
 .social-icons a{
@@ -196,6 +193,24 @@ form{
   transform: translateY(-3px);
   border-color: var(--primary);
 }
+
+.return-link{
+  display: flex;
+  justify-content: right;
+  align-items:right;
+  margin-top:10px;
+  padding-top:40px ;
+}
+
+.return-link a{
+  font-size: 12.5px;
+  color: var(--light);
+  text-decoration: none;
+}
+.return-link:hover a{
+  color: var(--secondary);
+}
+
 
 .toggle-box{
   position: absolute;
@@ -275,7 +290,7 @@ form{
 }
 @media screen and (max-width: 650px){
   .container{
-      height: calc(100vh - 40px);
+      height: calc(100vh - 20px);
   }
   .form-box{
       /* background-color: purple; */
