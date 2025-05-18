@@ -12,9 +12,25 @@
     {% block head %}{% endblock %}
 </head>
 <body>
+    {% include 'includes/toast.html' %}
+
+    <!-- Django Messages (hidden) -->
+    <div style="display: none;">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="django-message"
+                     data-type="{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}"
+                     data-title="{{ message.extra_tags|default:'' }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
     {% block content %}{% endblock %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/toast_new.js' %}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

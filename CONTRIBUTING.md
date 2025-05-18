@@ -84,6 +84,47 @@ The **frontend** directory contains static prototypes, while `apps/frontend` hol
 * **Static HTML & CSS/JS**: Work in the `frontend/` folder for standalone pages.
 * **Django Frontend App**: Modify `apps/frontend/templates/`, `views.py`, and related routes.
 
+#### Toast Notification System
+
+Sisimpur includes a global toast notification system for displaying feedback to users:
+
+**File Structure:**
+- `apps/frontend/templates/includes/toast.html`: Contains the toast container and CSS
+- `static/js/toast_new.js`: Contains the JavaScript for creating and managing toast notifications
+
+**Usage in Views:**
+```python
+from django.contrib import messages
+
+# Different types of messages
+messages.success(request, 'Operation completed successfully!', extra_tags='Success')
+messages.error(request, 'An error occurred.', extra_tags='Error')
+messages.warning(request, 'Warning: This action cannot be undone.', extra_tags='Warning')
+messages.info(request, 'Your session will expire in 10 minutes.', extra_tags='Info')
+```
+
+**Usage in JavaScript:**
+```javascript
+// Show a toast notification directly from JavaScript
+if (typeof window.showToast === 'function') {
+    window.showToast('success', 'Success', 'Operation completed successfully!');
+    window.showToast('error', 'Error', 'An error occurred.');
+    window.showToast('warning', 'Warning', 'This action cannot be undone.');
+    window.showToast('info', 'Info', 'Your session will expire in 10 minutes.');
+}
+```
+
+**Toast Types:**
+- `success`: Green color, check icon
+- `error`: Red color, exclamation icon
+- `warning`: Orange color, bell icon
+- `info`: Blue color, info icon
+
+**Testing:**
+- Visit `/toast-test/` to see a demonstration of all toast types
+- Each toast automatically disappears after 5 seconds
+- Toasts can be manually dismissed by clicking the × button
+
 Create feature branches:
 
 ```bash

@@ -49,7 +49,7 @@
           <a class="nav-link" href="#faq">FAQ</a>
         </li>
         <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
-          <a class="btn btn-glow" href="{% url 'signupin' %}">Get Started</a>
+          <a class="btn btn-glow" href="{% url 'auth:signupin' %}">Get Started</a>
         </li>
       </ul>
     </div>
@@ -70,7 +70,7 @@
           anytime, ace your exams.
         </p>
         <div class="d-flex gap-3 justify-content-center">
-          <a href="{% url 'signupin' %}" class="btn btn-glow">Start For Free</a>
+          <a href="{% url 'auth:signupin' %}" class="btn btn-glow">Start For Free</a>
           <a href="#how-it-works" class="btn btn-outline">Learn More</a>
         </div>
       </div>
@@ -262,7 +262,7 @@
         their exams
       </p>
       <div class="cta-buttons">
-        <a href="{% url 'signupin' %}" class="btn btn-glow btn-lg">Get Started</a>
+        <a href="{% url 'auth:signupin' %}" class="btn btn-glow btn-lg">Get Started</a>
       </div>
     </div>
   </div>

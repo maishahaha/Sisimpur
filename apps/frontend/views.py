@@ -1,13 +1,10 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
 import json
 import os
 from dotenv import load_dotenv
 from .utils import MailchimpService, EmailValidationService
-from pathlib import Path
-import requests
 
 load_dotenv()
 
@@ -27,11 +24,13 @@ def home(request):
     """
     return render(request, 'home.html')
 
-def signupin(request):
+
+
+def toast_test(request):
     """
-    View for the sign in / sign up page
+    View for testing toast notifications
     """
-    return render(request, 'signupin.html')
+    return render(request, 'toast_test.html')
 
 @csrf_exempt
 def subscribe_to_mailchimp(request):

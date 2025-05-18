@@ -34,16 +34,16 @@
         <i class="bx bxs-lock-alt"></i>
       </div>
       <div class="forget-link">
-        <a href="#">Forgot Password?</a>
+        <a href="{% url 'auth:password_reset' %}">Forgot Password?</a>
       </div>
       <button type="submit" class="btn">Sign In</button>
 
       <p>Or Sign In With</p>
       <div class="social-icons">
-        <a href="{% url 'signupin' %}?social=google"><i class="bx bxl-google"></i></a>
-        <a href="{% url 'signupin' %}?social=facebook"><i class="bx bxl-facebook-circle"></i></a>
-        <a href="{% url 'signupin' %}?social=github"><i class="bx bxl-github"></i></a>
-        <a href="{% url 'signupin' %}?social=linkedin"><i class="bx bxl-linkedin"></i></a>
+        <a href="{% url 'auth:signupin' %}?social=google"><i class="bx bxl-google"></i></a>
+        <a href="{% url 'auth:signupin' %}?social=facebook"><i class="bx bxl-facebook-circle"></i></a>
+        <a href="{% url 'auth:signupin' %}?social=github"><i class="bx bxl-github"></i></a>
+        <a href="{% url 'auth:signupin' %}?social=linkedin"><i class="bx bxl-linkedin"></i></a>
       </div>
       <div class="return-link">
         <a href="{% url 'home' %}">&#8592; Home </a>
@@ -52,7 +52,7 @@
   </div>
 
   <div class="form-box register">
-    <form action="{% url 'register' %}" method="post">
+    <form action="#" method="post">
       {% csrf_token %}
       <a class="logo" style="margin-bottom: 20px" href="{% url 'home' %}">
         SISIMPUR
@@ -78,10 +78,10 @@
       <button type="submit" class="btn">Sign Up</button>
       <p>Or Sign Up With</p>
       <div class="social-icons">
-        <a href="{% url 'signupin' %}?social=google"><i class="bx bxl-google"></i></a>
-        <a href="{% url 'signupin' %}?social=facebook"><i class="bx bxl-facebook-circle"></i></a>
-        <a href="{% url 'signupin' %}?social=github"><i class="bx bxl-github"></i></a>
-        <a href="{% url 'signupin' %}?social=linkedin"><i class="bx bxl-linkedin"></i></a>
+        <a href="{% url 'auth:signupin' %}?social=google"><i class="bx bxl-google"></i></a>
+        <a href="{% url 'auth:signupin' %}?social=facebook"><i class="bx bxl-facebook-circle"></i></a>
+        <a href="{% url 'auth:signupin' %}?social=github"><i class="bx bxl-github"></i></a>
+        <a href="{% url 'auth:signupin' %}?social=linkedin"><i class="bx bxl-linkedin"></i></a>
       </div>
       <div class="return-link" style="justify-content: left; align-items: left">
         <a href="{% url 'home' %}">&#8592; Home</a>
