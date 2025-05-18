@@ -25,9 +25,6 @@ SECRET_KEY = 'django-insecure-#m17e$1!_ky@zv6bpq_#s^b*caz-sog5pcdi5l44n9y5!39zb#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# settings.py
-COMING_SOON = True
-
 ALLOWED_HOSTS = ['*']
 
 
@@ -137,4 +134,4 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Coming soon mode
-COMING_SOON = False
+COMING_SOON = True
