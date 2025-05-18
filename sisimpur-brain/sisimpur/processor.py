@@ -61,8 +61,10 @@ class DocumentProcessor:
 
             else:
                 logger.info(f"Extracting text from document: {file_path}")
-                extractor = self._get_extractor(metadata)
-                extracted_text = extractor.extract(file_path)
+                
+                #here double object is being called
+                #extractor = self._get_extractor(metadata)
+                #extracted_text = extractor.extract(file_path)
                 # Standard processing pipeline for other documents
                 # Step 2: Extract text based on document type
                 if is_question_paper:

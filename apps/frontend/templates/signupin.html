@@ -1,15 +1,12 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}SISIMPUR - Sign In / Sign Up{% endblock %}
-
-{% block head %}
-<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-<link href="{% static 'css/signupin.css' %}" rel="stylesheet">
-<link href="{% static 'css/background.css' %}" rel="stylesheet">
-{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block title %}SISIMPUR - Sign In
+/ Sign Up{% endblock %} {% block head %}
+<link
+  href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+  rel="stylesheet"
+/>
+<link href="{% static 'css/signupin.css' %}" rel="stylesheet" />
+<link href="{% static 'css/background.css' %}" rel="stylesheet" />
+{% endblock %} {% block content %}
 <!-- Background Elements -->
 <div class="bg-grid"></div>
 <div class="blob blob-1"></div>
@@ -18,78 +15,95 @@
 
 <div class="container">
   <div class="form-box login">
-      <form action="{% url 'login' %}" method="post">
-        {% csrf_token %}
-        <div class="logo">SISIMPUR</div>
-          <h2>Welcome Back!</h2>
-          <div class="input-box">
-              <input type="text" name="username" placeholder="Username" required>
-              <i class='bx bxs-user'></i>
-          </div>
-          <div class="input-box">
-              <input type="password" name="password" placeholder="Password" required>
-              <i class='bx bxs-lock-alt' ></i>
-          </div>
-          <div class="forget-link">
-              <a href="{% url 'password_reset' %}">Forgot Password?</a>
-          </div>
-          <button type="submit" class="btn">Sign In</button>
-          <p>Or Sign In With</p>
-          <div class="social-icons">
-              <a href="#"><i class='bx bxl-google' ></i></a>
-              <a href="#"><i class='bx bxl-facebook-circle' ></i></a>
-              <a href="#"><i class='bx bxl-github' ></i></a>
-              <a href="#"><i class='bx bxl-linkedin' ></i></a>
-          </div>
-      </form>
+    <form action="{% url 'login' %}" method="post">
+      {% csrf_token %}
+
+      <a class="logo" href="{% url 'home' %}">SISIMPUR</a>
+      <h4>Welcome Back!</h4>
+      <div class="input-box">
+        <input type="text" name="username" placeholder="Username" required />
+        <i class="bx bxs-user"></i>
+      </div>
+      <div class="input-box">
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+        />
+        <i class="bx bxs-lock-alt"></i>
+      </div>
+      <div class="forget-link">
+        <a href="{% url 'password_reset' %}">Forgot Password?</a>
+      </div>
+      <button type="submit" class="btn">Sign In</button>
+
+      <p>Or Sign In With</p>
+      <div class="social-icons">
+        <a href="#"><i class="bx bxl-google"></i></a>
+        <a href="#"><i class="bx bxl-facebook-circle"></i></a>
+        <a href="#"><i class="bx bxl-github"></i></a>
+        <a href="#"><i class="bx bxl-linkedin"></i></a>
+      </div>
+      <div class="return-link">
+        <a href="{% url 'home' %}">&#8592; Home </a>
+      </div>
+    </form>
   </div>
 
   <div class="form-box register">
-      <form action="{% url 'register' %}" method="post">
-        {% csrf_token %}
-        <div class="logo" style="margin-bottom:0px">SISIMPUR</div>
-          <h2>Create an Account</h2>
-          <div class="input-box">
-              <input type="number" name="phonenumber" placeholder="Phone Number" required>
-              <i class='bx bxs-user'></i>
-          </div>
-          <div class="input-box">
-              <input type="email" name="email" placeholder="Email" required>
-              <i class='bx bxs-envelope'></i>
-          </div>
-          <div class="input-box">
-              <input type="password" name="password" placeholder="Password" required>
-              <i class='bx bxs-lock-alt' ></i>
-          </div>
-          <button type="submit" class="btn">Sign Up</button>
-          <p>Or Sign Up With</p>
-          <div class="social-icons">
-              <a href="#"><i class='bx bxl-google' ></i></a>
-              <a href="#"><i class='bx bxl-facebook-circle' ></i></a>
-              <a href="#"><i class='bx bxl-github' ></i></a>
-              <a href="#"><i class='bx bxl-linkedin' ></i></a>
-          </div>
-      </form>
+    <form action="{% url 'register' %}" method="post">
+      {% csrf_token %}
+      <a class="logo" style="margin-bottom: 20px" href="{% url 'home' %}">
+        SISIMPUR
+      </a>
+      <h4>Create an Account</h4>
+      <div class="input-box">
+        <input type="text" name="username" placeholder="Username" required />
+        <i class="bx bxs-user"></i>
+      </div>
+      <div class="input-box">
+        <input type="email" name="email" placeholder="Email" required />
+        <i class="bx bxs-envelope"></i>
+      </div>
+      <div class="input-box">
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+        />
+        <i class="bx bxs-lock-alt"></i>
+      </div>
+      <button type="submit" class="btn">Sign Up</button>
+      <p>Or Sign Up With</p>
+      <div class="social-icons">
+        <a href="#"><i class="bx bxl-google"></i></a>
+        <a href="#"><i class="bx bxl-facebook-circle"></i></a>
+        <a href="#"><i class="bx bxl-github"></i></a>
+        <a href="#"><i class="bx bxl-linkedin"></i></a>
+      </div>
+      <div class="return-link" style="justify-content: left; align-items: left">
+        <a href="{% url 'home' %}">&#8592; Home</a>
+      </div>
+    </form>
   </div>
 
   <div class="toggle-box">
-      <div class="toggle-panel toggle-left">
-          <h1>New Here?</h1>
-          <p>Sign up to turn your notes into instant exam questions.</p>
-          <button class="btn register-btn">Sign Up</button>
-      </div>
-       <div class="toggle-panel toggle-right">
-          <h2 style="margin-bottom:0px">Already have An Account?</h2>
-          <p>
-            Sign in to access your question library and keep preparing.
-          </p>
-          <button class="btn login-btn">Sign In</button>
-      </div>
+    <div class="toggle-panel toggle-left">
+      <h1>New Here?</h1>
+      <p>Sign up to turn your notes into instant exam questions.</p>
+      <button class="btn register-btn">Sign Up</button>
+    </div>
+    <div class="toggle-panel toggle-right">
+      <h2 style="margin-bottom: 0px">Already have An Account?</h2>
+      <p>Sign in to access your question library and keep preparing.</p>
+      <button class="btn login-btn">Sign In</button>
+    </div>
   </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script src="{% static 'js/signupin.js' %}"></script>
 <script src="{% static 'js/background.js' %}"></script>
 {% endblock %}
