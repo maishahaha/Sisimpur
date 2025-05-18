@@ -14,4 +14,4 @@ class UrlsTest(SimpleTestCase):
     def test_coming_soon_url_name(self):
         """Test that the coming_soon URL name resolves to the correct path"""
         url = reverse('coming_soon')
-        self.assertEqual(url, '/')
+        self.assertEqual(url, '/coming-soon/')
