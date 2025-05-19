@@ -1,0 +1,68 @@
+{
+  "questions": [
+    {
+      "question": "What is the most common method for recruiting app beta testers?",
+      "options": [
+        "Using online advertising",
+        "Employing professional recruiting firms",
+        "Leveraging personal and professional networks",
+        "Offering significant financial incentives"
+      ],
+      "answer": "Leveraging personal and professional networks",
+      "difficulty": "easy",
+      "type": "mcq"
+    },
+    {
+      "question": "Explain how personal and professional networks can be utilized for beta tester recruitment.",
+      "options": [],
+      "answer": "Recruiters can contact friends, family, colleagues, or classmates to participate in beta testing.",
+      "difficulty": "easy",
+      "type": "descriptive"
+    },
+    {
+      "question": "Why is it beneficial to recruit beta testers from relevant communities?",
+      "options": [],
+      "answer": "Because those communities are more likely to contain users who would be interested in using the app and provide valuable feedback.",
+      "difficulty": "medium",
+      "type": "descriptive"
+    },
+    {
+      "question": "If you are developing a fitness app for yoga practitioners, where would be a good place to recruit beta testers?",
+      "options": [
+        "Local CrossFit gyms",
+        "Online forums for gamers",
+        "Social media groups for dog lovers",
+        "Yoga studios and online yoga communities"
+      ],
+      "answer": "Yoga studios and online yoga communities",
+      "difficulty": "medium",
+      "type": "mcq"
+    },
+    {
+      "question": "How can social media be utilized in beta tester recruitment?",
+      "options": [],
+      "answer": "By posting about the app and asking followers to sign up for testing.",
+      "difficulty": "easy",
+      "type": "descriptive"
+    },
+    {
+      "question": "What is a potential drawback of relying solely on personal and professional networks for beta testing?",
+      "options": [
+        "It can be time-consuming",
+        "It may not reach a diverse user base",
+        "It may lead to biased feedback",
+        "All of the above"
+      ],
+      "answer": "All of the above",
+      "difficulty": "hard",
+      "type": "mcq"
+    },
+    {
+      "question": "Analyze the effectiveness of using online communities in contrast to social media for recruiting beta testers.  Consider the advantages and disadvantages of each.",
+      "options": [],
+      "answer": "Online communities offer targeted access to relevant users but may require more effort to locate and engage. Social media offers broad reach but may yield less targeted responses.",
+      "difficulty": "hard",
+      "type": "descriptive"
+    }
+  ]
+}
