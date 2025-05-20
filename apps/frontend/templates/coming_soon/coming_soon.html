@@ -112,13 +112,7 @@ SISIMPUR{% endblock %}
               </div>
             </div>
             <!-- Beta Button -->
-            <button
-              type="button"
-              class="btn btn-glow mt-3"
-              data-bs-toggle="modal"
-              data-bs-target="#betaModal"
-              style="margin-bottom: 20px;"
-            >
+            <button type="button" class="btn btn-glow mt-3" data-bs-toggle="modal" data-bs-target="#betaModal" style="margin-bottom: 20px;" >
               Join as Beta Tester
             </button>
 
@@ -246,7 +240,8 @@ SISIMPUR{% endblock %}
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="betaForm" class="needs-validation" novalidate>
+        <form id="subscribe-form-1" class="needs-validation" novalidate>
+          <input type="hidden" name="csrfmiddlewaretoken" value="z6TEj0PGqnWCECZnMaFCQLdVcZdyj17Ab44dccESOIqyyQq8nSyfg0VrUE2wl3Lw">
           <div class="mb-3">
             <label for="name" class="form-label">Full Name</label>
             <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required>
@@ -254,7 +249,7 @@ SISIMPUR{% endblock %}
           </div>
           <div class="mb-3">
             <label for="email" class="form-label">Email address</label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+            <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
             <div class="invalid-feedback">Please enter a valid email address.</div>
           </div>
           <div class="mb-3">
@@ -266,7 +261,7 @@ SISIMPUR{% endblock %}
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-glow" id="submitBeta">Submit Application</button>
+        <button type="submit" class="btn btn-glow" id="submitBeta">Submit Application</button>
       </div>
     </div>
   </div>
