@@ -3,6 +3,12 @@ SISIMPUR{% endblock %}
 
 {% block head %}
 <style>
+#success-message {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
 /* Beta Modal Styling */
 .modal-content {
     background: #050510;
@@ -231,42 +237,111 @@ SISIMPUR{% endblock %}
 
 
 
-  <!-- Beta Tester Modal -->
+<!-- Beta Tester Modal -->
 <div class="modal fade" id="betaModal" tabindex="-1" aria-labelledby="betaModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" >
+    <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="betaModalLabel">Join Our Beta Program</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeButton"></button>
       </div>
       <div class="modal-body">
         <form id="subscribe-form-1" class="needs-validation" novalidate>
           <input type="hidden" name="csrfmiddlewaretoken" value="z6TEj0PGqnWCECZnMaFCQLdVcZdyj17Ab44dccESOIqyyQq8nSyfg0VrUE2wl3Lw">
-          <div class="mb-3">
-            <label for="name" class="form-label">Full Name</label>
-            <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required>
-            <div class="invalid-feedback">Please enter your name.</div>
+          <div id="form-fields">
+            <div class="mb-3">
+              <label for="name" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required>
+              <div class="invalid-feedback">Please enter your name.</div>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email address</label>
+              <input type="email" name="email" class="form-control" id="email" placeholder="Enter your email" required>
+              <div class="invalid-feedback">Please enter a valid email address.</div>
+            </div>
+            <div class="mb-3">
+              <label for="phone" class="form-label">Whatsapp Number</label>
+              <input type="text" class="form-control" id="phone" name="phonee" placeholder="Enter your Whatsapp Number" required>
+              <div class="invalid-feedback">Please enter a valid Number.</div>
+            </div>
           </div>
-          <div class="mb-3">
-            <label for="email" class="form-label">Email address</label>
-            <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
-            <div class="invalid-feedback">Please enter a valid email address.</div>
-          </div>
-          <div class="mb-3">
-            <label for="phone" class="form-label">Whatsapp Number</label>
-            <input type="text" class="form-control" id="phone" name="phonee" placeholder="Enter your Whatsapp Number" required>
-            <div class="invalid-feedback">Please enter a valid Number.</div>
+          <!-- Success Message (Initially Hidden) -->
+          <div id="success-message" class="d-none">
+            <h3 id="success-text" class="text-center"></h3>
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-glow" id="submitBeta">Submit Application</button>
+        <button type="button" class="btn btn-secondary" id="closeButton">Close</button>
+        <button type="button" class="btn btn-glow" id="submitBeta">Submit Application</button>
       </div>
     </div>
   </div>
 </div>
+
 </div>
 
+
+<script>
+document.getElementById('submitBeta').addEventListener('click', function(event) {
+  event.preventDefault(); // Prevent form submission
+  
+  // Get email from the input field
+  const email = document.getElementById('email').value;
+
+  // Check if email is valid (simple regex validation)
+  if (!email || !is_valid_email(email)) {
+    alert('Please enter a valid email address.');
+    return;
+  }
+
+  // Send the email to the Django backend (your subscribe_to_mailchimp view)
+  fetch('/api/subscribe/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value // CSRF token
+    },
+    body: JSON.stringify({
+      email: email
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Hide the form fields and buttons
+      document.getElementById('form-fields').style.display = 'none';
+      document.getElementById('submitBeta').style.display = 'none';
+      document.getElementById('closeButton').style.display = 'none';
+
+      // Show success message and trigger confetti
+      const successMessage = document.getElementById('success-message');
+      successMessage.classList.remove('d-none');
+      const successText = document.getElementById('success-text');
+      successText.innerHTML = data.message || 'Hurray! You are registered as a beta tester.';
+
+      // Trigger the party confetti effect
+      party.confetti(successMessage, {
+        count: party.variation.range(20, 40),
+        size: party.variation.range(0.8, 1.2),
+      });
+    } else {
+      alert(data.error || 'An error occurred.');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('There was an error processing your request. Please try again.');
+  });
+});
+
+// Simple email validation function
+function is_valid_email(email) {
+  const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return re.test(String(email).toLowerCase());
+}
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/party-js@latest/bundle/party.min.js"></script>
 
 {% endblock %}
