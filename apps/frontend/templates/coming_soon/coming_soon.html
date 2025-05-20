@@ -1,183 +1,277 @@
-{% extends 'coming_soon/coming_soon_base.html' %}
+{% extends 'coming_soon/coming_soon_base.html' %} {% block title %}Coming Soon -
+SISIMPUR{% endblock %} 
 
-{% block title %}Coming Soon - SISIMPUR{% endblock %}
+{% block head %}
+<style>
+/* Beta Modal Styling */
+.modal-content {
+    background: #050510;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    color: #f8f9fa;
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+}
+
+.modal-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    color: #f8f9fa;
+}
+
+.btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.form-label {
+    color: #f8f9fa;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-control.is-invalid {
+    border-color: rgba(220, 53, 69, 0.5);
+    background-image: none;
+}
+
+.form-control.is-invalid:focus {
+    border-color: rgba(220, 53, 69, 0.75);
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+.invalid-feedback {
+    color: #f8d7da;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+</style>
+{% endblock %}
 
 {% block content %}
-    <!-- Background Elements -->
-    <div class="bg-grid"></div>
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="particles" id="particles"></div>
+<!-- Background Elements -->
+<div class="bg-grid"></div>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="particles" id="particles"></div>
 
-    <!-- Main Content -->
-    <div class="container py-5">
-        <header class="text-center mb-5">
-            <h1 class="logo">SISIMPUR</h1>
-            <p class="tagline">Transform any study material into customized exam questions with AI</p>
+<!-- Main Content -->
+<div class="container py-5">
+  <header class="text-center mb-5">
+    <h1 class="logo">SISIMPUR</h1>
+    <p class="tagline">
+      Transform any study material into customized exam questions with AI
+    </p>
 
-            <div class="typing-container mx-auto mb-4">
-                <div class="typing-text">Revolutionizing the way you prepare for exams</div>
-            </div>
-        </header>
-
-        <div class="row justify-content-center mb-5">
-            <div class="col-lg-10">
-                <div class="glass-card">
-                    <div class="row align-items-center">
-                        <div class="col-lg-6 mb-4 mb-lg-0 text-center">
-                            <h2 class="mb-4">Launching Soon</h2>
-                            <p class="mb-4">SISIMPUR is an AI-powered platform that converts any PDF or document into customized exam-style questions for rapid and effective exam preparation.</p>
-
-                            <!-- Countdown -->
-                            <div class="d-flex gap-3 mb-4 countdown-container justify-content-center">
-                                <div class="countdown-item">
-                                    <div class="countdown-number" id="days">30</div>
-                                    <div class="countdown-label">Days</div>
-                                </div>
-                                <div class="countdown-item">
-                                    <div class="countdown-number" id="hours">24</div>
-                                    <div class="countdown-label">Hours</div>
-                                </div>
-                                <div class="countdown-item">
-                                    <div class="countdown-number" id="minutes">60</div>
-                                    <div class="countdown-label">Mins</div>
-                                </div>
-                                <div class="countdown-item">
-                                    <div class="countdown-number" id="seconds">60</div>
-                                    <div class="countdown-label">Secs</div>
-                                </div>
-                            </div>
-
-                            <!-- Subscribe Form -->
-                            <div class="mb-4">
-                                <form id="subscribe-form-1" class="subscribe-form d-flex flex-column align-items-center">
-                                    <input type="hidden" name="csrfmiddlewaretoken" value="z6TEj0PGqnWCECZnMaFCQLdVcZdyj17Ab44dccESOIqyyQq8nSyfg0VrUE2wl3Lw">
-
-                                    <input type="email" name="email" class="form-control mb-2" placeholder="Enter your email" required>
-
-                                    <button type="submit" class="btn btn-glow">Notify Me</button>
-                                </form>
-                                <div class="form-response mt-2"></div>
-                                <small class="text-white mt-2">Get notified when we launch. No spam, we promise!</small>
-                            </div>
-
-                            <!-- Social Links -->
-                            <div class="social-icons d-flex justify-content-center">
-                                <a href="#" class="me-2"><i class="fab fa-twitter"></i></a>
-                                <a href="#" class="me-2"><i class="fab fa-facebook-f"></i></a>
-                                <a href="#" class="me-2"><i class="fab fa-linkedin-in"></i></a>
-                                <a href="#"><i class="fab fa-instagram"></i></a>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 text-center">
-                            <div class="ai-brain-container">
-                                <div class="ai-brain"></div>
-                                <div class="ai-connector ai-connector-1"></div>
-                                <div class="ai-connector ai-connector-2"></div>
-                                <div class="ai-connector ai-connector-3"></div>
-                                <div class="ai-connector ai-connector-4"></div>
-                                <div class="ai-node ai-node-1"></div>
-                                <div class="ai-node ai-node-2"></div>
-                                <div class="ai-node ai-node-3"></div>
-                                <div class="ai-node ai-node-4"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Features Section -->
-        <div class="row mb-5">
-            <div class="col-12 text-center mb-4">
-                <h2>Key Features</h2>
-                <p class="text-white">Experience the future of exam preparation</p>
-            </div>
-
-            <div class="col-6 col-md-4 mb-4">
-                <div class="features-item text-center">
-                    <div class="features-icon mx-auto">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <h3 class="feature-title">Document to Quiz</h3>
-                    <p class="feature-desc">Upload any PDF, Word or text document and instantly generate custom exam questions.</p>
-                </div>
-            </div>
-
-            <div class="col-6 col-md-4 mb-4">
-                <div class="features-item text-center">
-                    <div class="features-icon mx-auto">
-                        <i class="fas fa-brain"></i>
-                    </div>
-                    <h3 class="feature-title">AI-Powered</h3>
-                    <p class="feature-desc">Advanced AI algorithms that understand context and create relevant test questions.</p>
-                </div>
-            </div>
-
-            <div class="col-6 col-md-4 mb-4">
-                <div class="features-item text-center">
-                    <div class="features-icon mx-auto">
-                        <i class="fas fa-bolt"></i>
-                    </div>
-                    <h3 class="feature-title">10-Min Memory Boost</h3>
-                    <p class="feature-desc">Quick flash mode for rapid revision when you're short on time.</p>
-                </div>
-            </div>
-
-            <div class="col-6 col-md-4 mb-4">
-                <div class="features-item text-center">
-                    <div class="features-icon mx-auto">
-                        <i class="fas fa-sliders-h"></i>
-                    </div>
-                    <h3 class="feature-title">Customizable Format</h3>
-                    <p class="feature-desc">Choose from MCQs, one-word answers, short answers, and flashcards.</p>
-                </div>
-            </div>
-
-            <div class="col-6 col-md-4 mb-4">
-                <div class="features-item text-center">
-                    <div class="features-icon mx-auto">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h3 class="feature-title">Progress Tracking</h3>
-                    <p class="feature-desc">Monitor your performance and identify areas that need improvement.</p>
-                </div>
-            </div>
-
-            <div class="col-6 col-md-4 mb-4">
-                <div class="features-item text-center">
-                    <div class="features-icon mx-auto">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <h3 class="feature-title">Leaderboards</h3>
-                    <p class="feature-desc">Compete with peers and stay motivated throughout your preparation.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Newsletter -->
-        <div class="row justify-content-center mb-5">
-            <div class="col-lg-8">
-                <div class="glass-card text-center">
-                    <h2 class="mb-3">Join Our Waitlist</h2>
-                    <p class="mb-4">Be among the first to experience SISIMPUR and revolutionize your exam preparation.</p>
-                    <form id="subscribe-form-2" class="row g-3 justify-content-center subscribe-form">
-                        {% csrf_token %}
-                        <div class="col-md-8">
-                            <input type="email" name="email" class="form-control" placeholder="Your email address" required>
-                        </div>
-                        <div class="col-md-4">
-                            <button type="submit" class="btn btn-glow w-100">Join Waitlist</button>
-                        </div>
-                        <div class="col-12 form-response mt-2"></div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer class="footer text-center">
-            <p>&copy; 2025 SISIMPUR. All rights reserved.</p>
-        </footer>
+    <div class="typing-container mx-auto mb-4">
+      <div class="typing-text">
+        Revolutionizing the way you prepare for exams
+      </div>
     </div>
+  </header>
+
+  <div class="row justify-content-center mb-5">
+    <div class="col-lg-10">
+      <div class="glass-card">
+        <div class="row align-items-center">
+          <div class="col-lg-6 mb-4 mb-lg-0 text-center">
+            <h2 class="mb-4">Launching Soon</h2>
+            <p class="mb-4">
+              SISIMPUR is an AI-powered platform that converts any PDF or
+              document into customized exam-style questions for rapid and
+              effective exam preparation.
+            </p>
+
+            <!-- Countdown -->
+            <div
+              class="d-flex gap-3 mb-4 countdown-container justify-content-center"
+            >
+              <div class="countdown-item">
+                <div class="countdown-number" id="days">30</div>
+                <div class="countdown-label">Days</div>
+              </div>
+              <div class="countdown-item">
+                <div class="countdown-number" id="hours">24</div>
+                <div class="countdown-label">Hours</div>
+              </div>
+              <div class="countdown-item">
+                <div class="countdown-number" id="minutes">60</div>
+                <div class="countdown-label">Mins</div>
+              </div>
+              <div class="countdown-item">
+                <div class="countdown-number" id="seconds">60</div>
+                <div class="countdown-label">Secs</div>
+              </div>
+            </div>
+            <!-- Beta Button -->
+            <button
+              type="button"
+              class="btn btn-glow mt-3"
+              data-bs-toggle="modal"
+              data-bs-target="#betaModal"
+              style="margin-bottom: 20px;"
+            >
+              Join as Beta Tester
+            </button>
+
+            <!-- Social Links -->
+            <div class="social-icons d-flex justify-content-center">
+              <a href="#" class="me-2"><i class="fab fa-twitter"></i></a>
+              <a href="#" class="me-2"><i class="fab fa-facebook-f"></i></a>
+              <a href="#" class="me-2"><i class="fab fa-linkedin-in"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+          </div>
+          <div class="col-lg-6 text-center">
+            <div class="ai-brain-container">
+              <div class="ai-brain"></div>
+              <div class="ai-connector ai-connector-1"></div>
+              <div class="ai-connector ai-connector-2"></div>
+              <div class="ai-connector ai-connector-3"></div>
+              <div class="ai-connector ai-connector-4"></div>
+              <div class="ai-node ai-node-1"></div>
+              <div class="ai-node ai-node-2"></div>
+              <div class="ai-node ai-node-3"></div>
+              <div class="ai-node ai-node-4"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+  <!-- Features Section -->
+  <div class="row mb-5">
+    <div class="col-12 text-center mb-4">
+      <h2>Key Features</h2>
+      <p class="text-white">Experience the future of exam preparation</p>
+    </div>
+
+    <div class="col-6 col-md-4 mb-4">
+      <div class="features-item text-center">
+        <div class="features-icon mx-auto">
+          <i class="fas fa-file-alt"></i>
+        </div>
+        <h3 class="feature-title">Document to Quiz</h3>
+        <p class="feature-desc">
+          Upload any PDF, Word or text document and instantly generate custom
+          exam questions.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 mb-4">
+      <div class="features-item text-center">
+        <div class="features-icon mx-auto">
+          <i class="fas fa-brain"></i>
+        </div>
+        <h3 class="feature-title">AI-Powered</h3>
+        <p class="feature-desc">
+          Advanced AI algorithms that understand context and create relevant
+          test questions.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 mb-4">
+      <div class="features-item text-center">
+        <div class="features-icon mx-auto">
+          <i class="fas fa-bolt"></i>
+        </div>
+        <h3 class="feature-title">10-Min Memory Boost</h3>
+        <p class="feature-desc">
+          Quick flash mode for rapid revision when you're short on time.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 mb-4">
+      <div class="features-item text-center">
+        <div class="features-icon mx-auto">
+          <i class="fas fa-sliders-h"></i>
+        </div>
+        <h3 class="feature-title">Customizable Format</h3>
+        <p class="feature-desc">
+          Choose from MCQs, one-word answers, short answers, and flashcards.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 mb-4">
+      <div class="features-item text-center">
+        <div class="features-icon mx-auto">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <h3 class="feature-title">Progress Tracking</h3>
+        <p class="feature-desc">
+          Monitor your performance and identify areas that need improvement.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 mb-4">
+      <div class="features-item text-center">
+        <div class="features-icon mx-auto">
+          <i class="fas fa-trophy"></i>
+        </div>
+        <h3 class="feature-title">Leaderboards</h3>
+        <p class="feature-desc">
+          Compete with peers and stay motivated throughout your preparation.
+        </p>
+      </div>
+    </div>
+  </div>
+  <!-- Footer -->
+  <footer class="footer text-center">
+    <p>&copy; 2025 SISIMPUR. All rights reserved.</p>
+  </footer>
+
+
+
+  <!-- Beta Tester Modal -->
+<div class="modal fade" id="betaModal" tabindex="-1" aria-labelledby="betaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" >
+      <div class="modal-header">
+        <h5 class="modal-title" id="betaModalLabel">Join Our Beta Program</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="betaForm" class="needs-validation" novalidate>
+          <div class="mb-3">
+            <label for="name" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required>
+            <div class="invalid-feedback">Please enter your name.</div>
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email address</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+            <div class="invalid-feedback">Please enter a valid email address.</div>
+          </div>
+          <div class="mb-3">
+            <label for="phone" class="form-label">Whatsapp Number</label>
+            <input type="text" class="form-control" id="phone" name="phonee" placeholder="Enter your Whatsapp Number" required>
+            <div class="invalid-feedback">Please enter a valid Number.</div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-glow" id="submitBeta">Submit Application</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
 {% endblock %}
