@@ -3,10 +3,12 @@ SISIMPUR{% endblock %}
 
 {% block head %}
 <style>
-#success-message {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+  
+#success-text {
+  color: #fff;
+  text-align: center;
+  font-size: 1.25rem;
+  padding: 1rem;
 }
 
 /* Beta Modal Styling */
@@ -315,11 +317,12 @@ document.addEventListener("DOMContentLoaded", function () {
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log("📦 Response data:", data);
         submitBeta.disabled = false;
         submitBeta.innerText = "Submit Application";
 
         if (data.success) {
-          showSuccessMessage(data.message || "Hurray! You are registered as a beta tester.");
+          showSuccessMessage(data.message?.trim() ? data.message : "Hurray! You are registered as a beta tester.");
         } else {
           showErrorMessage(data.error || "Something went wrong. Please try again.");
         }
@@ -338,7 +341,10 @@ document.addEventListener("DOMContentLoaded", function () {
       `;
       const successMessage = document.getElementById('success-message');
       successMessage.classList.remove('d-none');
+
       document.getElementById('success-text').innerText = message;
+      successMessage.style.display = 'block';
+      successMessage.style.opacity = 1;
 
       // 🎉 Confetti!
       party.confetti(document.getElementById('success-text'), {
