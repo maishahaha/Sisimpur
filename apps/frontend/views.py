@@ -65,6 +65,7 @@ def subscribe_to_mailchimp(request):
                     'error': 'No Mailchimp lists found. Please create a list in your Mailchimp account.'
                 }, status=500)
         except Exception as e:
+            print("Shomossa Ekhane 3")
             # If there's an error getting lists, use a placeholder for testing
             # In production, this should be handled more gracefully
             return JsonResponse({
@@ -79,9 +80,12 @@ def subscribe_to_mailchimp(request):
         if result['success']:
             return JsonResponse({'success': True, 'message': 'Thank you for subscribing!'})
         else:
+            print("Shomossa Ekhane 4")
             return JsonResponse({'success': False, 'error': result['error']}, status=400)
 
     except json.JSONDecodeError:
+        print("Shomossa Ekhane 2")
         return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
     except Exception as e:
+        print("Shomossa Ekhane 1")
         return JsonResponse({'success': False, 'error': str(e)}, status=500)

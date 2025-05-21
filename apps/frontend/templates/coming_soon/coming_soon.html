@@ -282,124 +282,99 @@ SISIMPUR{% endblock %}
 
 
 <script>
-// Handle subscription form submissions
 document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll(".subscribe-form").forEach((form) => {
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
+  const submitBeta = document.getElementById('submitBeta');
+  const subscribeForm = document.getElementById('subscribe-form-1');
+  const betaModal = document.getElementById('betaModal');
 
-      const email = this.querySelector('input[name="email"]').value;
-      const responseDiv = this.closest("div").querySelector(".form-response");
+  submitBeta.addEventListener('click', function (e) {
+    e.preventDefault();
 
-      if (!email) {
-        responseDiv.innerHTML =
-          '<div class="alert alert-danger">Please enter a valid email address.</div>';
-        return;
-      }
+    // Validate fields
+    if (!subscribeForm.checkValidity()) {
+      subscribeForm.classList.add('was-validated');
+      return;
+    }
 
-      // Get CSRF token
-      const csrfToken = document.querySelector(
-        "[name=csrfmiddlewaretoken]"
-      ).value;
+    const email = document.getElementById('email').value;
+    const name = document.getElementById('name').value;
 
-      // Show loading state
-      responseDiv.innerHTML = '<div class="text-white">Subscribing...</div>';
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-      // Send AJAX request to the backend
-      fetch("/api/subscribe/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken,
-        },
-        body: JSON.stringify({ email: email }),
+    // Disable the button to prevent multiple clicks
+    submitBeta.disabled = true;
+    submitBeta.innerText = "Submitting...";
+
+    fetch("/api/subscribe/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken
+      },
+      body: JSON.stringify({ email: email })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        submitBeta.disabled = false;
+        submitBeta.innerText = "Submit Application";
+
+        if (data.success) {
+          showSuccessMessage(data.message || "Hurray! You are registered as a beta tester.");
+        } else {
+          showErrorMessage(data.error || "Something went wrong. Please try again.");
+        }
       })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.success) {
-            responseDiv.innerHTML =
-              '<div class="alert alert-success">' + data.message + "</div>";
-            form.reset();
-          } else {
-            // Check if it's an already subscribed error
-            if (data.error && data.error.includes("already subscribed")) {
-              responseDiv.innerHTML =
-                '<div class="alert alert-info">This email is already in our list. Thank you!</div>';
-            } else {
-              responseDiv.innerHTML =
-                '<div class="alert alert-danger">' +
-                (data.error || "An error occurred. Please try again.") +
-                "</div>";
-            }
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-          responseDiv.innerHTML =
-            '<div class="alert alert-danger">An error occurred. Please try again later.</div>';
-        });
-    });
-  });
-});
+      .catch((error) => {
+        console.error("Error:", error);
+        submitBeta.disabled = false;
+        submitBeta.innerText = "Submit Application";
+        showErrorMessage("An unexpected error occurred.");
+      });
 
-// Beta Form Handling
-document.addEventListener('DOMContentLoaded', function() {
-    const subscribeForm1 = document.getElementById('subscribe-form-1');
-    const submitBeta = document.getElementById('submitBeta');
-    const betaModal = document.getElementById('betaModal');
+    function showSuccessMessage(message) {
+      document.getElementById('form-fields').style.display = 'none';
+      document.querySelector('.modal-footer').innerHTML = `
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      `;
+      const successMessage = document.getElementById('success-message');
+      successMessage.classList.remove('d-none');
+      document.getElementById('success-text').innerText = message;
 
-    if (submitBeta && subscribeForm1) {
-        submitBeta.addEventListener('click', function(event) {
-            if (!subscribeForm1.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-                subscribeForm1.classList.add('was-validated');
-                return;
-            }
-
-            const formData = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-            };
-
-            // Here you would normally send the data to your backend
-            // For now, we'll just show a success message
-            const modalBody = betaModal.querySelector('.modal-body');
-            modalBody.innerHTML = `
-                <div class="alert alert-success">
-                    Thank you for applying to be a beta tester! We'll be in touch soon.
-                </div>
-            `;
-            
-            const modalFooter = betaModal.querySelector('.modal-footer');
-            modalFooter.innerHTML = `
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            `;
-        });
+      // 🎉 Confetti!
+      party.confetti(document.getElementById('success-text'), {
+        count: party.variation.range(20, 40),
+        size: party.variation.range(0.8, 1.2),
+      });
     }
 
-    // Reset form when modal is closed
-    if (betaModal) {
-        betaModal.addEventListener('hidden.bs.modal', function() {
-            if (subscribe-form-1) {
-                subscribeForm1.reset();
-                subscribeForm1.classList.remove('was-validated');
-            }
-        });
-    }
-});
+    function showErrorMessage(errorMsg) {
+      const errorDiv = document.getElementById('form-fields');
+      const errorAlert = document.createElement('div');
+      errorAlert.className = 'alert alert-danger';
+      errorAlert.innerText = errorMsg;
 
-// Remove validation styling on input
-document
-  .querySelectorAll("#subscribe-form-1 input, #subscribe-form-1 select")
-  .forEach((input) => {
-    input.addEventListener("input", function () {
-      if (this.value) {
-        this.classList.remove("is-invalid");
-      }
-    });
+      // Remove any existing alerts first
+      errorDiv.querySelectorAll('.alert').forEach(el => el.remove());
+      errorDiv.prepend(errorAlert);
+    }
   });
 
+  // Reset modal when hidden
+  betaModal.addEventListener('hidden.bs.modal', function () {
+    subscribeForm.reset();
+    subscribeForm.classList.remove('was-validated');
+    document.getElementById('form-fields').style.display = 'block';
+    document.getElementById('success-message').classList.add('d-none');
+    document.querySelector('.modal-footer').innerHTML = `
+      <button type="button" class="btn btn-secondary" id="closeButton" data-bs-dismiss="modal">Close</button>
+      <button type="button" class="btn btn-glow" id="submitBeta">Submit Application</button>
+    `;
+    // Reattach the event listener since button was re-rendered
+    setTimeout(() => {
+      document.getElementById('submitBeta').addEventListener('click', arguments.callee);
+    }, 10);
+  });
+});
 </script>
 <script src="https://cdn.jsdelivr.net/npm/party-js@latest/bundle/party.min.js"></script>
 
