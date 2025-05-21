@@ -32,7 +32,7 @@ class TemplateTest(TestCase):
         self.assertIn('SISIMPUR', rendered)
         self.assertIn('Launching Soon', rendered)
         self.assertIn('Key Features', rendered)
-        self.assertIn('Join Our Waitlist', rendered)
+        self.assertIn('Join as Beta Tester', rendered)
         
         # Check for countdown elements
         self.assertIn('countdown-container', rendered)

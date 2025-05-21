@@ -1,7 +1,8 @@
 from django.test import TestCase, Client
 from django.urls import reverse
+from django.test import override_settings
 
-
+@override_settings(COMING_SOON=False, DEBUG=False)
 class coming_soonViewTest(TestCase):
     """Test cases for the coming_soon view"""
 
