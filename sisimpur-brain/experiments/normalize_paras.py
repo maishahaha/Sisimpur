@@ -2,6 +2,7 @@ import re
 import sys
 from pathlib import Path
 
+
 def clean_text(text: str) -> str:
     """
     Normalize into paragraphs:
@@ -12,24 +13,26 @@ def clean_text(text: str) -> str:
     """
     text = text.strip()
     # Split into raw paragraphs
-    paras = re.split(r'\n\s*\n', text)
+    paras = re.split(r"\n\s*\n", text)
     cleaned_paras = []
     for p in paras:
         # collapse internal line-breaks, squash whitespace
-        single = ' '.join(p.splitlines())
-        single = re.sub(r'\s+', ' ', single).strip()
+        single = " ".join(p.splitlines())
+        single = re.sub(r"\s+", " ", single).strip()
         if single:
             cleaned_paras.append(single)
     return "\n\n".join(cleaned_paras)
 
+
 def process_file(path: Path):
     # Read
-    original = path.read_text(encoding='utf-8')
+    original = path.read_text(encoding="utf-8")
     # Clean
     cleaned = clean_text(original)
     # Overwrite
-    path.write_text(cleaned, encoding='utf-8')
+    path.write_text(cleaned, encoding="utf-8")
     print(f"Cleaned and updated: {path!s}")
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

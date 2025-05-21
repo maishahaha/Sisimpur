@@ -20,11 +20,10 @@ from sisimpur.generators.question_paper_processor import QuestionPaperProcessor
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.StreamHandler(sys.stdout)
-    ]
+    handlers=[logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger("sisimpur.test_question_paper")
+
 
 def test_question_paper_detection(file_path):
     """Test question paper detection"""
@@ -40,7 +39,10 @@ def test_question_paper_detection(file_path):
     logger.info(f"Full metadata: {metadata}")
     return metadata
 
-def test_question_paper_processing(file_path, num_questions=None, question_type=None, num_options=None):
+
+def test_question_paper_processing(
+    file_path, num_questions=None, question_type=None, num_options=None
+):
     """Test question paper processing"""
     if not Path(file_path).exists():
         logger.error(f"File not found: {file_path}")
@@ -49,11 +51,13 @@ def test_question_paper_processing(file_path, num_questions=None, question_type=
     # Update config if parameters are provided
     if question_type:
         from sisimpur.config import QUESTION_TYPE
+
         globals()["QUESTION_TYPE"] = question_type
         logger.info(f"Question type set to: {question_type}")
 
     if num_options:
         from sisimpur.config import ANSWER_OPTIONS
+
         globals()["ANSWER_OPTIONS"] = num_options
         logger.info(f"Number of options set to: {num_options}")
 
@@ -65,7 +69,7 @@ def test_question_paper_processing(file_path, num_questions=None, question_type=
         logger.info(f"Q&A pairs saved to: {output_file}")
 
         # Display generated Q&A pairs
-        with open(output_file, 'r', encoding='utf-8') as f:
+        with open(output_file, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         question_count = len(data["questions"])
@@ -93,17 +97,41 @@ def test_question_paper_processing(file_path, num_questions=None, question_type=
         logger.error(f"Error processing question paper: {e}")
         return None
 
+
 def main():
     """Main entry point"""
-    parser = argparse.ArgumentParser(description="Test Sisimpur Brain Question Paper Processing")
+    parser = argparse.ArgumentParser(
+        description="Test Sisimpur Brain Question Paper Processing"
+    )
     parser.add_argument("file_path", help="Path to the question paper file")
-    parser.add_argument("--questions", "-q", type=int, help="Number of Q&A pairs to extract (if not specified, will extract all)")
-    parser.add_argument("--question-type", "-t", choices=["SHORT", "MULTIPLECHOICE"],
-                        help="Type of questions to generate (default is set in config)")
-    parser.add_argument("--options", "-o", type=int, choices=[2, 3, 4, 5, 6],
-                        help="Number of options for multiple-choice questions (default is set in config)")
-    parser.add_argument("--detect-only", "-d", action="store_true", help="Only detect if it's a question paper, don't process")
-    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
+    parser.add_argument(
+        "--questions",
+        "-q",
+        type=int,
+        help="Number of Q&A pairs to extract (if not specified, will extract all)",
+    )
+    parser.add_argument(
+        "--question-type",
+        "-t",
+        choices=["SHORT", "MULTIPLECHOICE"],
+        help="Type of questions to generate (default is set in config)",
+    )
+    parser.add_argument(
+        "--options",
+        "-o",
+        type=int,
+        choices=[2, 3, 4, 5, 6],
+        help="Number of options for multiple-choice questions (default is set in config)",
+    )
+    parser.add_argument(
+        "--detect-only",
+        "-d",
+        action="store_true",
+        help="Only detect if it's a question paper, don't process",
+    )
+    parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Enable verbose logging"
+    )
 
     args = parser.parse_args()
 
@@ -119,8 +147,9 @@ def main():
             file_path=args.file_path,
             num_questions=args.questions,
             question_type=args.question_type,
-            num_options=args.options
+            num_options=args.options,
         )
+
 
 if __name__ == "__main__":
     main()

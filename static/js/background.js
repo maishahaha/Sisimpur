@@ -1,12 +1,13 @@
 // Random particle animation
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function () {
   const particlesContainer = document.getElementById("particles");
 
   // Check if the particles container exists
   if (particlesContainer) {
     console.log("Particles container found, creating particles...");
 
-    for (let i = 0; i < 100; i++) { // Increased from 50 to 100 particles
+    for (let i = 0; i < 100; i++) {
+      // Increased from 50 to 100 particles
       const particle = document.createElement("div");
       particle.className = "particle";
 

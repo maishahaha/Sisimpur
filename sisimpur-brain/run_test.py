@@ -21,11 +21,10 @@ from sisimpur.config import GEMINI_API_KEY
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.StreamHandler(sys.stdout)
-    ]
+    handlers=[logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger("sisimpur.test")
+
 
 def test_document_detection(file_path):
     """Test document type detection"""
@@ -33,6 +32,7 @@ def test_document_detection(file_path):
     metadata = detect_document_type(file_path)
     logger.info(f"Detected: {metadata}")
     return metadata
+
 
 def test_document_processing(file_path, num_questions=None):
     """Test document processing and Q&A generation"""
@@ -48,7 +48,7 @@ def test_document_processing(file_path, num_questions=None):
         logger.info(f"Q&A pairs saved to: {output_file}")
 
         # Display generated Q&A pairs
-        with open(output_file, 'r', encoding='utf-8') as f:
+        with open(output_file, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         question_count = len(data["questions"])
@@ -69,13 +69,26 @@ def test_document_processing(file_path, num_questions=None):
         logger.error(f"Error processing document: {e}")
         return None
 
+
 def main():
     """Main entry point"""
     parser = argparse.ArgumentParser(description="Test Sisimpur Brain")
     parser.add_argument("file_path", help="Path to the document file")
-    parser.add_argument("--questions", "-q", type=int, help="Number of Q&A pairs to generate (if not specified, will auto-determine optimal count)")
-    parser.add_argument("--detect-only", "-d", action="store_true", help="Only detect document type, don't process")
-    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
+    parser.add_argument(
+        "--questions",
+        "-q",
+        type=int,
+        help="Number of Q&A pairs to generate (if not specified, will auto-determine optimal count)",
+    )
+    parser.add_argument(
+        "--detect-only",
+        "-d",
+        action="store_true",
+        help="Only detect document type, don't process",
+    )
+    parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Enable verbose logging"
+    )
 
     args = parser.parse_args()
 
@@ -85,7 +98,9 @@ def main():
 
     # Check if Google API key is set
     if not GEMINI_API_KEY:
-        logger.warning("GOOGLE_API_KEY not found in environment variables. Gemini features will not work.")
+        logger.warning(
+            "GOOGLE_API_KEY not found in environment variables. Gemini features will not work."
+        )
         logger.warning("Set it with: export GOOGLE_API_KEY='your_api_key_here'")
 
     # Run tests
@@ -93,6 +108,7 @@ def main():
         test_document_detection(args.file_path)
     else:
         test_document_processing(args.file_path, args.questions)
+
 
 if __name__ == "__main__":
     main()

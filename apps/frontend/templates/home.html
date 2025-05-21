@@ -1,14 +1,8 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}SISIMPUR - AI-Powered Exam Prep{% endblock %}
-
-{% block head %}
-<link href="{% static 'css/home.css' %}" rel="stylesheet">
-<link href="{% static 'css/background.css' %}" rel="stylesheet">
-{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block title %}SISIMPUR -
+AI-Powered Exam Prep{% endblock %} {% block head %}
+<link href="{% static 'css/home.css' %}" rel="stylesheet" />
+<link href="{% static 'css/background.css' %}" rel="stylesheet" />
+{% endblock %} {% block content %}
 <!-- Background Elements -->
 <div class="bg-grid"></div>
 <div class="blob blob-1"></div>
@@ -49,7 +43,9 @@
           <a class="nav-link" href="#faq">FAQ</a>
         </li>
         <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
-          <a class="btn btn-glow" href="{% url 'auth:signupin' %}">Get Started</a>
+          <a class="btn btn-glow" href="{% url 'auth:signupin' %}"
+            >Get Started</a
+          >
         </li>
       </ul>
     </div>
@@ -66,11 +62,13 @@
         </h1>
         <p class="hero-subtitle">
           SISIMPUR converts your study materials into personalized practice
-          tests for effective exam preparation. Upload once, practice
-          anytime, ace your exams.
+          tests for effective exam preparation. Upload once, practice anytime,
+          ace your exams.
         </p>
         <div class="d-flex gap-3 justify-content-center">
-          <a href="{% url 'auth:signupin' %}" class="btn btn-glow">Start For Free</a>
+          <a href="{% url 'auth:signupin' %}" class="btn btn-glow"
+            >Start For Free</a
+          >
           <a href="#how-it-works" class="btn btn-outline">Learn More</a>
         </div>
       </div>
@@ -119,8 +117,8 @@
           </div>
           <h3 class="feature-title">AI Question Generator</h3>
           <p>
-            Advanced algorithms create relevant and challenging questions
-            from your uploaded content, saving hours of manual preparation.
+            Advanced algorithms create relevant and challenging questions from
+            your uploaded content, saving hours of manual preparation.
           </p>
         </div>
       </div>
@@ -132,8 +130,8 @@
           </div>
           <h3 class="feature-title">Multiple Question Formats</h3>
           <p>
-            Choose from MCQs, one-word answers, short answers, and
-            flashcards to customize your learning experience.
+            Choose from MCQs, one-word answers, short answers, and flashcards to
+            customize your learning experience.
           </p>
         </div>
       </div>
@@ -145,8 +143,8 @@
           </div>
           <h3 class="feature-title">Global Leaderboard</h3>
           <p>
-            Compete with peers worldwide, track your ranking, and stay
-            motivated with our interactive leaderboard system.
+            Compete with peers worldwide, track your ranking, and stay motivated
+            with our interactive leaderboard system.
           </p>
         </div>
       </div>
@@ -171,8 +169,8 @@
           </div>
           <h3 class="feature-title">10-Minute Memory Boost</h3>
           <p>
-            Quick flash-style sessions for rapid revision when you're short
-            on time. Perfect for last-minute preparation.
+            Quick flash-style sessions for rapid revision when you're short on
+            time. Perfect for last-minute preparation.
           </p>
         </div>
       </div>
@@ -196,8 +194,8 @@
           <div class="step-number">1</div>
           <h3>Upload Your Materials</h3>
           <p>
-            Upload your study materials in PDF, Word, or text format. Our
-            system accepts files up to 20MB.
+            Upload your study materials in PDF, Word, or text format. Our system
+            accepts files up to 20MB.
           </p>
         </div>
       </div>
@@ -206,8 +204,8 @@
           <div class="step-number">2</div>
           <h3>AI Processing</h3>
           <p>
-            Our AI analyzes your content and generates relevant questions
-            based on the material.
+            Our AI analyzes your content and generates relevant questions based
+            on the material.
           </p>
         </div>
       </div>
@@ -216,8 +214,8 @@
           <div class="step-number">3</div>
           <h3>Start Practicing</h3>
           <p>
-            Begin practicing with AI-generated questions and track your
-            progress in real-time.
+            Begin practicing with AI-generated questions and track your progress
+            in real-time.
           </p>
         </div>
       </div>
@@ -231,20 +229,35 @@
     <div class="text-center mb-5">
       <h2 class="section-title">What Our Users Say</h2>
       <p class="section-subtitle">
-        Join thousands of satisfied students who have transformed their exam preparation
+        Join thousands of satisfied students who have transformed their exam
+        preparation
       </p>
     </div>
 
-    <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div
+      id="testimonialCarousel"
+      class="carousel slide"
+      data-bs-ride="carousel"
+    >
       <div class="carousel-inner" id="carouselTestimonialsContainer">
         <!-- Testimonials injected via JS -->
       </div>
 
-      <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+      <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#testimonialCarousel"
+        data-bs-slide="prev"
+      >
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Previous</span>
       </button>
-      <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+      <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#testimonialCarousel"
+        data-bs-slide="next"
+      >
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Next</span>
       </button>
@@ -258,11 +271,13 @@
     <div class="cta-content text-center">
       <h2>Ready to Transform Your Exam Preparation?</h2>
       <p>
-        Join thousands of students who are already using SISIMPUR to ace
-        their exams
+        Join thousands of students who are already using SISIMPUR to ace their
+        exams
       </p>
       <div class="cta-buttons">
-        <a href="{% url 'auth:signupin' %}" class="btn btn-glow btn-lg">Get Started</a>
+        <a href="{% url 'auth:signupin' %}" class="btn btn-glow btn-lg"
+          >Get Started</a
+        >
       </div>
     </div>
   </div>
@@ -275,8 +290,8 @@
       <div class="col-lg-4 mb-4 mb-lg-0 text-center">
         <div class="footer-logo">SISIMPUR</div>
         <p class="text-light opacity-75">
-          Empowering students with AI-driven exam preparation tools to
-          achieve academic excellence.
+          Empowering students with AI-driven exam preparation tools to achieve
+          academic excellence.
         </p>
         <div class="social-icons">
           <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -335,9 +350,7 @@
     </div>
   </div>
 </footer>
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script src="{% static 'js/background.js' %}"></script>
 <script src="{% static 'js/home.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

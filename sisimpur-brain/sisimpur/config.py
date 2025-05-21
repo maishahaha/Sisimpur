@@ -30,13 +30,15 @@ import os
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
-dotenv_path = BASE_DIR / '.env'
+dotenv_path = BASE_DIR / ".env"
 load_dotenv(dotenv_path=dotenv_path)
 
 # Get API key from environment variable
 GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
 if not GEMINI_API_KEY:
-    logger.warning("GOOGLE_API_KEY not found in environment variables. Gemini features will not work.")
+    logger.warning(
+        "GOOGLE_API_KEY not found in environment variables. Gemini features will not work."
+    )
 
 # Rate limiting settings
 MAX_RETRIES = 5
@@ -48,7 +50,9 @@ RATE_LIMIT_COOLDOWN = 10  # seconds between batches
 # Model settings
 DEFAULT_GEMINI_MODEL = "models/gemini-1.5-flash"
 QA_GEMINI_MODEL = "models/gemini-1.5-flash"
-FALLBACK_GEMINI_MODEL = "models/gemini-1.5-flash"  # Fallback to older model if rate limited
+FALLBACK_GEMINI_MODEL = (
+    "models/gemini-1.5-flash"  # Fallback to older model if rate limited
+)
 
 # Document processing settings
 MIN_TEXT_LENGTH = 100  # Minimum text length to consider a PDF as text-based

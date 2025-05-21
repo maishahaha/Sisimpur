@@ -1,70 +1,65 @@
 {% extends 'coming_soon/coming_soon_base.html' %} {% block title %}Coming Soon -
-SISIMPUR{% endblock %} 
-
-{% block head %}
+SISIMPUR{% endblock %} {% block head %}
 <style>
+  #success-text {
+    color: #fff;
+    text-align: center;
+    font-size: 1.25rem;
+    padding: 1rem;
+  }
 
-#success-text {
-  color: #fff;
-  text-align: center;
-  font-size: 1.25rem;
-  padding: 1rem;
-}
-
-/* Beta Modal Styling */
-.modal-content {
+  /* Beta Modal Styling */
+  .modal-content {
     background: #050510;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     color: #f8f9fa;
-}
+  }
 
-.modal-header {
+  .modal-header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 1.5rem;
-}
+  }
 
-.modal-footer {
+  .modal-footer {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding: 1.5rem;
-}
+  }
 
-.modal-title {
-    font-family: 'Space Grotesk', sans-serif;
+  .modal-title {
+    font-family: "Space Grotesk", sans-serif;
     font-weight: 600;
     color: #f8f9fa;
-}
+  }
 
-.btn-close {
+  .btn-close {
     filter: invert(1) grayscale(100%) brightness(200%);
-}
+  }
 
-.form-label {
+  .form-label {
     color: #f8f9fa;
     font-weight: 500;
     margin-bottom: 0.5rem;
-}
+  }
 
-.form-control.is-invalid {
+  .form-control.is-invalid {
     border-color: rgba(220, 53, 69, 0.5);
     background-image: none;
-}
+  }
 
-.form-control.is-invalid:focus {
+  .form-control.is-invalid:focus {
     border-color: rgba(220, 53, 69, 0.75);
     box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
-}
+  }
 
-.invalid-feedback {
+  .invalid-feedback {
     color: #f8d7da;
     font-size: 0.875rem;
     margin-top: 0.25rem;
-}
+  }
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <!-- Background Elements -->
 <div class="bg-grid"></div>
 <div class="blob blob-1"></div>
@@ -120,7 +115,13 @@ SISIMPUR{% endblock %}
               </div>
             </div>
             <!-- Beta Button -->
-            <button type="button" class="btn btn-glow mt-3" data-bs-toggle="modal" data-bs-target="#betaModal" style="margin-bottom: 20px;" >
+            <button
+              type="button"
+              class="btn btn-glow mt-3"
+              data-bs-toggle="modal"
+              data-bs-target="#betaModal"
+              style="margin-bottom: 20px"
+            >
               Join as Beta Tester
             </button>
 
@@ -149,7 +150,6 @@ SISIMPUR{% endblock %}
       </div>
     </div>
   </div>
-  
 
   <!-- Features Section -->
   <div class="row mb-5">
@@ -237,153 +237,193 @@ SISIMPUR{% endblock %}
     <p>&copy; 2025 SISIMPUR. All rights reserved.</p>
   </footer>
 
-
-
-<!-- Beta Tester Modal -->
-<div class="modal fade" id="betaModal" tabindex="-1" aria-labelledby="betaModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="betaModalLabel">Join Our Beta Program</h5>
-      </div>
-      <div class="modal-body">
-        <form id="subscribe-form-1" class="needs-validation" novalidate>
-          <input type="hidden" name="csrfmiddlewaretoken" value="z6TEj0PGqnWCECZnMaFCQLdVcZdyj17Ab44dccESOIqyyQq8nSyfg0VrUE2wl3Lw">
-          <div id="form-fields">
-            <div class="mb-3">
-              <label for="name" class="form-label">Full Name</label>
-              <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required>
-              <div class="invalid-feedback">Please enter your name.</div>
+  <!-- Beta Tester Modal -->
+  <div
+    class="modal fade"
+    id="betaModal"
+    tabindex="-1"
+    aria-labelledby="betaModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="betaModalLabel">Join Our Beta Program</h5>
+        </div>
+        <div class="modal-body">
+          <form id="subscribe-form-1" class="needs-validation" novalidate>
+            <input
+              type="hidden"
+              name="csrfmiddlewaretoken"
+              value="z6TEj0PGqnWCECZnMaFCQLdVcZdyj17Ab44dccESOIqyyQq8nSyfg0VrUE2wl3Lw"
+            />
+            <div id="form-fields">
+              <div class="mb-3">
+                <label for="name" class="form-label">Full Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="name"
+                  name="name"
+                  placeholder="Enter your name"
+                  required
+                />
+                <div class="invalid-feedback">Please enter your name.</div>
+              </div>
+              <div class="mb-3">
+                <label for="email" class="form-label">Email address</label>
+                <input
+                  type="email"
+                  name="email"
+                  class="form-control"
+                  id="email"
+                  placeholder="Enter your email"
+                  required
+                />
+                <div class="invalid-feedback">
+                  Please enter a valid email address.
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="phone" class="form-label">Whatsapp Number</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="phone"
+                  name="phone"
+                  placeholder="Enter your Whatsapp Number"
+                  required
+                />
+                <div class="invalid-feedback">Please enter a valid Number.</div>
+              </div>
             </div>
-            <div class="mb-3">
-              <label for="email" class="form-label">Email address</label>
-              <input type="email" name="email" class="form-control" id="email" placeholder="Enter your email" required>
-              <div class="invalid-feedback">Please enter a valid email address.</div>
+            <!-- Success Message (Initially Hidden) -->
+            <div id="success-message" class="d-none">
+              <h3 id="success-text" class="text-center"></h3>
             </div>
-            <div class="mb-3">
-              <label for="phone" class="form-label">Whatsapp Number</label>
-              <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter your Whatsapp Number" required>
-              <div class="invalid-feedback">Please enter a valid Number.</div>
-            </div>
-          </div>
-          <!-- Success Message (Initially Hidden) -->
-          <div id="success-message" class="d-none">
-            <h3 id="success-text" class="text-center"></h3>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="closeButton">Close</button>
-        <button type="button" class="btn btn-glow" id="submitBeta">Submit Application</button>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="closeButton">
+            Close
+          </button>
+          <button type="button" class="btn btn-glow" id="submitBeta">
+            Submit Application
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-</div>
-
-
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const submitBeta = document.getElementById('submitBeta');
-  const subscribeForm = document.getElementById('subscribe-form-1');
-  const betaModal = document.getElementById('betaModal');
+  document.addEventListener("DOMContentLoaded", function () {
+    const submitBeta = document.getElementById("submitBeta");
+    const subscribeForm = document.getElementById("subscribe-form-1");
+    const betaModal = document.getElementById("betaModal");
 
-  submitBeta.addEventListener('click', function (e) {
-    e.preventDefault();
+    submitBeta.addEventListener("click", function (e) {
+      e.preventDefault();
 
-    // Validate fields
-    if (!subscribeForm.checkValidity()) {
-      subscribeForm.classList.add('was-validated');
-      return;
-    }
+      // Validate fields
+      if (!subscribeForm.checkValidity()) {
+        subscribeForm.classList.add("was-validated");
+        return;
+      }
 
-    const email = document.getElementById('email').value;
-    const name = document.getElementById('name').value;
+      const email = document.getElementById("email").value;
+      const name = document.getElementById("name").value;
 
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      const csrfToken = document.querySelector(
+        "[name=csrfmiddlewaretoken]",
+      ).value;
 
-    // Disable the button to prevent multiple clicks
-    submitBeta.disabled = true;
-    submitBeta.innerText = "Submitting...";
+      // Disable the button to prevent multiple clicks
+      submitBeta.disabled = true;
+      submitBeta.innerText = "Submitting...";
 
-    fetch("/api/subscribe/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrfToken
-      },
-      body: JSON.stringify({ email: email })
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        submitBeta.disabled = false;
-        submitBeta.innerText = "Submit Application";
-
-        if (data.success) {
-          // Update modal title
-          document.getElementById('betaModalLabel').innerText = data.title || "You're In!";
-
-          // Show message
-          showSuccessMessage(data.message || "Let the magic begin! ✨🌈");
-        } else {
-          showErrorMessage(data.error || "Something went wrong. Please try again.");
-        }
+      fetch("/api/subscribe/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
+        },
+        body: JSON.stringify({ email: email }),
       })
-      .catch((error) => {
-        console.error("Error:", error);
-        submitBeta.disabled = false;
-        submitBeta.innerText = "Submit Application";
-        showErrorMessage("An unexpected error occurred.");
-      });
+        .then((response) => response.json())
+        .then((data) => {
+          submitBeta.disabled = false;
+          submitBeta.innerText = "Submit Application";
 
-    function showSuccessMessage(message) {
-      document.getElementById('form-fields').style.display = 'none';
-      document.querySelector('.modal-footer').innerHTML = `
+          if (data.success) {
+            // Update modal title
+            document.getElementById("betaModalLabel").innerText =
+              data.title || "You're In!";
+
+            // Show message
+            showSuccessMessage(data.message || "Let the magic begin! ✨🌈");
+          } else {
+            showErrorMessage(
+              data.error || "Something went wrong. Please try again.",
+            );
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          submitBeta.disabled = false;
+          submitBeta.innerText = "Submit Application";
+          showErrorMessage("An unexpected error occurred.");
+        });
+
+      function showSuccessMessage(message) {
+        document.getElementById("form-fields").style.display = "none";
+        document.querySelector(".modal-footer").innerHTML = `
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       `;
-      const successMessage = document.getElementById('success-message');
-      successMessage.classList.remove('d-none');
+        const successMessage = document.getElementById("success-message");
+        successMessage.classList.remove("d-none");
 
-      document.getElementById('success-text').innerText = message;
-      successMessage.style.display = 'block';
-      successMessage.style.opacity = 1;
+        document.getElementById("success-text").innerText = message;
+        successMessage.style.display = "block";
+        successMessage.style.opacity = 1;
 
-      // 🎉 Confetti!
-      party.confetti(document.getElementById('success-text'), {
-        count: party.variation.range(20, 40),
-        size: party.variation.range(0.8, 1.2),
-      });
-    }
+        // 🎉 Confetti!
+        party.confetti(document.getElementById("success-text"), {
+          count: party.variation.range(20, 40),
+          size: party.variation.range(0.8, 1.2),
+        });
+      }
 
-    function showErrorMessage(errorMsg) {
-      const errorDiv = document.getElementById('form-fields');
-      const errorAlert = document.createElement('div');
-      errorAlert.className = 'alert alert-danger';
-      errorAlert.innerText = errorMsg;
+      function showErrorMessage(errorMsg) {
+        const errorDiv = document.getElementById("form-fields");
+        const errorAlert = document.createElement("div");
+        errorAlert.className = "alert alert-danger";
+        errorAlert.innerText = errorMsg;
 
-      // Remove any existing alerts first
-      errorDiv.querySelectorAll('.alert').forEach(el => el.remove());
-      errorDiv.prepend(errorAlert);
-    }
-  });
+        // Remove any existing alerts first
+        errorDiv.querySelectorAll(".alert").forEach((el) => el.remove());
+        errorDiv.prepend(errorAlert);
+      }
+    });
 
-  // Reset modal when hidden
-  betaModal.addEventListener('hidden.bs.modal', function () {
-    subscribeForm.reset();
-    subscribeForm.classList.remove('was-validated');
-    document.getElementById('form-fields').style.display = 'block';
-    document.getElementById('success-message').classList.add('d-none');
-    document.querySelector('.modal-footer').innerHTML = `
+    // Reset modal when hidden
+    betaModal.addEventListener("hidden.bs.modal", function () {
+      subscribeForm.reset();
+      subscribeForm.classList.remove("was-validated");
+      document.getElementById("form-fields").style.display = "block";
+      document.getElementById("success-message").classList.add("d-none");
+      document.querySelector(".modal-footer").innerHTML = `
       <button type="button" class="btn btn-secondary" id="closeButton" data-bs-dismiss="modal">Close</button>
       <button type="button" class="btn btn-glow" id="submitBeta">Submit Application</button>
     `;
-    // Reattach the event listener since button was re-rendered
-    setTimeout(() => {
-      document.getElementById('submitBeta').addEventListener('click', arguments.callee);
-    }, 10);
+      // Reattach the event listener since button was re-rendered
+      setTimeout(() => {
+        document
+          .getElementById("submitBeta")
+          .addEventListener("click", arguments.callee);
+      }, 10);
+    });
   });
-});
 </script>
 <script src="https://cdn.jsdelivr.net/npm/party-js@latest/bundle/party.min.js"></script>
 

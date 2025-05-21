@@ -3,7 +3,8 @@ Main document processor for Sisimpur Brain.
 
 This module provides the main document processing pipeline.
 """
-#Need Fine tuning here
+
+# Need Fine tuning here
 import logging
 from typing import Dict, Any, Optional
 
@@ -18,6 +19,7 @@ from .utils.extractor_factory import get_extractor
 from .utils.file_utils import save_qa_pairs
 
 logger = logging.getLogger("sisimpur.processor")
+
 
 class DocumentProcessor:
     """Main document processing pipeline"""
@@ -34,8 +36,7 @@ class DocumentProcessor:
         Returns:
             Path to the generated JSON file
         """
-        
-        
+
         try:
             # Step 1: Detect document type
             logger.info(f"Detecting document type for: {file_path}")
@@ -49,34 +50,52 @@ class DocumentProcessor:
             language = metadata.get("language", "english")
             is_question_paper = metadata.get("is_question_paper", False)
 
-            if (metadata.get("doc_type") == "pdf" and
-                language == "bengali" and
-                is_question_paper):
+            if (
+                metadata.get("doc_type") == "pdf"
+                and language == "bengali"
+                and is_question_paper
+            ):
 
                 # Use direct PDF processing for Bengali question papers in PDF format
-                logger.info("Bengali question paper in PDF format detected - using direct PDF processing")
-                direct_processor = DirectPDFProcessor(language=language, is_question_paper=True)
-                qa_pairs = direct_processor.process(file_path, max_questions=num_questions)
-                logger.info(f"Directly extracted {len(qa_pairs)} questions from PDF question paper")
+                logger.info(
+                    "Bengali question paper in PDF format detected - using direct PDF processing"
+                )
+                direct_processor = DirectPDFProcessor(
+                    language=language, is_question_paper=True
+                )
+                qa_pairs = direct_processor.process(
+                    file_path, max_questions=num_questions
+                )
+                logger.info(
+                    f"Directly extracted {len(qa_pairs)} questions from PDF question paper"
+                )
 
             else:
                 logger.info(f"Extracting text from document: {file_path}")
-                
-                #here double object is being called
-                #extractor = self._get_extractor(metadata)
-                #extracted_text = extractor.extract(file_path)
+
+                # here double object is being called
+                # extractor = self._get_extractor(metadata)
+                # extracted_text = extractor.extract(file_path)
                 # Standard processing pipeline for other documents
                 # Step 2: Extract text based on document type
                 if is_question_paper:
-                    logger.info("Document detected as a question paper, using specialized processor")
+                    logger.info(
+                        "Document detected as a question paper, using specialized processor"
+                    )
                     processor = QuestionPaperProcessor(language=language)
-                    qa_pairs = processor.process(extracted_text, max_questions=num_questions)
-                    logger.info(f"Extracted {len(qa_pairs)} questions from question paper")
+                    qa_pairs = processor.process(
+                        extracted_text, max_questions=num_questions
+                    )
+                    logger.info(
+                        f"Extracted {len(qa_pairs)} questions from question paper"
+                    )
                 else:
                     logger.info("Using standard QA generator")
                     qa_generator = QAGenerator(language=language)
                     if num_questions is None:
-                        logger.info("Auto-determining optimal number of questions to generate")
+                        logger.info(
+                            "Auto-determining optimal number of questions to generate"
+                        )
                         qa_pairs = qa_generator.generate_optimal(extracted_text)
                     else:
                         logger.info(f"Generating {num_questions} Q&A pairs")
@@ -106,12 +125,10 @@ class DocumentProcessor:
             logger.info(f"Q&A pairs saved to {output_file}")
             return output_file
 
-
         except Exception as e:
             logger.error(f"Error processing document: {e}")
             raise
 
-        
     def _get_extractor(self, metadata: Dict[str, Any]) -> BaseExtractor:
         """
         Get appropriate extractor based on document metadata.
@@ -132,13 +149,17 @@ class DocumentProcessor:
             else:  # image_based or unknown
                 language = metadata.get("language", "eng")
                 lang_code = "ben" if language == "bengali" else "eng"
-                logging.getLogger("sisimpur.processor").info(f"Using ImagePDFExtractor with language: {lang_code}")
+                logging.getLogger("sisimpur.processor").info(
+                    f"Using ImagePDFExtractor with language: {lang_code}"
+                )
                 return ImagePDFExtractor(language=lang_code)
 
         elif doc_type == "image":
             language = metadata.get("language", "eng")
             lang_code = "ben" if language == "bengali" else "eng"
-            logging.getLogger("sisimpur.processor").info(f"Using ImageExtractor with language: {lang_code}")
+            logging.getLogger("sisimpur.processor").info(
+                f"Using ImageExtractor with language: {lang_code}"
+            )
             return ImageExtractor(language=lang_code)
 
         else:

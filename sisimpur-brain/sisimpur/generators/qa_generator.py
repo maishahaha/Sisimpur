@@ -108,6 +108,7 @@ MCQ:
 {text}
 """.strip()
 
+
 # ---------------------------------------------------------------------------
 #  Helper utilities
 # ---------------------------------------------------------------------------
@@ -126,7 +127,9 @@ def _estimate_difficulty(text: str) -> str:
     return "advanced"
 
 
-def _split_into_chunks(text: str, chunk_words: int = 800, overlap: int = 80) -> List[str]:
+def _split_into_chunks(
+    text: str, chunk_words: int = 800, overlap: int = 80
+) -> List[str]:
     """Split long text into overlapping chunks for LLM calls."""
     words = text.split()
     if len(words) <= chunk_words:
@@ -243,7 +246,9 @@ class QAGenerator:
     @staticmethod
     def _strip_json_fence(resp_text: str) -> str:
         """Remove triple-backtick fences, returning raw JSON."""
-        m = re.search(r"```json(.*?)```", resp_text, re.S) or re.search(r"```(.*?)```", resp_text, re.S)
+        m = re.search(r"```json(.*?)```", resp_text, re.S) or re.search(
+            r"```(.*?)```", resp_text, re.S
+        )
         return m.group(1).strip() if m else resp_text
 
     def _parse_response(self, resp_text: str) -> List[Dict[str, str]]:

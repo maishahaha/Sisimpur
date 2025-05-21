@@ -1,5 +1,9 @@
-{% extends 'base.html' %} {% load static %} {% block title %}SISIMPUR - Sign In / Sign Up{% endblock %} {% block head %}
-<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"/>
+{% extends 'base.html' %} {% load static %} {% block title %}SISIMPUR - Sign In
+/ Sign Up{% endblock %} {% block head %}
+<link
+  href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+  rel="stylesheet"
+/>
 <link href="{% static 'css/signupin.css' %}" rel="stylesheet" />
 <link href="{% static 'css/background.css' %}" rel="stylesheet" />
 {% endblock %} {% block content %}
@@ -36,10 +40,18 @@
 
       <p>Or Sign In With</p>
       <div class="social-icons">
-        <a href="{% url 'auth:signupin' %}?social=google"><i class="bx bxl-google"></i></a>
-        <a href="{% url 'auth:signupin' %}?social=facebook"><i class="bx bxl-facebook-circle"></i></a>
-        <a href="{% url 'auth:signupin' %}?social=github"><i class="bx bxl-github"></i></a>
-        <a href="{% url 'auth:signupin' %}?social=linkedin"><i class="bx bxl-linkedin"></i></a>
+        <a href="{% url 'auth:signupin' %}?social=google"
+          ><i class="bx bxl-google"></i
+        ></a>
+        <a href="{% url 'auth:signupin' %}?social=facebook"
+          ><i class="bx bxl-facebook-circle"></i
+        ></a>
+        <a href="{% url 'auth:signupin' %}?social=github"
+          ><i class="bx bxl-github"></i
+        ></a>
+        <a href="{% url 'auth:signupin' %}?social=linkedin"
+          ><i class="bx bxl-linkedin"></i
+        ></a>
       </div>
       <div class="return-link">
         <a href="{% url 'home' %}">&#8592; Home </a>
@@ -74,10 +86,18 @@
       <button type="submit" class="btn">Sign Up</button>
       <p>Or Sign Up With</p>
       <div class="social-icons">
-        <a href="{% url 'auth:signupin' %}?social=google"><i class="bx bxl-google"></i></a>
-        <a href="{% url 'auth:signupin' %}?social=facebook"><i class="bx bxl-facebook-circle"></i></a>
-        <a href="{% url 'auth:signupin' %}?social=github"><i class="bx bxl-github"></i></a>
-        <a href="{% url 'auth:signupin' %}?social=linkedin"><i class="bx bxl-linkedin"></i></a>
+        <a href="{% url 'auth:signupin' %}?social=google"
+          ><i class="bx bxl-google"></i
+        ></a>
+        <a href="{% url 'auth:signupin' %}?social=facebook"
+          ><i class="bx bxl-facebook-circle"></i
+        ></a>
+        <a href="{% url 'auth:signupin' %}?social=github"
+          ><i class="bx bxl-github"></i
+        ></a>
+        <a href="{% url 'auth:signupin' %}?social=linkedin"
+          ><i class="bx bxl-linkedin"></i
+        ></a>
       </div>
       <div class="return-link" style="justify-content: left; align-items: left">
         <a href="{% url 'home' %}">&#8592; Home</a>
@@ -106,38 +126,54 @@
 <!-- Main toast script -->
 <script>
   // Add direct toast notification for social media buttons
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log('Social media script loaded');
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("Social media script loaded");
 
     // Get all social media links
-    const socialLinks = document.querySelectorAll('.social-icons a');
+    const socialLinks = document.querySelectorAll(".social-icons a");
 
     // Add click event listener to each link
-    socialLinks.forEach(function(link) {
-      link.addEventListener('click', function(e) {
+    socialLinks.forEach(function (link) {
+      link.addEventListener("click", function (e) {
         // Get the social media type from the URL
         const url = new URL(this.href);
-        const socialType = url.searchParams.get('social');
+        const socialType = url.searchParams.get("social");
 
-        if (socialType && typeof window.showToast === 'function') {
+        if (socialType && typeof window.showToast === "function") {
           // We'll prevent default behavior to show toast immediately
 
           // Prevent default link behavior to show toast immediately
           e.preventDefault();
 
           // Show appropriate toast based on social media type
-          switch(socialType) {
-            case 'google':
-              window.showToast('info', 'Google Sign-In', 'Google sign-in is coming soon!');
+          switch (socialType) {
+            case "google":
+              window.showToast(
+                "info",
+                "Google Sign-In",
+                "Google sign-in is coming soon!",
+              );
               break;
-            case 'facebook':
-              window.showToast('warning', 'Facebook', 'Facebook integration is under maintenance.');
+            case "facebook":
+              window.showToast(
+                "warning",
+                "Facebook",
+                "Facebook integration is under maintenance.",
+              );
               break;
-            case 'github':
-              window.showToast('success', 'GitHub', 'GitHub authentication is ready to use!');
+            case "github":
+              window.showToast(
+                "success",
+                "GitHub",
+                "GitHub authentication is ready to use!",
+              );
               break;
-            case 'linkedin':
-              window.showToast('error', 'LinkedIn', 'LinkedIn sign-in is temporarily unavailable.');
+            case "linkedin":
+              window.showToast(
+                "error",
+                "LinkedIn",
+                "LinkedIn sign-in is temporarily unavailable.",
+              );
               break;
           }
 

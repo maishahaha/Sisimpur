@@ -2,33 +2,39 @@ const testimonials = [
   {
     name: "Sarah Johnson",
     role: "Medical Student",
-    content: "SISIMPUR has revolutionized how I prepare for exams. The AI-generated questions are incredibly relevant and challenging."
+    content:
+      "SISIMPUR has revolutionized how I prepare for exams. The AI-generated questions are incredibly relevant and challenging.",
   },
   {
     name: "Michael Chen",
     role: "Engineering Student",
-    content: "The platform is intuitive and the questions are well-structured. It's like having a personal tutor available 24/7."
+    content:
+      "The platform is intuitive and the questions are well-structured. It's like having a personal tutor available 24/7.",
   },
   {
     name: "Emma Rodriguez",
     role: "Law Student",
-    content: "I've seen a significant improvement in my test scores since using SISIMPUR. The practice questions are spot on!"
+    content:
+      "I've seen a significant improvement in my test scores since using SISIMPUR. The practice questions are spot on!",
   },
   {
     name: "David Kim",
     role: "Computer Science Student",
-    content: "The AI-generated questions are incredibly smart and adapt to my learning style. It's like having a personalized study plan."
+    content:
+      "The AI-generated questions are incredibly smart and adapt to my learning style. It's like having a personalized study plan.",
   },
   {
     name: "Lisa Patel",
     role: "Business Student",
-    content: "SISIMPUR has made exam preparation so much more efficient. I can practice anywhere, anytime, and track my progress."
+    content:
+      "SISIMPUR has made exam preparation so much more efficient. I can practice anywhere, anytime, and track my progress.",
   },
   {
     name: "James Wilson",
     role: "Physics Student",
-    content: "The variety of question formats keeps me engaged and helps me understand concepts from different angles."
-  }
+    content:
+      "The variety of question formats keeps me engaged and helps me understand concepts from different angles.",
+  },
 ];
 
 function generateTestimonials() {
@@ -42,7 +48,9 @@ function generateTestimonials() {
     const slideItems = testimonials.slice(i, i + perSlide);
     const isActive = i === 0 ? "active" : "";
 
-    const row = slideItems.map(t => `
+    const row = slideItems
+      .map(
+        (t) => `
       <div class="col-md-4 mb-4">
         <div class="testimonial-card h-100">
           <div class="testimonial-quote">"</div>
@@ -55,7 +63,9 @@ function generateTestimonials() {
           </div>
         </div>
       </div>
-    `).join("");
+    `,
+      )
+      .join("");
 
     container.innerHTML += `
       <div class="carousel-item ${isActive}">
@@ -65,7 +75,5 @@ function generateTestimonials() {
   }
 }
 
-window.addEventListener('DOMContentLoaded', generateTestimonials);
-window.addEventListener('resize', generateTestimonials);
-
-
+window.addEventListener("DOMContentLoaded", generateTestimonials);
+window.addEventListener("resize", generateTestimonials);

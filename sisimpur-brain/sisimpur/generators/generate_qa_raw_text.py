@@ -10,14 +10,15 @@ from ..utils.document_detector import detect_language
 
 logger = logging.getLogger("sisimpur.generators.generate_qa_raw_text")
 
+
 def generate_qa_from_raw_text(
     text: str,
-    language: str = 'english',
+    language: str = "english",
     num_questions: Optional[int] = None,
     source_name: Optional[str] = None,
-    output_dir: str = "qa_outputs"
+    output_dir: str = "qa_outputs",
 ) -> str:
-    
+
     raw = language.strip().lower()
     if raw in ("auto", ""):
         lang = detect_language(text)
@@ -43,14 +44,17 @@ def generate_qa_from_raw_text(
         qa_pairs = []
 
     if source_name:
-        safe = "".join(c for c in source_name if c.isalnum() or c in "-_").strip()[:50] or "raw_text"
+        safe = (
+            "".join(c for c in source_name if c.isalnum() or c in "-_").strip()[:50]
+            or "raw_text"
+        )
     else:
         ts = int(time.time())
         h = hashlib.md5(text.encode("utf-8")).hexdigest()[:8]
         safe = f"{ts}_{h}"
 
     out_path = os.path.join(output_dir, f"{safe}.json")
-    
+
     payload = {"questions": qa_pairs}
     try:
         with open(out_path, "w", encoding="utf-8") as fp:

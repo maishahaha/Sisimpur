@@ -1,6 +1,7 @@
 from ..extractors import TextPDFExtractor, ImagePDFExtractor, ImageExtractor
 from ..extractors.base import BaseExtractor
 
+
 def get_extractor(metadata: dict) -> BaseExtractor:
     """
     Selects and returns the right extractor based on metadata.
