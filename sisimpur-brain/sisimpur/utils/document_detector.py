@@ -6,17 +6,22 @@ This module provides functionality to detect document types and languages.
 
 import logging
 import re
+import io
 from pathlib import Path
 from typing import Dict, Any
 
 import fitz  # PyMuPDF
-import pytesseract
 from PIL import Image
+import numpy as np
+import easyocr
 
 from ..config import MIN_TEXT_LENGTH
 
 logger = logging.getLogger("sisimpur.detector")
-pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
+
+# Initialize EasyOCR reader once (English and Bengali)
+OCR_LANGUAGES = ['en', 'bn']
+reader = easyocr.Reader(OCR_LANGUAGES, gpu=False)
 
 def detect_language(text: str) -> str:
     """
@@ -67,7 +72,7 @@ def detect_question_paper(text: str, language: str) -> bool:
     
     bengali_term_matches = sum(1 for term in bengali_terms if term in text)
     
-    # Bengali detection thresholds (lowered)
+    # Bengali detection thresholds
     if (len(bengali_numbers) >= 2 or 
         len(bengali_options) >= 3 or 
         bengali_term_matches >= 1):
@@ -136,20 +141,17 @@ def detect_document_type(file_path: str) -> Dict[str, Any]:
                 if len(image_list) > 0 and len(page_text.strip()) < 50:
                     is_scanned_pdf = True
                     
-                    # Try OCR on first image
+                    # OCR on first image using EasyOCR
                     try:
                         xref = image_list[0][0]
                         base_image = doc.extract_image(xref)
                         image = Image.open(io.BytesIO(base_image["image"]))
-                        ocr_text = pytesseract.image_to_string(
-                            image, 
-                            lang='ben+eng',  # Bengali first
-                            config='--psm 6'  # Assume uniform block of text
-                        )
+                        img_array = np.array(image)
+                        ocr_results = reader.readtext(img_array, detail=0, paragraph=True)
+                        ocr_text = "\n".join(ocr_results)
                         
                         if len(ocr_text.strip()) > len(page_text.strip()):
                             text_content += "\n" + ocr_text
-                            is_scanned_pdf = True
                     except Exception as e:
                         logger.warning(f"OCR error: {e}")
                 
@@ -178,24 +180,21 @@ def detect_document_type(file_path: str) -> Dict[str, Any]:
                 metadata["pdf_type"] = "text_based"
             
             doc.close()
-            
+        
         elif file_ext in ['.jpg', '.jpeg', '.png']:
             metadata["doc_type"] = "image"
             img = Image.open(file_path)
+            img_array = np.array(img)
             
-            # OCR with Bengali priority
-            ocr_text = pytesseract.image_to_string(
-                img, 
-                lang='ben+eng',
-                config='--psm 6'
-            )
+            # OCR with EasyOCR
+            ocr_results = reader.readtext(img_array, detail=0, paragraph=True)
+            ocr_text = "\n".join(ocr_results)
             
             metadata["language"] = detect_language(ocr_text)
             metadata["is_question_paper"] = detect_question_paper(
                 ocr_text,
                 metadata["language"]
             )
-            
     except Exception as e:
         logger.error(f"Document processing error: {e}")
     
