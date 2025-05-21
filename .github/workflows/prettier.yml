@@ -9,9 +9,14 @@ jobs:
   prettier:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }} # Check out the branch from the pull request
+
       - name: Run Prettier
         uses: creyD/prettier_action@v4.5
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
