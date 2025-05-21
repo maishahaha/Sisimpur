@@ -243,7 +243,6 @@ SISIMPUR{% endblock %}
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="betaModalLabel">Join Our Beta Program</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeButton"></button>
       </div>
       <div class="modal-body">
         <form id="subscribe-form-1" class="needs-validation" novalidate>
@@ -261,7 +260,7 @@ SISIMPUR{% endblock %}
             </div>
             <div class="mb-3">
               <label for="phone" class="form-label">Whatsapp Number</label>
-              <input type="text" class="form-control" id="phone" name="phonee" placeholder="Enter your Whatsapp Number" required>
+              <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter your Whatsapp Number" required>
               <div class="invalid-feedback">Please enter a valid Number.</div>
             </div>
           </div>
@@ -283,63 +282,123 @@ SISIMPUR{% endblock %}
 
 
 <script>
-document.getElementById('submitBeta').addEventListener('click', function(event) {
-  event.preventDefault(); // Prevent form submission
-  
-  // Get email from the input field
-  const email = document.getElementById('email').value;
+// Handle subscription form submissions
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".subscribe-form").forEach((form) => {
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
 
-  // Check if email is valid (simple regex validation)
-  if (!email || !is_valid_email(email)) {
-    alert('Please enter a valid email address.');
-    return;
-  }
+      const email = this.querySelector('input[name="email"]').value;
+      const responseDiv = this.closest("div").querySelector(".form-response");
 
-  // Send the email to the Django backend (your subscribe_to_mailchimp view)
-  fetch('/api/subscribe/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value // CSRF token
-    },
-    body: JSON.stringify({
-      email: email
-    })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      // Hide the form fields and buttons
-      document.getElementById('form-fields').style.display = 'none';
-      document.getElementById('submitBeta').style.display = 'none';
-      document.getElementById('closeButton').style.display = 'none';
+      if (!email) {
+        responseDiv.innerHTML =
+          '<div class="alert alert-danger">Please enter a valid email address.</div>';
+        return;
+      }
 
-      // Show success message and trigger confetti
-      const successMessage = document.getElementById('success-message');
-      successMessage.classList.remove('d-none');
-      const successText = document.getElementById('success-text');
-      successText.innerHTML = data.message || 'Hurray! You are registered as a beta tester.';
+      // Get CSRF token
+      const csrfToken = document.querySelector(
+        "[name=csrfmiddlewaretoken]"
+      ).value;
 
-      // Trigger the party confetti effect
-      party.confetti(successMessage, {
-        count: party.variation.range(20, 40),
-        size: party.variation.range(0.8, 1.2),
-      });
-    } else {
-      alert(data.error || 'An error occurred.');
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    alert('There was an error processing your request. Please try again.');
+      // Show loading state
+      responseDiv.innerHTML = '<div class="text-white">Subscribing...</div>';
+
+      // Send AJAX request to the backend
+      fetch("/api/subscribe/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
+        },
+        body: JSON.stringify({ email: email }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            responseDiv.innerHTML =
+              '<div class="alert alert-success">' + data.message + "</div>";
+            form.reset();
+          } else {
+            // Check if it's an already subscribed error
+            if (data.error && data.error.includes("already subscribed")) {
+              responseDiv.innerHTML =
+                '<div class="alert alert-info">This email is already in our list. Thank you!</div>';
+            } else {
+              responseDiv.innerHTML =
+                '<div class="alert alert-danger">' +
+                (data.error || "An error occurred. Please try again.") +
+                "</div>";
+            }
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          responseDiv.innerHTML =
+            '<div class="alert alert-danger">An error occurred. Please try again later.</div>';
+        });
+    });
   });
 });
 
-// Simple email validation function
-function is_valid_email(email) {
-  const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  return re.test(String(email).toLowerCase());
-}
+// Beta Form Handling
+document.addEventListener('DOMContentLoaded', function() {
+    const subscribeForm1 = document.getElementById('subscribe-form-1');
+    const submitBeta = document.getElementById('submitBeta');
+    const betaModal = document.getElementById('betaModal');
+
+    if (submitBeta && subscribeForm1) {
+        submitBeta.addEventListener('click', function(event) {
+            if (!subscribeForm1.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+                subscribeForm1.classList.add('was-validated');
+                return;
+            }
+
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+            };
+
+            // Here you would normally send the data to your backend
+            // For now, we'll just show a success message
+            const modalBody = betaModal.querySelector('.modal-body');
+            modalBody.innerHTML = `
+                <div class="alert alert-success">
+                    Thank you for applying to be a beta tester! We'll be in touch soon.
+                </div>
+            `;
+            
+            const modalFooter = betaModal.querySelector('.modal-footer');
+            modalFooter.innerHTML = `
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            `;
+        });
+    }
+
+    // Reset form when modal is closed
+    if (betaModal) {
+        betaModal.addEventListener('hidden.bs.modal', function() {
+            if (subscribe-form-1) {
+                subscribeForm1.reset();
+                subscribeForm1.classList.remove('was-validated');
+            }
+        });
+    }
+});
+
+// Remove validation styling on input
+document
+  .querySelectorAll("#subscribe-form-1 input, #subscribe-form-1 select")
+  .forEach((input) => {
+    input.addEventListener("input", function () {
+      if (this.value) {
+        this.classList.remove("is-invalid");
+      }
+    });
+  });
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/party-js@latest/bundle/party.min.js"></script>
