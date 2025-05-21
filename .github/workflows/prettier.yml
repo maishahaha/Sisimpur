@@ -10,13 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout PR branch
+      - name: Checkout PR head branch
         uses: actions/checkout@v3
         with:
-          # 👇 checkout the actual head branch, not the auto‐merge ref
+          # explicitly pull from the PR head repo (needed for forked PRs)
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          # check out the branch name from that repo
           ref: ${{ github.event.pull_request.head.ref }}
-          # 👇 bring down full history so git commit & push work
+          # bring down the full history so git commit & push work
           fetch-depth: 0
+          # ensure we have credentials to push back
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Prettier
         uses: creyD/prettier_action@v4.5
