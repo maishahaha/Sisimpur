@@ -31,5 +31,8 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
+          echo "Setting API key..."
+          export GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
+
           echo "Running script..."
           python main.py test_data/1_bangla.jpg
