@@ -78,8 +78,10 @@ jobs:
       # 6️⃣ PUSH ALL CHANGES BACK
       # ——————————————
       - name: Commit & push formatting changes
+        if: github.event.pull_request.head.repo.full_name == github.repository
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "Apply Black & Prettier formatting"
           branch: ${{ github.head_ref }}
+          skip_checkout: true
           token: ${{ secrets.GITHUB_TOKEN }}
