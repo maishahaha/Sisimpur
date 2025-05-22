@@ -58,7 +58,7 @@ def subscribe_to_mailchimp(request):
 
         # Initialize Mailchimp service
         api_key = os.getenv("MAILCHIMP_API_KEY")  # Your Mailchimp API key
-        server_prefix = "us13"  # Extract from API key
+        server_prefix = os.getenv("MAILCHIMP_SERVER_PREFIX")  # Extract from API key
 
         # In production, you should store these in settings or environment variables
         # You need to create a list in Mailchimp and get its ID
