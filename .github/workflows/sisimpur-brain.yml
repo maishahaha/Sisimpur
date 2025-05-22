@@ -4,7 +4,6 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    types: [opened, synchronize, reopened]
     branches: [ main ]
 
 jobs:
@@ -18,22 +17,31 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'  # Adjust if needed
+          python-version: '3.10'
 
-      - name: Run Sisimpur Brain script
-        working-directory: sisimpur-brain
+      - name: Create virtual environment and install dependencies
         run: |
+          cd sisimpur-brain
           echo "Creating virtual environment..."
           python -m venv venv
           source venv/bin/activate
-
           echo "Installing requirements..."
           pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Set API Key
+        run: export GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
+
+      - name: Validate API Key
+        run: |
+          if [ -z "$GOOGLE_API_KEY" ]; then
+            echo "GOOGLE_API_KEY is not set. Exiting..."
+            exit 1
+          fi
+
+      - name: Run script in sisimpur-brain
+        run: |
+          cd sisimpur-brain
+          source venv/bin/activate
           echo "Running script..."
-          # ✅ Explicitly set the env variable on the same line
-          GOOGLE_API_KEY="${GOOGLE_API_KEY}" python main.py test_data/1_bangla.jpg
-        env:
-          # ✅ Makes secret available to the shell above
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          python main.py test_data/1_bangla.jpg
