@@ -32,14 +32,9 @@ jobs:
       - name: Set API Key
         run: export GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
 
-      - name: Validate API Key
-        run: |
-          if [ -z "$GOOGLE_API_KEY" ]; then
-            echo "GOOGLE_API_KEY is not set. Exiting..."
-            exit 1
-          fi
-
       - name: Run script in sisimpur-brain
+        env: 
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: |
           cd sisimpur-brain
           source venv/bin/activate
