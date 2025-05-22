@@ -82,4 +82,5 @@ jobs:
         with:
           commit_message: "Apply Black & Prettier formatting"
           branch: ${{ github.head_ref }}
+          skip_checkout: true
           token: ${{ secrets.GITHUB_TOKEN }}
