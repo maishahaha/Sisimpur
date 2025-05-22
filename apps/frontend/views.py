@@ -58,7 +58,7 @@ def subscribe_to_mailchimp(request):
 
         # Initialize Mailchimp service
         api_key = os.getenv("MAILCHIMP_API_KEY")  # Your Mailchimp API key
-        server_prefix = "us13"  # Extract from API key
+        server_prefix = os.getenv("MAILCHIMP_SERVER_PREFIX")  # Extract from API key
 
         # In production, you should store these in settings or environment variables
         # You need to create a list in Mailchimp and get its ID
@@ -102,8 +102,8 @@ def subscribe_to_mailchimp(request):
             return JsonResponse(
                 {
                     "success": True,
-                    "title": "🎉 Yay! You're part of the Sisimpur Circle 🐾",
-                    "message": "Early access? ✅ Secret features? ✅\nBig hugs from the team 💛\nLet the magic begin! ✨🌈",
+                    "title": "Thanks for trusting us 💕",
+                    "message": "You're now part of the Sisimpur early circle.\nWe'll email you soon with early access and updates ✨ no spam, just the good stuff.\nWe're building this with you in mind.❤️",
                 }
             )
         else:
