@@ -1,0 +1,30 @@
+{
+  "source_document": "/home/lucifer-morningstar/Sisimpur/Sisimpur/sisimpur-brain/test_data/2_jamuna_news.jpg",
+  "generated_at": "2025-05-22T15:31:03.563820",
+  "questions": [
+    {
+      "question": "জগন্নাথ বিশ্ববিদ্যালয়ের শিক্ষার্থীরা কোন দিকে লংমার্চ করছেন?",
+      "options": [
+        "উত্তর",
+        "দক্ষিণ",
+        "পূর্ব",
+        "যমুনা"
+      ],
+      "answer": "যমুনা",
+      "difficulty": "সহজ",
+      "type": "বহুনির্বাচনী"
+    },
+    {
+      "question": "লংমার্চের ঘোষণা কখন দেওয়া হয়?",
+      "options": [
+        "১৪ মে",
+        "১৩ মে",
+        "১৫ মে",
+        "১২ মে"
+      ],
+      "answer": "১৩ মে",
+      "difficulty": "সহজ",
+      "type": "বহুনির্বাচনী"
+    }
+  ]
+}

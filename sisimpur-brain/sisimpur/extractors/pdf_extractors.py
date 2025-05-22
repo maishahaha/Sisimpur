@@ -215,7 +215,8 @@ class ImagePDFExtractor(BaseExtractor):
         boxes = []
         for cnt in contours:
             x, y, w, h = cv2.boundingRect(cnt)
-            if w > 100 and h > 50:  # Tune thresholds if necessary
+            # Tune thresholds if necessary
+            if w > 100 and h > 50:
                 boxes.append((x, y, w, h))
         boxes = sorted(boxes, key=lambda b: (b[1], b[0]))
         return boxes
@@ -244,8 +245,10 @@ class ImagePDFExtractor(BaseExtractor):
         boxes = self._merge_close_boxes(boxes)
 
         results = []
-        mcq_pattern = re.compile(r'^(?:[১২৩৪৫৬৭৮৯০]+\.|\d+\.)\s*')  # Bengali/English question numbers
-        option_pattern = re.compile(r'^(?:[ক-ঘ]|\([ক-ঘ]\)|[a-dA-D]|\([a-dA-D]\))[\.\)]')  # Option markers
+        # Bengali/English question numbers
+        mcq_pattern = re.compile(r'^(?:[১২৩৪৫৬৭৮৯০]+\.|\d+\.)\s*')
+        # Option markers
+        option_pattern = re.compile(r'^(?:[ক-ঘ]|\([ক-ঘ]\)|[a-dA-D]|\([a-dA-D]\))[\.\)]')
 
         for (x, y, w, h) in boxes:
             crop_img = img[y:y+h, x:x+w]

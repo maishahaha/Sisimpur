@@ -246,10 +246,14 @@ class QAGenerator:
     @staticmethod
     def _strip_json_fence(resp_text: str) -> str:
         """Remove triple-backtick fences, returning raw JSON."""
-        m = re.search(r"```json(.*?)```", resp_text, re.S) or re.search(
-            r"```(.*?)```", resp_text, re.S
-        )
-        return m.group(1).strip() if m else resp_text
+        m = re.search(r"```json(.*?)```", resp_text, re.S) \
+        or re.search(r"```(.*?)```", resp_text, re.S)
+        raw = m.group(1).strip() if m else resp_text
+
+        # NEW: remove any comma immediately followed by optional whitespace and then '}' or ']'
+        raw = re.sub(r',\s*(?=[}\]])', '', raw)
+
+        return raw
 
     def _parse_response(self, resp_text: str) -> List[Dict[str, str]]:
         """Parse JSON array or legacy dict structure into a list of QA dicts."""

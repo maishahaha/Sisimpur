@@ -41,71 +41,53 @@ class DocumentProcessor:
             logger.info(f"Detecting document type for: {file_path}")
             metadata = detect_document_type(file_path)
 
+            # Step 2: Extract text
             logger.info(f"Extracting text from document: {file_path}")
             extractor = get_extractor(metadata)
             extracted_text = extractor.extract(file_path)
 
-            # Special handling for Bengali question papers in PDF format
             language = metadata.get("language", "english")
             is_question_paper = metadata.get("is_question_paper", False)
+            doc_type = metadata.get("doc_type")
 
-            if (metadata.get("doc_type") == "pdf" and
-                language == "bengali" and
-                is_question_paper):
-
-                # Use direct PDF processing for Bengali question papers in PDF format
+            # Step 3: Choose processing strategy
+            if doc_type == "pdf" and language == "bengali" and is_question_paper:
+                # Direct PDF processing for Bengali question papers
                 logger.info("Bengali question paper in PDF format detected - using direct PDF processing")
                 direct_processor = DirectPDFProcessor(language=language, is_question_paper=True)
                 qa_pairs = direct_processor.process(file_path, max_questions=num_questions)
                 logger.info(f"Directly extracted {len(qa_pairs)} questions from PDF question paper")
 
+            elif doc_type == "image" and is_question_paper:
+                # Fallback for images misclassified as question papers
+                logger.warning("Detected image marked as question paper: falling back to standard QA generator")
+                qa_generator = QAGenerator(language=language)
+                if num_questions is None:
+                    qa_pairs = qa_generator.generate_optimal(extracted_text)
+                else:
+                    qa_pairs = qa_generator.generate(extracted_text, num_questions)
+                logger.info(f"Extracted {len(qa_pairs)} questions from image content")
+
             else:
-                logger.info(f"Extracting text from document: {file_path}")
-                
-                #here double object is being called
-                #extractor = self._get_extractor(metadata)
-                #extracted_text = extractor.extract(file_path)
-                # Standard processing pipeline for other documents
-                # Step 2: Extract text based on document type
                 if is_question_paper:
+                    # Specialized processor for genuine question papers
                     logger.info("Document detected as a question paper, using specialized processor")
                     processor = QuestionPaperProcessor(language=language)
                     qa_pairs = processor.process(extracted_text, max_questions=num_questions)
                     logger.info(f"Extracted {len(qa_pairs)} questions from question paper")
                 else:
+                    # Standard QA generation
                     logger.info("Using standard QA generator")
                     qa_generator = QAGenerator(language=language)
                     if num_questions is None:
-                        logger.info("Auto-determining optimal number of questions to generate")
                         qa_pairs = qa_generator.generate_optimal(extracted_text)
                     else:
-                        logger.info(f"Generating {num_questions} Q&A pairs")
                         qa_pairs = qa_generator.generate(extracted_text, num_questions)
-                # Step 3: Generate Q&A pairs
-                # Use specialized question paper processor if detected as a question paper
-                # if is_question_paper:
-                #     logger.info("Document detected as a question paper, using specialized processor")
-                #     processor = QuestionPaperProcessor(language=language)
-                #     qa_pairs = processor.process(extracted_text, max_questions=num_questions)
-                #     logger.info(f"Extracted {len(qa_pairs)} questions from question paper")
-                # else:
-                #     # Use standard QA generator for regular documents
-                #     logger.info("Using standard QA generator")
-                #     qa_generator = QAGenerator(language=language)
-
-                #     if num_questions is None:
-                #         logger.info("Auto-determining optimal number of questions to generate")
-                #         qa_pairs = qa_generator.generate_optimal(extracted_text)
-                #         logger.info(f"Generated {len(qa_pairs)} questions from document")
-                #     else:
-                #         logger.info(f"Generating {num_questions} Q&A pairs")
-                #         qa_pairs = qa_generator.generate(extracted_text, num_questions)
 
             # Step 4: Save Q&A pairs to JSON
             output_file = save_qa_pairs(qa_pairs, file_path)
             logger.info(f"Q&A pairs saved to {output_file}")
             return output_file
-
 
         except Exception as e:
             logger.error(f"Error processing document: {e}")
