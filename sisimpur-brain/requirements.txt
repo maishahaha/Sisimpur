@@ -2,9 +2,9 @@
 numpy>=1.24.0
 Pillow>=10.0.0
 opencv-python>=4.8.0
-pytesseract>=0.3.10
 pdf2image>=1.16.3
 PyMuPDF>=1.22.5  # fitz
+easyocr>=1.7.2
 
 # LLM and text processing
 google-generativeai>=0.3.0
