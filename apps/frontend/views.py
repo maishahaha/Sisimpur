@@ -102,8 +102,8 @@ def subscribe_to_mailchimp(request):
             return JsonResponse(
                 {
                     "success": True,
-                    "title": "🎉 Yay! You're part of the Sisimpur Circle 🐾",
-                    "message": "Early access? ✅ Secret features? ✅\nBig hugs from the team 💛\nLet the magic begin! ✨🌈",
+                    "title": "Thanks for trusting us 💕",
+                    "message": "You're now part of the Sisimpur early circle.\nWe'll email you soon with early access and updates ✨ no spam, just the good stuff.\nWe're building this with you in mind.❤️",
                 }
             )
         else:
