@@ -31,8 +31,9 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-          echo "Setting API key..."
-          export GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
-          
           echo "Running script..."
-          python main.py test_data/1_bangla.jpg
+          # ✅ Explicitly set the env variable on the same line
+          GOOGLE_API_KEY="${GOOGLE_API_KEY}" python main.py test_data/1_bangla.jpg
+        env:
+          # ✅ Makes secret available to the shell above
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
