@@ -333,6 +333,7 @@ SISIMPUR{% endblock %} {% block head %}
 
       const email = document.getElementById("email").value;
       const name = document.getElementById("name").value;
+      const phone = document.getElementById("phone").value;
 
       const csrfToken = document.querySelector(
         "[name=csrfmiddlewaretoken]",
@@ -342,13 +343,17 @@ SISIMPUR{% endblock %} {% block head %}
       submitBeta.disabled = true;
       submitBeta.innerText = "Submitting...";
 
-      fetch("/api/subscribe/", {
+      fetch("/submit-and-subscribe/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "X-CSRFToken": csrfToken,
         },
-        body: JSON.stringify({ email: email }),
+        body: JSON.stringify({ 
+            name: name,
+            email: email,
+            phone: phone,
+         }),
       })
         .then((response) => response.json())
         .then((data) => {

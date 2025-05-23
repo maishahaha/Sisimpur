@@ -18,7 +18,7 @@ class ComingSoonMiddleware:
             and not request.path.startswith("/admin/")
             and not request.path.startswith(settings.STATIC_URL)
             and not request.path.startswith("/__reload__/")
-            and not request.path.startswith("/api/subscribe/")
+            and not request.path.startswith("/submit-and-subscribe/")
         ):
             return render(request, "coming_soon/coming_soon.html", status=503)
         return self.get_response(request)
