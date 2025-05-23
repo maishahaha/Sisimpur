@@ -17,22 +17,26 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'  # Adjust if your project needs a different version
+          python-version: '3.10'
 
-      - name: Run script in sisimpur-brain
+      - name: Create virtual environment and install dependencies
         run: |
           cd sisimpur-brain
-
           echo "Creating virtual environment..."
           python -m venv venv
           source venv/bin/activate
-
           echo "Installing requirements..."
           pip install --upgrade pip
           pip install -r requirements.txt
 
-          echo "Setting API key..."
-          export GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
+      - name: Set API Key
+        run: export GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
 
+      - name: Run script in sisimpur-brain
+        env: 
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        run: |
+          cd sisimpur-brain
+          source venv/bin/activate
           echo "Running script..."
           python main.py test_data/1_bangla.jpg
