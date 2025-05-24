@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.timezone import now
 import json
 import os
 from dotenv import load_dotenv
 from .utils import EmailValidationService
 import requests
 from requests.exceptions import SSLError, RequestException
-from datetime import datetime
 
 load_dotenv()
 

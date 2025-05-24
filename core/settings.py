@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+COMING_SOON_TARGET_DATE = "2025-06-25T00:00:00Z"
+
 
 # Application definition
 
