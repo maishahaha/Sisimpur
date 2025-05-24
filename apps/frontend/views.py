@@ -53,11 +53,16 @@ def submit_and_subscribe(request):
         if not is_valid_email(email):
             return JsonResponse({'success': False, 'error': 'Invalid email address'}, status=400)
 
-        # Check if email already exists in SheetDB
+        # SheetDB API configuration
         api_url = 'https://sheetdb.io/api/v1/rc0u9b8squ1ku'
+        headers = {
+            'Authorization': f'Bearer {os.getenv("SHEETDB_API_KEY")}',
+            'Content-Type': 'application/json'
+        }
+
         try:
             # Get all records from SheetDB
-            response = requests.get(api_url)
+            response = requests.get(api_url, headers=headers, timeout=10)
             response.raise_for_status()
             existing_data = response.json()
             
@@ -86,8 +91,12 @@ def submit_and_subscribe(request):
                 }]
             }
 
-            sheetdb_response = requests.post(api_url, json=payload)
+            sheetdb_response = requests.post(api_url, headers=headers, json=payload, timeout=10)
             sheetdb_response.raise_for_status()
+            
+            # Log successful submission
+            print(f"Successfully submitted data to SheetDB for email: {email}")
+            
             return JsonResponse({
                 'success': True, 
                 'message': 'Form submitted successfully',
@@ -95,12 +104,34 @@ def submit_and_subscribe(request):
                 'details': "You're now part of our amazing community. Get ready for exciting updates! ✨"
             })
 
-        except SSLError:
-            return JsonResponse({'success': False, 'error': 'SSL Error Occurred'}, status=500)
+        except SSLError as ssl_err:
+            print(f"SSL Error occurred: {str(ssl_err)}")
+            return JsonResponse({
+                'success': False, 
+                'error': 'SSL Error Occurred', 
+                'details': 'There was a problem with the secure connection. Please try again later.'
+            }, status=500)
+        except requests.Timeout:
+            print("Request timed out while connecting to SheetDB")
+            return JsonResponse({
+                'success': False, 
+                'error': 'Request timed out',
+                'details': 'The request took too long to complete. Please try again later.'
+            }, status=500)
         except RequestException as e:
-            return JsonResponse({'success': False, 'error': 'SheetDB request failed', 'details': str(e)}, status=500)
+            print(f"SheetDB request failed: {str(e)}")
+            return JsonResponse({
+                'success': False, 
+                'error': 'SheetDB request failed',
+                'details': 'Unable to connect to the database. Please try again later.'
+            }, status=500)
 
     except json.JSONDecodeError:
         return JsonResponse({'success': False, 'error': 'Invalid JSON data'}, status=400)
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+        print(f"Unexpected error in submit_and_subscribe: {str(e)}")
+        return JsonResponse({
+            'success': False, 
+            'error': 'An unexpected error occurred',
+            'details': 'Please try again later or contact support if the problem persists.'
+        }, status=500)
