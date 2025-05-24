@@ -4,12 +4,12 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import os
 from dotenv import load_dotenv
-from .utils import MailchimpService, EmailValidationService
+from .utils import EmailValidationService
 import requests
 from requests.exceptions import SSLError, RequestException
+from datetime import datetime
 
 load_dotenv()
-
 
 def is_valid_email(email):
     email_validator = EmailValidationService(
@@ -53,50 +53,54 @@ def submit_and_subscribe(request):
         if not is_valid_email(email):
             return JsonResponse({'success': False, 'error': 'Invalid email address'}, status=400)
 
-        # Submit form to SheetDB
+        # Check if email already exists in SheetDB
         api_url = 'https://sheetdb.io/api/v1/rc0u9b8squ1ku'
-        payload = {
-            "data": {
-                "fullname": fullname,
-                "email": email,
-                "phone": phone
-            }
-        }
-
         try:
+            # Get all records from SheetDB
+            response = requests.get(api_url)
+            response.raise_for_status()
+            existing_data = response.json()
+            
+            # Check if email already exists
+            if any(record.get('email') == email for record in existing_data):
+                return JsonResponse({
+                    'success': False, 
+                    'error': 'You are already subscribed! 🎉',
+                    'title': "Welcome Back! 🐾",
+                    'details': "You're already part of our amazing community. Stay tuned for more updates! ✨"
+                })
+
+            # Get current time and date
+            current_datetime = datetime.now()
+            current_time = current_datetime.strftime("%H:%M:%S")
+            current_date = current_datetime.strftime("%Y-%m-%d")
+
+            # Submit form to SheetDB
+            payload = {
+                "data": [{
+                    "time": current_time,
+                    "date": current_date,
+                    "name": fullname,
+                    "email": email,
+                    "phone number": phone
+                }]
+            }
+
             sheetdb_response = requests.post(api_url, json=payload)
             sheetdb_response.raise_for_status()
+            return JsonResponse({
+                'success': True, 
+                'message': 'Form submitted successfully',
+                'title': "🎉 Welcome to Sisimpur! 🐾",
+                'details': "You're now part of our amazing community. Get ready for exciting updates! ✨"
+            })
+
         except SSLError:
             return JsonResponse({'success': False, 'error': 'SSL Error Occurred'}, status=500)
         except RequestException as e:
             return JsonResponse({'success': False, 'error': 'SheetDB request failed', 'details': str(e)}, status=500)
 
-        # Subscribe to Mailchimp
-        api_key = os.getenv("MAILCHIMP_API_KEY")
-        server_prefix = "us13"  # Adjust this based on your actual Mailchimp API key
-        mailchimp = MailchimpService(api_key, server_prefix)
-
-        try:
-            response = mailchimp.client.lists.get_all_lists()
-            if response["lists"] and len(response["lists"]) > 0:
-                list_id = response["lists"][0]["id"]
-            else:
-                return JsonResponse({'success': False, 'error': 'No Mailchimp lists found'}, status=500)
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': f'Mailchimp connection error: {str(e)}'}, status=500)
-
-        result = mailchimp.add_subscriber(list_id, email, status="subscribed")
-        if not result["success"]:
-            return JsonResponse({'success': False, 'error': result["error"]}, status=400)
-
-        return JsonResponse({
-            'success': True,
-            'message': 'Form submitted and subscribed successfully',
-            'title': "🎉 Yay! You're part of the Sisimpur Circle 🐾",
-            'details': "Early access? ✅ Secret features? ✅ Big hugs from the team 💛 Let the magic begin! ✨🌈"
-        })
-
     except json.JSONDecodeError:
-        return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+        return JsonResponse({'success': False, 'error': 'Invalid JSON data'}, status=400)
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
