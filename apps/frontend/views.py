@@ -99,9 +99,8 @@ def submit_and_subscribe(request):
             
             return JsonResponse({
                 'success': True, 
-                'message': 'Form submitted successfully',
-                'title': "🎉 Welcome to Sisimpur! 🐾",
-                'details': "You're now part of our amazing community. Get ready for exciting updates! ✨"
+                'message': "You're now part of our amazing community. Get ready for exciting updates! ✨",
+                'title': "🎉 Welcome to Sisimpur! 🐾"
             })
 
         except SSLError as ssl_err:
