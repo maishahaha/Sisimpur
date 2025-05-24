@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from .utils import EmailValidationService
 import requests
 from requests.exceptions import SSLError, RequestException
+import datetime
 
 load_dotenv()
 
