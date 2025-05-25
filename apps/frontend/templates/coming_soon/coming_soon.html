@@ -65,7 +65,7 @@ SISIMPUR{% endblock %} {% block head %}
 <div class="blob blob-1"></div>
 <div class="blob blob-2"></div>
 <div class="particles" id="particles"></div>
-
+{{ target_date|json_script:"target-date" }}
 <!-- Main Content -->
 <div class="container py-5">
   <header class="text-center mb-5">
@@ -98,19 +98,19 @@ SISIMPUR{% endblock %} {% block head %}
               class="d-flex gap-3 mb-4 countdown-container justify-content-center"
             >
               <div class="countdown-item">
-                <div class="countdown-number" id="days">30</div>
+                <div class="countdown-number" id="days"></div>
                 <div class="countdown-label">Days</div>
               </div>
               <div class="countdown-item">
-                <div class="countdown-number" id="hours">24</div>
+                <div class="countdown-number" id="hours"></div>
                 <div class="countdown-label">Hours</div>
               </div>
               <div class="countdown-item">
-                <div class="countdown-number" id="minutes">60</div>
+                <div class="countdown-number" id="minutes"></div>
                 <div class="countdown-label">Mins</div>
               </div>
               <div class="countdown-item">
-                <div class="countdown-number" id="seconds">60</div>
+                <div class="countdown-number" id="seconds"></div>
                 <div class="countdown-label">Secs</div>
               </div>
             </div>
@@ -333,6 +333,7 @@ SISIMPUR{% endblock %} {% block head %}
 
       const email = document.getElementById("email").value;
       const name = document.getElementById("name").value;
+      const phone = document.getElementById("phone").value;
 
       const csrfToken = document.querySelector(
         "[name=csrfmiddlewaretoken]",
@@ -342,13 +343,17 @@ SISIMPUR{% endblock %} {% block head %}
       submitBeta.disabled = true;
       submitBeta.innerText = "Submitting...";
 
-      fetch("/api/subscribe/", {
+      fetch("/submit-and-subscribe/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "X-CSRFToken": csrfToken,
         },
-        body: JSON.stringify({ email: email }),
+        body: JSON.stringify({ 
+            name: name,
+            email: email,
+            phone: phone,
+         }),
       })
         .then((response) => response.json())
         .then((data) => {
@@ -424,7 +429,48 @@ SISIMPUR{% endblock %} {% block head %}
       }, 10);
     });
   });
+  document.getElementById("closeButton").addEventListener("click", function () {
+  const modal = bootstrap.Modal.getInstance(document.getElementById("betaModal"));
+  if (modal) modal.hide();
+  });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/party-js@latest/bundle/party.min.js"></script>
+
+<!-- Countdown Timer Script -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Parse the countdown date from Django (already in UTC ISO format)
+    var countDownDate = new Date(JSON.parse(document.getElementById("target-date").textContent)).getTime();
+
+    var countdownInterval = setInterval(function() {
+      try {
+        var now = new Date().getTime();
+        var distance = countDownDate - now;
+
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById("days").innerHTML = days;
+        document.getElementById("hours").innerHTML = hours;
+        document.getElementById("minutes").innerHTML = minutes;
+        document.getElementById("seconds").innerHTML = seconds;
+
+        if (distance < 0) {
+          clearInterval(countdownInterval);
+          document.getElementById("days").innerHTML = "0";
+          document.getElementById("hours").innerHTML = "0";
+          document.getElementById("minutes").innerHTML = "0";
+          document.getElementById("seconds").innerHTML = "0";
+        }
+      } catch (error) {
+        console.error("Error in countdown timer:", error);
+        clearInterval(countdownInterval);
+      }
+    }, 1000);
+  });
+  console.log("Target Date:", document.getElementById("target-date").textContent);
+</script>
 
 {% endblock %}

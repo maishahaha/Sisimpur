@@ -1,7 +1,7 @@
-# core/middleware.py
 from django.conf import settings
 from django.shortcuts import render
-
+from django.utils.timezone import now
+from datetime import timedelta
 
 class ComingSoonMiddleware:
     """
@@ -12,13 +12,17 @@ class ComingSoonMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # Bypass in admin, static files, browser reload, or if flag is off
         if (
             settings.COMING_SOON
             and not request.path.startswith("/admin/")
             and not request.path.startswith(settings.STATIC_URL)
             and not request.path.startswith("/__reload__/")
-            and not request.path.startswith("/api/subscribe/")
+            and not request.path.startswith("/submit-and-subscribe/")
         ):
-            return render(request, "coming_soon/coming_soon.html", status=503)
+            # Fixed date – only change it when you plan to update launch
+            target_date_iso = settings.COMING_SOON_TARGET_DATE
+            return render(request, "coming_soon/coming_soon.html", {
+                "target_date": target_date_iso
+            }, status=503)
+
         return self.get_response(request)
