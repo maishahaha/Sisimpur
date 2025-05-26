@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SISIMPUR - AI-Powered Exam Prep</title>
+    <link href="..\static\css\background.css" rel="stylesheet" />
+    <link href="..\static\css\dashboard.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.min.css">
+  </head>
+  <body>
+    <!-- Background Elements -->
+    <div class="bg-grid"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="particles" id="particles"></div>
+
+    <!-- Main Layout -->
+    <div class="app-container">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="logo">
+            <span class="logo-text">SISIMPUR</span>
+          </div>
+          <button class="toggle-sidebar" id="toggle-sidebar">
+            <i class="ri-arrow-left-s-line"></i>
+          </button>
+        </div>
+
+        <nav class="sidebar-nav">
+          <ul>
+            <li class="nav-item active">
+              <a href="#quiz">
+                <i class="ri-question-answer-line"></i>
+                <span class="nav-text">Quiz</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#flashcards">
+                <i class="ri-file-list-3-line"></i>
+                <span class="nav-text">Flashcards</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#leaderboard">
+                <i class="ri-medal-line"></i>
+                <span class="nav-text">Leaderboard</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#daily-boost">
+                <i class="ri-rocket-line"></i>
+                <span class="nav-text">Daily Memory Boost</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#my-topics">
+                <i class="ri-book-open-line"></i>
+                <span class="nav-text">My Topics</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#stats">
+                <i class="ri-bar-chart-line"></i>
+                <span class="nav-text">Stats</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        <!-- Navbar -->
+        <header class="navbar">
+          <div class="navbar-left">
+            <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+              <i class="ri-menu-line"></i>
+            </button>
+            <div class="search-container">
+              <div class="search-box">
+                <i class="ri-search-line"></i>
+                <input type="text" placeholder="Search topics, quizzes..." />
+              </div>
+              <div class="search-results" id="search-results"></div>
+            </div>
+          </div>
+
+          <div class="navbar-right">
+            <div class="language-switcher">
+              <button class="language-current" id="language-toggle">
+                <i class="ri-global-line"></i>
+                <span>English</span>
+                <i class="ri-arrow-down-s-line"></i>
+              </button>
+              <div class="language-dropdown" id="language-dropdown">
+                <a href="#" class="language-option active" data-lang="en-us">
+                  <img src="..\static\images\Flag_of_the_United_States.svg.png" alt="US Flag">
+                  <span>English (US)</span>
+                </a>
+                <a href="#" class="language-option" data-lang="en-gb">
+                  <img src="..\static\images\Flag_of_the_United_Kingdom_(3-5).svg.png" alt="UK Flag">
+                  <span>English (UK)</span>
+                </a>
+                <a href="#" class="language-option" data-lang="bn">
+                  <img src="..\static\images\Flag_of_Bangladesh.svg.png">
+                  <span>বাংলা (Bangladesh)</span>
+                </a>
+              </div>
+            </div>
+
+            <button class="notification-btn">
+              <i class="ri-notification-3-line"></i>
+              <span class="badge">3</span>
+            </button>
+
+            <button class="theme-toggle" id="theme-toggle">
+              <i class="ri-moon-line"></i>
+            </button>
+
+            <div class="profile-menu">
+              <button class="profile-btn" id="profile-toggle">
+                <img src="..\static\images\bnp-babor.jpg" alt="Profile" />
+                <span class="profile-name">Babor</span>
+                <i class="ri-arrow-down-s-line"></i>
+              </button>
+              <div class="profile-dropdown" id="profile-dropdown">
+                <div class="profile-header">
+                  <img src="..\static\images\bnp-babor.jpg" alt="Profile" />
+                  <div>
+                    <h4>Daddy Babor</h4>
+                    <p>Pro Member</p>
+                  </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <a href="#profile"><i class="ri-user-line"></i> My Profile</a>
+                <a href="#settings"><i class="ri-settings-line"></i> Settings</a>
+                <a href="#help"><i class="ri-question-line"></i> Help & Support</a>
+                <div class="dropdown-divider"></div>
+                <a href="#logout" class="logout-btn"><i class="ri-logout-box-line"></i> Logout</a>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="content-wrapper">
+          <div class="content-container">
+            <div class="quiz-section">
+              <h1 class="page-title">Create Quiz</h1>
+              <p class="page-description">Generate AI-powered quizzes from your content</p>
+
+              <div class="quiz-form">
+                <div class="form-group">
+                  <label>Enter your text or upload a file</label>
+                  <textarea placeholder="Enter your text here..." class="quiz-textarea"></textarea>
+                  
+                  <div class="file-upload">
+                    <input type="file" id="file-input" accept=".pdf,.docx,.pptx" multiple hidden />
+                    <label for="file-input" class="file-upload-btn">
+                      <i class="ri-upload-cloud-line"></i>
+                      Upload Files
+                    </label>
+                    <span class="file-types">Supported: PDF, DOCX, PPTX</span>
+                  </div>
+                </div>
+
+                <div class="quiz-options">
+                  <div class="option-group">
+                    <label>Number of Questions</label>
+                    <select class="quiz-select" id="question-count">
+                      <option value="5">5 Questions</option>
+                      <option value="10" selected>10 Questions</option>
+                      <option value="15">15 Questions</option>
+                      <option value="20">20 Questions</option>
+                      <option value="25">25 Questions</option>
+                    </select>
+                  </div>
+
+                  <div class="option-group">
+                    <label>Difficulty Level</label>
+                    <div class="difficulty-buttons">
+                      <button class="difficulty-btn active" data-difficulty="easy">Easy</button>
+                      <button class="difficulty-btn" data-difficulty="medium">Medium</button>
+                      <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+                    </div>
+                  </div>
+
+                  <div class="option-group">
+                    <label>Exam Type</label>
+                    <select class="quiz-select" id="exam-type">
+                      <option value="default" selected>Default</option>
+                      <option value="ielts">IELTS</option>
+                      <option value="sat">SAT</option>
+                      <option value="gre">GRE</option>
+                      <option value="hsc">HSC</option>
+                      <option value="ssc">SSC</option>
+                      <option value="a-levels">A-levels</option>
+                      <option value="o-levels">O-levels</option>
+                      <option value="admission-general">Admission (General)</option>
+                      <option value="admission-medical">Admission (Medical)</option>
+                      <option value="admission-engineering">Admission (Engineering)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button class="generate-btn">
+                  <i class="ri-magic-line"></i>
+                  Generate Quiz
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <script src="..\static\js\background.js"></script>
+    <script src="..\static\js\dashboard.js"></script>
+  </body>
+</html>

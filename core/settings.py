@@ -148,4 +148,4 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Coming soon mode
-COMING_SOON = True
+COMING_SOON = False
