@@ -1,0 +1,171 @@
+{% load static %} {% load django_browser_reload %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}SISIMPUR{% endblock %}</title>
+    <link href="{% static 'css/background.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/dashboard.css' %}" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.min.css">
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <!-- Background Elements -->
+    <div class="bg-grid"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="particles" id="particles"></div>
+
+    <!-- Main Layout -->
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-text">SISIMPUR</span>
+                </div>
+                <button class="toggle-sidebar" id="toggle-sidebar">
+                    <i class="ri-arrow-left-s-line"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item active">
+                        <a href="#quiz">
+                            <i class="ri-question-answer-line"></i>
+                            <span class="nav-text">Quiz</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#flashcards">
+                            <i class="ri-file-list-3-line"></i>
+                            <span class="nav-text">Flashcards</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#leaderboard">
+                            <i class="ri-medal-line"></i>
+                            <span class="nav-text">Leaderboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#daily-boost">
+                            <i class="ri-rocket-line"></i>
+                            <span class="nav-text">Daily Memory Boost</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#my-topics">
+                            <i class="ri-book-open-line"></i>
+                            <span class="nav-text">My Topics</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#stats">
+                            <i class="ri-bar-chart-line"></i>
+                            <span class="nav-text">Stats</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Navbar -->
+            <header class="navbar">
+                <div class="navbar-left">
+                    <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+                        <i class="ri-menu-line"></i>
+                    </button>
+                    <div class="search-container">
+                        <div class="search-box">
+                            <i class="ri-search-line"></i>
+                            <input type="text" placeholder="Search topics, quizzes..." />
+                        </div>
+                        <div class="search-results" id="search-results"></div>
+                    </div>
+                </div>
+
+                <div class="navbar-right">
+                    <div class="language-switcher">
+                        <button class="language-current" id="language-toggle">
+                            <i class="ri-global-line"></i>
+                            <span>English</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </button>
+                        <div class="language-dropdown" id="language-dropdown">
+                            <a href="#" class="language-option active" data-lang="en-us">
+                                <img src="..\static\images\Flag_of_the_United_States.svg.png" alt="US Flag">
+                                <span>English (US)</span>
+                            </a>
+                            <a href="#" class="language-option" data-lang="en-gb">
+                                <img src="..\static\images\Flag_of_the_United_Kingdom_(3-5).svg.png" alt="UK Flag">
+                                <span>English (UK)</span>
+                            </a>
+                            <a href="#" class="language-option" data-lang="bn">
+                                <img src="..\static\images\Flag_of_Bangladesh.svg.png">
+                                <span>বাংলা (Bangladesh)</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <button class="notification-btn">
+                        <i class="ri-notification-3-line"></i>
+                        <span class="badge">3</span>
+                    </button>
+
+                    <button class="theme-toggle" id="theme-toggle">
+                        <i class="ri-moon-line"></i>
+                    </button>
+
+                    <div class="profile-menu">
+                        <button class="profile-btn" id="profile-toggle">
+                            <img src="..\static\images\bnp-babor.jpg" alt="Profile" />
+                            <span class="profile-name">Babor</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </button>
+                        <div class="profile-dropdown" id="profile-dropdown">
+                            <div class="profile-header">
+                                <img src="..\static\images\bnp-babor.jpg" alt="Profile" />
+                                <div>
+                                    <h4>Daddy Babor</h4>
+                                    <p>Pro Member</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#profile"><i class="ri-user-line"></i> My Profile</a>
+                            <a href="#settings"><i class="ri-settings-line"></i> Settings</a>
+                            <a href="#help"><i class="ri-question-line"></i> Help & Support</a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#logout" class="logout-btn"><i class="ri-logout-box-line"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+    {% include 'includes/toast.html' %}
+
+    <!-- Django Messages (hidden) -->
+    <div style="display: none">
+        {% if messages %} {% for message in messages %}
+        <div class="django-message" data-type="{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}"
+            data-title="{{ message.extra_tags|default:'' }}">
+            {{ message }}
+        </div>
+        {% endfor %} {% endif %}
+    </div>
+
+    {% block content %}{% endblock %}
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <script src="..\static\js\background.js"></script>
+    <script src="..\static\js\dashboard.js"></script>
+    {% django_browser_reload_script %} {% block scripts %}{% endblock %}
+</body>
+
+</html>
