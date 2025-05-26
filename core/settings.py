@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import sys
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,12 +26,21 @@ sys.path.insert(0, str(BASE_DIR / "apps"))  # 👈 adds apps/ to Python path
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-#m17e$1!_ky@zv6bpq_#s^b*caz-sog5pcdi5l44n9y5!39zb#"
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', "django-insecure-#m17e$1!_ky@zv6bpq_#s^b*caz-sog5pcdi5l44n9y5!39zb#")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
+
+# Google OAuth2 settings
+GOOGLE_OAUTH2_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID')
+GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET')
+GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/auth/google-callback/'
+
+# Allow insecure transport for OAuth in development
+if DEBUG:
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 COMING_SOON_TARGET_DATE = "2025-06-25T00:00:00Z"
 
@@ -41,6 +54,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",  # Required for social auth
     "authentication",
     "frontend",
     "dashboard",
@@ -149,3 +163,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Coming soon mode
 COMING_SOON = False
+
+# Add SITE_ID setting
+SITE_ID = 1

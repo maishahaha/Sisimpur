@@ -126,24 +126,32 @@
 
                     <div class="profile-menu">
                         <button class="profile-btn" id="profile-toggle">
-                            <img src="..\static\images\bnp-babor.jpg" alt="Profile" />
-                            <span class="profile-name">Babor</span>
+                            {% if user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name|default:user.username }}" />
+                            {% else %}
+                                <img src="{% static 'images/default-avatar.png' %}" alt="{{ user.get_full_name|default:user.username }}" />
+                            {% endif %}
+                            <span class="profile-name">{{ user.get_full_name|default:user.username }}</span>
                             <i class="ri-arrow-down-s-line"></i>
                         </button>
                         <div class="profile-dropdown" id="profile-dropdown">
                             <div class="profile-header">
-                                <img src="..\static\images\bnp-babor.jpg" alt="Profile" />
+                                {% if user.profile.avatar %}
+                                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name|default:user.username }}" />
+                                {% else %}
+                                    <img src="{% static 'images/default-avatar.png' %}" alt="{{ user.get_full_name|default:user.username }}" />
+                                {% endif %}
                                 <div>
-                                    <h4>Daddy Babor</h4>
-                                    <p>Pro Member</p>
+                                    <h4>{{ user.get_full_name|default:user.username }}</h4>
+                                    <p>{% if user.is_staff %}Admin{% else %}Member{% endif %}</p>
                                 </div>
                             </div>
                             <div class="dropdown-divider"></div>
-                            <a href="#profile"><i class="ri-user-line"></i> My Profile</a>
-                            <a href="#settings"><i class="ri-settings-line"></i> Settings</a>
-                            <a href="#help"><i class="ri-question-line"></i> Help & Support</a>
+                            <a href="{% url 'dashboard:profile' %}"><i class="ri-user-line"></i> My Profile</a>
+                            <a href="{% url 'dashboard:settings' %}"><i class="ri-settings-line"></i> Settings</a>
+                            <a href="{% url 'dashboard:help' %}"><i class="ri-question-line"></i> Help & Support</a>
                             <div class="dropdown-divider"></div>
-                            <a href="#logout" class="logout-btn"><i class="ri-logout-box-line"></i> Logout</a>
+                            <a href="{% url 'dashboard:logout' %}" class="logout-btn"><i class="ri-logout-box-line"></i> Logout</a>
                         </div>
                     </div>
                 </div>
