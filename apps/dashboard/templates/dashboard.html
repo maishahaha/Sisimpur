@@ -81,18 +81,84 @@
                   <i class="ri-loader-4-line"></i> Processing...
                 </div>
               </button>
+
+              <!-- Demo Button for Testing Animation (Remove in production) -->
+              <button type="button" class="generate-btn" id="demo-btn" style="margin-top: 10px; background: linear-gradient(90deg, #ff9500, #ff6b00);" onclick="demoProcessingAnimation()">
+                <i class="ri-play-line"></i>
+                Demo Animation
+              </button>
             </div>
 
-            <!-- Processing Status -->
-            <div id="processing-status" style="display: none;" class="processing-status">
-              <div class="status-content">
-                <div class="status-icon">
-                  <i class="ri-loader-4-line"></i>
+            <!-- Modern Processing Status -->
+            <div id="processing-status" style="display: none;" class="modern-processing-status">
+              <div class="processing-container">
+                <!-- Animated Background -->
+                <div class="processing-bg">
+                  <div class="processing-particles"></div>
+                  <div class="processing-waves">
+                    <div class="wave wave-1"></div>
+                    <div class="wave wave-2"></div>
+                    <div class="wave wave-3"></div>
+                  </div>
                 </div>
-                <h3>Processing Document...</h3>
-                <p id="status-message">Extracting text and generating questions...</p>
-                <div class="progress-bar">
-                  <div class="progress-fill" id="progress-fill"></div>
+
+                <!-- Main Content -->
+                <div class="processing-content">
+                  <!-- Progress Ring -->
+                  <div class="progress-ring-container">
+                    <svg class="progress-ring" width="120" height="120">
+                      <defs>
+                        <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" style="stop-color:#5e17eb;stop-opacity:1" />
+                          <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:1" />
+                        </linearGradient>
+                      </defs>
+                      <circle class="progress-ring-bg" cx="60" cy="60" r="50" />
+                      <circle class="progress-ring-fill" cx="60" cy="60" r="50" id="progress-circle" />
+                    </svg>
+                    <div class="progress-center">
+                      <div class="progress-icon" id="progress-icon">
+                        <i class="ri-file-text-line"></i>
+                      </div>
+                      <div class="progress-percentage" id="progress-percentage">0%</div>
+                    </div>
+                  </div>
+
+                  <!-- Status Info -->
+                  <div class="status-info">
+                    <h3 id="status-title">Processing Document</h3>
+                    <p id="status-message">Preparing your document for analysis...</p>
+                    <div class="status-stages">
+                      <div class="stage" id="stage-upload">
+                        <div class="stage-icon"><i class="ri-upload-line"></i></div>
+                        <span>Upload</span>
+                      </div>
+                      <div class="stage" id="stage-analyze">
+                        <div class="stage-icon"><i class="ri-search-line"></i></div>
+                        <span>Analyze</span>
+                      </div>
+                      <div class="stage" id="stage-generate">
+                        <div class="stage-icon"><i class="ri-magic-line"></i></div>
+                        <span>Generate</span>
+                      </div>
+                      <div class="stage" id="stage-complete">
+                        <div class="stage-icon"><i class="ri-check-line"></i></div>
+                        <span>Complete</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Estimated Time -->
+                  <div class="estimated-time">
+                    <i class="ri-time-line"></i>
+                    <span id="estimated-time">Estimating time...</span>
+                  </div>
+
+                  <!-- Cancel Button -->
+                  <button class="cancel-processing-btn" id="cancel-processing" onclick="cancelProcessing()">
+                    <i class="ri-close-line"></i>
+                    Cancel Processing
+                  </button>
                 </div>
               </div>
             </div>
@@ -146,12 +212,19 @@ Dropzone.autoDiscover = false;
 document.addEventListener('DOMContentLoaded', function() {
     const processingStatus = document.getElementById('processing-status');
     const statusMessage = document.getElementById('status-message');
-    const progressFill = document.getElementById('progress-fill');
     const generateBtn = document.getElementById('generate-btn');
     const btnText = document.getElementById('btn-text');
     const loadingSpinner = document.getElementById('loading-spinner');
 
     let uploadedFile = null;
+
+    // Initialize progress ring
+    const progressCircle = document.getElementById('progress-circle');
+    if (progressCircle) {
+        const circumference = 2 * Math.PI * 50;
+        progressCircle.style.strokeDasharray = circumference;
+        progressCircle.style.strokeDashoffset = circumference;
+    }
 
     // Get quiz configuration values
     function getQuizConfig() {
@@ -275,27 +348,275 @@ document.addEventListener('DOMContentLoaded', function() {
         myDropzone.processQueue();
     });
 
-    // Helper functions for UI updates
+    // Modern Processing Animation Functions
+    let currentStage = 0;
+    let progressInterval;
+    let currentProgress = 0;
+
     function showProcessingStatus() {
         processingStatus.style.display = 'block';
-        statusMessage.textContent = 'Processing document...';
-        progressFill.style.width = '50%';
+        currentStage = 0;
+        currentProgress = 0;
+
+        // Reset all stages
+        document.querySelectorAll('.stage').forEach(stage => {
+            stage.classList.remove('active', 'completed');
+        });
+
+        // Start the processing animation
+        startProcessingAnimation();
+
+        // Simulate real-time progress with enhanced timing
+        enhancedSimulateProgress();
     }
 
     function hideProcessingStatus() {
         processingStatus.style.display = 'none';
-        progressFill.style.width = '0%';
+        if (progressInterval) {
+            clearInterval(progressInterval);
+        }
+        currentProgress = 0;
+        updateProgressRing(0);
+    }
+
+    function startProcessingAnimation() {
+        // Add entrance animation
+        const container = document.querySelector('.processing-container');
+        container.style.opacity = '0';
+        container.style.transform = 'scale(0.9)';
+
+        setTimeout(() => {
+            container.style.transition = 'all 0.5s ease';
+            container.style.opacity = '1';
+            container.style.transform = 'scale(1)';
+        }, 100);
+
+        // Start particles animation
+        createProcessingParticles();
+    }
+
+    function simulateProgress() {
+        const stages = [
+            { name: 'upload', title: 'Uploading Document', message: 'Securely uploading your file...', progress: 25, time: '30 seconds' },
+            { name: 'analyze', title: 'Analyzing Content', message: 'AI is reading and understanding your document...', progress: 50, time: '45 seconds' },
+            { name: 'generate', title: 'Generating Questions', message: 'Creating intelligent questions from your content...', progress: 85, time: '15 seconds' },
+            { name: 'complete', title: 'Almost Done', message: 'Finalizing your quiz...', progress: 100, time: 'Complete!' }
+        ];
+
+        let stageIndex = 0;
+
+        function nextStage() {
+            if (stageIndex < stages.length) {
+                const stage = stages[stageIndex];
+                updateProcessingStage(stage);
+                stageIndex++;
+
+                // Move to next stage after delay
+                setTimeout(nextStage, 2000 + Math.random() * 3000); // 2-5 seconds per stage
+            }
+        }
+
+        nextStage();
+    }
+
+    function updateProcessingStage(stage) {
+        // Update stage indicators
+        const stageElement = document.getElementById(`stage-${stage.name}`);
+        if (stageElement) {
+            // Mark previous stages as completed
+            document.querySelectorAll('.stage').forEach((el, index) => {
+                if (index < currentStage) {
+                    el.classList.add('completed');
+                    el.classList.remove('active');
+                }
+            });
+
+            // Mark current stage as active
+            stageElement.classList.add('active');
+            currentStage++;
+        }
+
+        // Update text content
+        document.getElementById('status-title').textContent = stage.title;
+        document.getElementById('status-message').textContent = stage.message;
+        document.getElementById('estimated-time').textContent = stage.time;
+
+        // Update progress ring
+        animateProgressTo(stage.progress);
+
+        // Update icon based on stage
+        const iconElement = document.getElementById('progress-icon').querySelector('i');
+        const iconMap = {
+            'upload': 'ri-upload-cloud-line',
+            'analyze': 'ri-search-eye-line',
+            'generate': 'ri-magic-line',
+            'complete': 'ri-check-line'
+        };
+        iconElement.className = iconMap[stage.name] || 'ri-file-text-line';
+    }
+
+    function animateProgressTo(targetProgress) {
+        const progressCircle = document.getElementById('progress-circle');
+        const progressPercentage = document.getElementById('progress-percentage');
+        const circumference = 2 * Math.PI * 50; // radius = 50
+
+        const animateStep = () => {
+            if (currentProgress < targetProgress) {
+                currentProgress += 1;
+                updateProgressRing(currentProgress);
+                requestAnimationFrame(animateStep);
+            }
+        };
+
+        animateStep();
+    }
+
+    function updateProgressRing(progress) {
+        const progressCircle = document.getElementById('progress-circle');
+        const progressPercentage = document.getElementById('progress-percentage');
+        const circumference = 2 * Math.PI * 50;
+
+        const offset = circumference - (progress / 100) * circumference;
+        progressCircle.style.strokeDashoffset = offset;
+        progressPercentage.textContent = `${Math.round(progress)}%`;
+    }
+
+    function createProcessingParticles() {
+        const particlesContainer = document.querySelector('.processing-particles');
+        particlesContainer.innerHTML = '';
+
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 3 + 's';
+            particle.style.animationDuration = (3 + Math.random() * 2) + 's';
+            particlesContainer.appendChild(particle);
+        }
     }
 
     function showSuccessMessage(message) {
-        statusMessage.textContent = message;
-        progressFill.style.width = '100%';
+        // Complete all stages
+        document.querySelectorAll('.stage').forEach(stage => {
+            stage.classList.add('completed');
+            stage.classList.remove('active');
+        });
 
-        // Change status icon to success
-        const statusIcon = document.querySelector('.status-icon i');
-        statusIcon.className = 'ri-check-line';
-        statusIcon.style.color = '#28a745';
-        statusIcon.style.animation = 'none';
+        // Update to success state
+        document.getElementById('status-title').textContent = 'Success!';
+        document.getElementById('status-message').textContent = message;
+        document.getElementById('estimated-time').textContent = 'Complete!';
+
+        // Final progress animation
+        animateProgressTo(100);
+
+        // Success icon
+        const iconElement = document.getElementById('progress-icon').querySelector('i');
+        iconElement.className = 'ri-check-line';
+
+        // Add success glow effect
+        const progressRing = document.querySelector('.progress-ring-container');
+        progressRing.classList.add('success');
+
+        // Add celebration particles
+        createCelebrationParticles();
+    }
+
+    function createCelebrationParticles() {
+        const container = document.querySelector('.processing-container');
+
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.style.position = 'absolute';
+            particle.style.width = '6px';
+            particle.style.height = '6px';
+            particle.style.background = `hsl(${Math.random() * 60 + 280}, 70%, 60%)`;
+            particle.style.borderRadius = '50%';
+            particle.style.left = '50%';
+            particle.style.top = '50%';
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '1000';
+
+            const angle = (Math.PI * 2 * i) / 30;
+            const velocity = 100 + Math.random() * 100;
+            const lifetime = 1000 + Math.random() * 1000;
+
+            container.appendChild(particle);
+
+            let startTime = Date.now();
+            function animateParticle() {
+                const elapsed = Date.now() - startTime;
+                const progress = elapsed / lifetime;
+
+                if (progress < 1) {
+                    const x = Math.cos(angle) * velocity * progress;
+                    const y = Math.sin(angle) * velocity * progress - (progress * progress * 200);
+                    const opacity = 1 - progress;
+
+                    particle.style.transform = `translate(${x}px, ${y}px)`;
+                    particle.style.opacity = opacity;
+
+                    requestAnimationFrame(animateParticle);
+                } else {
+                    container.removeChild(particle);
+                }
+            }
+
+            requestAnimationFrame(animateParticle);
+        }
+    }
+
+    // Enhanced progress tracking with more realistic timing
+    function enhancedSimulateProgress() {
+        const stages = [
+            {
+                name: 'upload',
+                title: 'Uploading Document',
+                message: 'Securely uploading your file...',
+                progress: 15,
+                time: '20-30 seconds',
+                duration: 3000
+            },
+            {
+                name: 'analyze',
+                title: 'Analyzing Content',
+                message: 'AI is reading and understanding your document...',
+                progress: 45,
+                time: '30-60 seconds',
+                duration: 5000
+            },
+            {
+                name: 'generate',
+                title: 'Generating Questions',
+                message: 'Creating intelligent questions from your content...',
+                progress: 85,
+                time: '10-20 seconds',
+                duration: 4000
+            },
+            {
+                name: 'complete',
+                title: 'Finalizing',
+                message: 'Adding finishing touches to your quiz...',
+                progress: 100,
+                time: 'Almost done!',
+                duration: 2000
+            }
+        ];
+
+        let stageIndex = 0;
+
+        function nextStage() {
+            if (stageIndex < stages.length) {
+                const stage = stages[stageIndex];
+                updateProcessingStage(stage);
+                stageIndex++;
+
+                // Use stage-specific duration
+                setTimeout(nextStage, stage.duration);
+            }
+        }
+
+        nextStage();
     }
 
     function showErrorMessage(message) {
@@ -318,6 +639,189 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 10000); // Refresh every 10 seconds
     }
 });
+
+// Demo function for testing the animation
+function demoProcessingAnimation() {
+    const processingStatus = document.getElementById('processing-status');
+    processingStatus.style.display = 'block';
+
+    // Reset and start animation
+    document.querySelectorAll('.stage').forEach(stage => {
+        stage.classList.remove('active', 'completed');
+    });
+
+    // Initialize progress ring
+    const progressCircle = document.getElementById('progress-circle');
+    if (progressCircle) {
+        const circumference = 2 * Math.PI * 50;
+        progressCircle.style.strokeDasharray = circumference;
+        progressCircle.style.strokeDashoffset = circumference;
+    }
+
+    // Start demo animation
+    const container = document.querySelector('.processing-container');
+    container.style.opacity = '0';
+    container.style.transform = 'scale(0.9)';
+
+    setTimeout(() => {
+        container.style.transition = 'all 0.5s ease';
+        container.style.opacity = '1';
+        container.style.transform = 'scale(1)';
+    }, 100);
+
+    // Create particles
+    const particlesContainer = document.querySelector('.processing-particles');
+    particlesContainer.innerHTML = '';
+
+    for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 3 + 's';
+        particle.style.animationDuration = (3 + Math.random() * 2) + 's';
+        particlesContainer.appendChild(particle);
+    }
+
+    // Run demo stages
+    const stages = [
+        { name: 'upload', title: 'Demo: Uploading', message: 'Simulating file upload...', progress: 25, time: '5 seconds' },
+        { name: 'analyze', title: 'Demo: Analyzing', message: 'Simulating content analysis...', progress: 50, time: '3 seconds' },
+        { name: 'generate', title: 'Demo: Generating', message: 'Simulating question generation...', progress: 85, time: '2 seconds' },
+        { name: 'complete', title: 'Demo Complete!', message: 'Animation demo finished successfully!', progress: 100, time: 'Done!' }
+    ];
+
+    let stageIndex = 0;
+    let currentProgress = 0;
+
+    function nextDemoStage() {
+        if (stageIndex < stages.length) {
+            const stage = stages[stageIndex];
+
+            // Update stage indicators
+            const stageElement = document.getElementById(`stage-${stage.name}`);
+            if (stageElement) {
+                document.querySelectorAll('.stage').forEach((el, index) => {
+                    if (index < stageIndex) {
+                        el.classList.add('completed');
+                        el.classList.remove('active');
+                    }
+                });
+                stageElement.classList.add('active');
+            }
+
+            // Update text content
+            document.getElementById('status-title').textContent = stage.title;
+            document.getElementById('status-message').textContent = stage.message;
+            document.getElementById('estimated-time').textContent = stage.time;
+
+            // Animate progress
+            const targetProgress = stage.progress;
+            const animateStep = () => {
+                if (currentProgress < targetProgress) {
+                    currentProgress += 2;
+                    const progressCircle = document.getElementById('progress-circle');
+                    const progressPercentage = document.getElementById('progress-percentage');
+                    const circumference = 2 * Math.PI * 50;
+
+                    const offset = circumference - (currentProgress / 100) * circumference;
+                    progressCircle.style.strokeDashoffset = offset;
+                    progressPercentage.textContent = `${Math.round(currentProgress)}%`;
+
+                    requestAnimationFrame(animateStep);
+                }
+            };
+            animateStep();
+
+            stageIndex++;
+
+            if (stageIndex < stages.length) {
+                setTimeout(nextDemoStage, 2000);
+            } else {
+                // Demo complete - add celebration
+                setTimeout(() => {
+                    const progressRing = document.querySelector('.progress-ring-container');
+                    progressRing.classList.add('success');
+
+                    // Add celebration particles
+                    const container = document.querySelector('.processing-container');
+                    for (let i = 0; i < 30; i++) {
+                        const particle = document.createElement('div');
+                        particle.style.position = 'absolute';
+                        particle.style.width = '6px';
+                        particle.style.height = '6px';
+                        particle.style.background = `hsl(${Math.random() * 60 + 280}, 70%, 60%)`;
+                        particle.style.borderRadius = '50%';
+                        particle.style.left = '50%';
+                        particle.style.top = '50%';
+                        particle.style.pointerEvents = 'none';
+                        particle.style.zIndex = '1000';
+
+                        const angle = (Math.PI * 2 * i) / 30;
+                        const velocity = 100 + Math.random() * 100;
+                        const lifetime = 1000 + Math.random() * 1000;
+
+                        container.appendChild(particle);
+
+                        let startTime = Date.now();
+                        function animateParticle() {
+                            const elapsed = Date.now() - startTime;
+                            const progress = elapsed / lifetime;
+
+                            if (progress < 1) {
+                                const x = Math.cos(angle) * velocity * progress;
+                                const y = Math.sin(angle) * velocity * progress - (progress * progress * 200);
+                                const opacity = 1 - progress;
+
+                                particle.style.transform = `translate(${x}px, ${y}px)`;
+                                particle.style.opacity = opacity;
+
+                                requestAnimationFrame(animateParticle);
+                            } else {
+                                container.removeChild(particle);
+                            }
+                        }
+
+                        requestAnimationFrame(animateParticle);
+                    }
+
+                    // Auto-hide after 3 seconds
+                    setTimeout(() => {
+                        processingStatus.style.display = 'none';
+                        progressRing.classList.remove('success');
+                    }, 3000);
+                }, 1000);
+            }
+        }
+    }
+
+    nextDemoStage();
+}
+
+// Global function for canceling processing
+function cancelProcessing() {
+    if (confirm('Are you sure you want to cancel the processing? This will stop the current operation.')) {
+        // Hide processing status
+        const processingStatus = document.getElementById('processing-status');
+        processingStatus.style.display = 'none';
+
+        // Reset generate button
+        const generateBtn = document.getElementById('generate-btn');
+        const btnText = document.getElementById('btn-text');
+        const loadingSpinner = document.getElementById('loading-spinner');
+
+        btnText.style.display = 'inline';
+        loadingSpinner.style.display = 'none';
+        generateBtn.disabled = false;
+
+        // Show notification
+        showNotification('Processing cancelled', 'info');
+
+        // Clear any ongoing intervals
+        if (window.progressInterval) {
+            clearInterval(window.progressInterval);
+        }
+    }
+}
 
 // Global function for deleting quizzes
 function deleteQuiz(jobId, documentName) {
@@ -509,38 +1013,375 @@ function showNotification(message, type = 'info') {
     text-decoration: underline;
 }
 
-.processing-status {
-    text-align: center;
-    padding: 40px 20px;
-    border-radius: 10px;
-    margin-top: 20px;
-}
-
-.status-icon i {
-    font-size: 3em;
-    color: #007bff;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.progress-bar {
+/* Modern Processing Animation Styles */
+.modern-processing-status {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 8px;
-    background-color: #e9ecef;
-    border-radius: 4px;
-    margin-top: 20px;
+    height: 100%;
+    background: rgba(10, 10, 25, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.5s ease;
+}
+
+.processing-container {
+    position: relative;
+    background: rgba(15, 15, 35, 0.9);
+    border: 1px solid rgba(94, 23, 235, 0.3);
+    border-radius: 24px;
+    padding: 40px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     overflow: hidden;
 }
 
-.progress-fill {
+.processing-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
     height: 100%;
-    background-color: #007bff;
-    transition: width 0.3s ease;
-    border-radius: 4px;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 24px;
+}
+
+.processing-particles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: linear-gradient(45deg, #5e17eb, #00d4ff);
+    border-radius: 50%;
+    animation: floatUp 4s infinite linear;
+    opacity: 0;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100px) scale(1);
+        opacity: 0;
+    }
+}
+
+.processing-waves {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.wave {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200px;
+    height: 200px;
+    border: 2px solid rgba(94, 23, 235, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulse 2s infinite ease-in-out;
+}
+
+.wave-2 {
+    animation-delay: 0.5s;
+    border-color: rgba(0, 212, 255, 0.3);
+}
+
+.wave-3 {
+    animation-delay: 1s;
+    border-color: rgba(255, 149, 0, 0.3);
+}
+
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+    }
+}
+
+.processing-content {
+    position: relative;
+    z-index: 10;
+}
+
+.progress-ring-container {
+    position: relative;
+    margin: 0 auto 30px;
+    width: 120px;
+    height: 120px;
+}
+
+.progress-ring {
+    transform: rotate(-90deg);
+    width: 120px;
+    height: 120px;
+}
+
+.progress-ring-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 8;
+}
+
+.progress-ring-fill {
+    fill: none;
+    stroke: url(#progressGradient);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 314.16; /* 2 * PI * 50 */
+    stroke-dashoffset: 314.16;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+.progress-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-icon {
+    font-size: 2rem;
+    color: #5e17eb;
+    margin-bottom: 5px;
+    animation: iconPulse 2s infinite ease-in-out;
+}
+
+.progress-percentage {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+@keyframes iconPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.status-info h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, #5e17eb, #00d4ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.status-info p {
+    color: #aaaaaa;
+    margin-bottom: 25px;
+    font-size: 1rem;
+}
+
+.status-stages {
+    display: flex;
+    justify-content: space-between;
+    margin: 25px 0;
+    padding: 0 10px;
+}
+
+.stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.4;
+    transition: all 0.3s ease;
+}
+
+.stage.active {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.stage.completed {
+    opacity: 1;
+}
+
+.stage.completed .stage-icon {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.stage-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.stage.active .stage-icon {
+    background: linear-gradient(135deg, #5e17eb, #7c3aed);
+    animation: stagePulse 1.5s infinite ease-in-out;
+}
+
+@keyframes stagePulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(94, 23, 235, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(94, 23, 235, 0);
+    }
+}
+
+.stage span {
+    font-size: 0.8rem;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.estimated-time {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #aaaaaa;
+    font-size: 0.9rem;
+    margin-top: 20px;
+}
+
+.estimated-time i {
+    color: #5e17eb;
+}
+
+.cancel-processing-btn {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.cancel-processing-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.5);
+    transform: translateY(-1px);
+}
+
+.progress-ring-container.success {
+    animation: successPulse 0.6s ease;
+}
+
+@keyframes successPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive Styles for Processing Animation */
+@media screen and (max-width: 768px) {
+    .processing-container {
+        padding: 30px 20px;
+        margin: 20px;
+        max-width: none;
+        width: calc(100% - 40px);
+    }
+
+    .progress-ring-container {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 20px;
+    }
+
+    .progress-ring {
+        width: 100px;
+        height: 100px;
+    }
+
+    .progress-icon {
+        font-size: 1.5rem;
+    }
+
+    .status-info h3 {
+        font-size: 1.3rem;
+    }
+
+    .status-stages {
+        padding: 0 5px;
+        gap: 5px;
+    }
+
+    .stage-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+
+    .stage span {
+        font-size: 0.7rem;
+    }
+
+    .wave {
+        width: 150px;
+        height: 150px;
+    }
 }
 
 .recent-jobs {
