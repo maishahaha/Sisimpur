@@ -1,4 +1,4 @@
-{% extends 'dashboard_base.html' %} 
+{% extends 'dashboard_base.html' %}
 {% load static %}
 {% block title %} My Quizzes - SISIMPUR {% endblock %}
 {% block content %}
@@ -13,7 +13,7 @@
           Create New Quiz
         </a>
       </div>
-      
+
       <p class="page-description">View and manage your generated quizzes</p>
 
       {% if jobs %}
@@ -73,13 +73,17 @@
                 <i class="ri-download-line"></i>
                 Download JSON
               </a>
+              <button class="btn-danger" onclick="deleteQuiz({{ job.id }}, '{{ job.document_name|escapejs }}')">
+                <i class="ri-delete-bin-line"></i>
+                Delete
+              </button>
             {% elif job.status == 'processing' %}
               <button class="btn-secondary" disabled>
                 <i class="ri-loader-4-line"></i>
                 Processing...
               </button>
             {% elif job.status == 'failed' %}
-              <button class="btn-danger" onclick="deleteJob({{ job.id }})">
+              <button class="btn-danger" onclick="deleteQuiz({{ job.id }}, '{{ job.document_name|escapejs }}')">
                 <i class="ri-delete-bin-line"></i>
                 Delete
               </button>
@@ -119,26 +123,84 @@
 </div>
 
 <script>
-function deleteJob(jobId) {
-    if (confirm('Are you sure you want to delete this quiz? This action cannot be undone.')) {
-        fetch(`/api/brain/jobs/${jobId}/`, {
+function deleteQuiz(jobId, documentName) {
+    if (confirm(`Are you sure you want to delete "${documentName}"? This action cannot be undone.`)) {
+        // Show loading state
+        const deleteBtn = event.target.closest('button');
+        const originalContent = deleteBtn.innerHTML;
+        deleteBtn.innerHTML = '<i class="ri-loader-4-line"></i>';
+        deleteBtn.disabled = true;
+
+        // Send delete request
+        fetch(`/api/brain/jobs/${jobId}/delete/`, {
             method: 'DELETE',
             headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json'
             }
         })
         .then(response => {
             if (response.ok) {
-                location.reload();
+                // Remove the quiz card from the DOM
+                const quizCard = deleteBtn.closest('.quiz-card');
+                quizCard.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                quizCard.style.opacity = '0';
+                quizCard.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    quizCard.remove();
+
+                    // Check if no quizzes left
+                    const quizzesGrid = document.querySelector('.quizzes-grid');
+                    if (quizzesGrid && quizzesGrid.children.length === 0) {
+                        location.reload(); // Reload to show empty state
+                    }
+                }, 300);
+
+                // Show success notification
+                showNotification('Quiz deleted successfully', 'success');
             } else {
-                alert('Failed to delete quiz. Please try again.');
+                throw new Error('Failed to delete quiz');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while deleting the quiz.');
+            // Restore button state
+            deleteBtn.innerHTML = originalContent;
+            deleteBtn.disabled = false;
+            showNotification('Failed to delete quiz. Please try again.', 'error');
         });
     }
+}
+
+// Function to show notifications
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="ri-${type === 'success' ? 'check' : 'error-warning'}-line"></i>
+            <span>${message}</span>
+        </div>
+    `;
+
+    // Add to page
+    document.body.appendChild(notification);
+
+    // Show with animation
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
 }
 
 // Auto-refresh for processing jobs
@@ -152,5 +214,52 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<style>
+/* Notification Styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 15px 20px;
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    border-left: 4px solid #007bff;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification.notification-success {
+    border-left-color: #28a745;
+}
+
+.notification.notification-error {
+    border-left-color: #dc3545;
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notification-content i {
+    font-size: 1.2em;
+}
+
+.notification-success .notification-content i {
+    color: #28a745;
+}
+
+.notification-error .notification-content i {
+    color: #dc3545;
+}
+</style>
 
 {% endblock %}

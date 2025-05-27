@@ -504,3 +504,61 @@ def dev_list_jobs(request):
         'jobs': jobs_data,
         'total': jobs.count()
     })
+
+
+@login_required
+@require_http_methods(["DELETE"])
+def delete_job(request, job_id):
+    """
+    Delete a processing job and its associated data
+    """
+    try:
+        job = get_object_or_404(ProcessingJob, id=job_id, user=request.user)
+
+        # Store job info for response
+        job_name = job.document_name
+
+        # Delete associated files
+        if job.document_file:
+            try:
+                job.document_file.delete(save=False)
+            except Exception as e:
+                logger.warning(f"Failed to delete document file for job {job_id}: {e}")
+
+        if job.extracted_text_file:
+            try:
+                job.extracted_text_file.delete(save=False)
+            except Exception as e:
+                logger.warning(f"Failed to delete extracted text file for job {job_id}: {e}")
+
+        if job.output_file:
+            try:
+                job.output_file.delete(save=False)
+            except Exception as e:
+                logger.warning(f"Failed to delete output file for job {job_id}: {e}")
+
+        # Delete Q&A pairs (will be deleted automatically due to foreign key cascade)
+        qa_count = job.get_qa_pairs().count()
+
+        # Delete the job
+        job.delete()
+
+        logger.info(f"Deleted job {job_id} ({job_name}) with {qa_count} Q&A pairs")
+
+        return JsonResponse({
+            'success': True,
+            'message': f'Quiz "{job_name}" deleted successfully'
+        })
+
+    except ProcessingJob.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Quiz not found'
+        }, status=404)
+
+    except Exception as e:
+        logger.error(f"Error deleting job {job_id}: {e}")
+        return JsonResponse({
+            'success': False,
+            'error': 'Failed to delete quiz'
+        }, status=500)

@@ -104,14 +104,133 @@ def quiz_results(request, job_id):
 def api_process_document(request):
     """
     API endpoint to process documents via AJAX (OCR + Question Generation Pipeline)
+    Handles file upload and storage using Django's file system
     """
     try:
-        from apps.brain.views import process_document
-        return process_document(request)
+        # Validate request
+        if 'document' not in request.FILES:
+            return JsonResponse({
+                'success': False,
+                'error': 'No document file provided'
+            }, status=400)
+
+        uploaded_file = request.FILES['document']
+
+        # Validate file type
+        allowed_extensions = ['.pdf', '.jpg', '.jpeg', '.png']
+        file_extension = uploaded_file.name.lower().split('.')[-1]
+        if f'.{file_extension}' not in allowed_extensions:
+            return JsonResponse({
+                'success': False,
+                'error': 'Invalid file type. Please upload PDF, JPG, or PNG files.'
+            }, status=400)
+
+        # Validate file size (max 10MB)
+        max_size = 10 * 1024 * 1024  # 10MB
+        if uploaded_file.size > max_size:
+            return JsonResponse({
+                'success': False,
+                'error': 'File size too large. Maximum size is 10MB.'
+            }, status=400)
+
+        # Get form data
+        language = request.POST.get('language', 'auto')
+        question_type = request.POST.get('question_type', 'MULTIPLECHOICE')
+        num_questions = request.POST.get('num_questions')
+
+        # Convert num_questions to int if provided
+        if num_questions:
+            try:
+                num_questions = int(num_questions)
+            except ValueError:
+                num_questions = None
+
+        # Import brain models and create job
+        from apps.brain.models import ProcessingJob
+        from django.core.files.storage import default_storage
+        import os
+        from pathlib import Path
+
+        # Create processing job
+        job = ProcessingJob.objects.create(
+            user=request.user,
+            document_name=uploaded_file.name,
+            language=language,
+            num_questions=num_questions,
+            question_type=question_type,
+            status='pending'
+        )
+
+        # Save uploaded file
+        file_path = f'brain/uploads/{job.id}_{uploaded_file.name}'
+        saved_path = default_storage.save(file_path, uploaded_file)
+
+        # Update job with file path
+        job.document_file = saved_path
+        job.save()
+
+        # Start processing in background (for now, we'll process immediately)
+        try:
+            job.status = 'processing'
+            job.save()
+
+            # Get full file path for processing
+            full_file_path = default_storage.path(saved_path)
+
+            # Import and use brain processor
+            from apps.brain.brain_engine.processor import DocumentProcessor
+            processor = DocumentProcessor(language=language)
+
+            # Process document
+            output_file = processor.process(full_file_path, num_questions=num_questions)
+
+            # Load results and save to database
+            import json
+            with open(output_file, 'r', encoding='utf-8') as f:
+                qa_data = json.load(f)
+
+            # Save Q&A pairs to database
+            from apps.brain.models import QuestionAnswer
+            for qa_item in qa_data.get('questions', []):
+                QuestionAnswer.objects.create(
+                    job=job,
+                    question=qa_item.get('question', ''),
+                    answer=qa_item.get('answer', ''),
+                    question_type=question_type,
+                    options=qa_item.get('options', []),
+                    correct_option=qa_item.get('correct_option', ''),
+                    confidence_score=qa_item.get('confidence_score'),
+                    source_text=qa_item.get('source_text', '')
+                )
+
+            # Save output file path
+            output_filename = f'brain/qa_outputs/{job.id}_results.json'
+            with open(default_storage.path(output_filename), 'w', encoding='utf-8') as f:
+                json.dump(qa_data, f, ensure_ascii=False, indent=2)
+            job.output_file = output_filename
+
+            # Mark job as completed
+            job.mark_completed()
+
+            return JsonResponse({
+                'success': True,
+                'job_id': job.id,
+                'message': 'Document uploaded and processing started',
+                'questions_generated': len(qa_data.get('questions', []))
+            })
+
+        except Exception as processing_error:
+            # Mark job as failed
+            job.mark_failed(str(processing_error))
+            return JsonResponse({
+                'success': False,
+                'error': f'Processing failed: {str(processing_error)}'
+            }, status=500)
+
     except Exception as e:
         return JsonResponse({
             'success': False,
-            'error': f'Brain processing not available: {str(e)}'
+            'error': f'Upload failed: {str(e)}'
         }, status=500)
 
 @login_required(login_url='auth:signupin')

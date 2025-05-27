@@ -1,6 +1,12 @@
-{% extends 'dashboard_base.html' %} 
+{% extends 'dashboard_base.html' %}
 {% load static %}
 {% block title %} Quiz Generator - SISIMPUR {% endblock %}
+
+{% block extra_head %}
+<!-- Dropzone CSS -->
+<link href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
 {% block content %}
 
 <div class="content-wrapper">
@@ -10,26 +16,13 @@
       <p class="page-description">Upload documents and generate AI-powered quizzes with OCR text extraction</p>
 
       <div class="quiz-form">
-        <form id="document-upload-form" enctype="multipart/form-data">
-          {% csrf_token %}
-          <div class="form-group">
-            <label>Upload Document</label>
-            <p class="upload-description">Our AI will extract text using OCR and generate questions automatically</p>
-
-            <div class="file-upload">
-              <input type="file" id="file-input" name="document" accept=".pdf,.jpg,.jpeg,.png" required hidden />
-              <label for="file-input" class="file-upload-btn">
-                <i class="ri-upload-cloud-line"></i>
-                Upload Document
-              </label>
-              <span class="file-types">Supported: PDF, JPG, PNG</span>
-              <div id="file-preview" class="file-preview" style="display: none;"></div>
-            </div>
-          </div>
+        <!-- Quiz Options -->
+        <div class="quiz-options-form">
+          <h3>Quiz Configuration</h3>
 
           <div class="quiz-options">
             <div class="option-group">
-              <label>Number of Questions</label>
+              <label for="question-count">Number of Questions</label>
               <select class="quiz-select" id="question-count" name="num_questions">
                 <option value="">Auto (Optimal)</option>
                 <option value="3">3 Questions</option>
@@ -42,7 +35,7 @@
             </div>
 
             <div class="option-group">
-              <label>Question Type</label>
+              <label for="question-type">Question Type</label>
               <select class="quiz-select" id="question-type" name="question_type">
                 <option value="MULTIPLECHOICE" selected>Multiple Choice</option>
                 <option value="SHORT">Short Answer</option>
@@ -50,7 +43,7 @@
             </div>
 
             <div class="option-group">
-              <label>Language Detection</label>
+              <label for="language">Language Detection</label>
               <select class="quiz-select" id="language" name="language">
                 <option value="auto" selected>Auto Detect</option>
                 <option value="english">English</option>
@@ -58,15 +51,32 @@
               </select>
             </div>
           </div>
+        </div>
 
-          <button type="submit" class="generate-btn" id="generate-btn">
+        <!-- Dropzone Upload -->
+        <div class="upload-section">
+          <h3>Upload Document</h3>
+          <p class="upload-description">Upload a document first, then click Generate to process it</p>
+
+          <div class="dropzone" id="document-dropzone">
+            <div class="dz-message" data-dz-message>
+              <div class="upload-icon">
+                <i class="ri-upload-cloud-line"></i>
+              </div>
+              <h4>Drop files here or click to upload</h4>
+              <p>Supported: PDF, JPG, PNG (Max 10MB)</p>
+            </div>
+          </div>
+
+          <!-- Generate Button -->
+          <button type="button" class="generate-btn" id="generate-btn" disabled>
             <i class="ri-magic-line"></i>
             <span id="btn-text">Generate Quiz</span>
             <div id="loading-spinner" style="display: none;">
               <i class="ri-loader-4-line"></i> Processing...
             </div>
           </button>
-        </form>
+        </div>
 
         <!-- Processing Status -->
         <div id="processing-status" style="display: none;" class="processing-status">
@@ -86,106 +96,301 @@
   </div>
 </div>
 
+<!-- Dropzone JavaScript -->
+<script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+
 <script>
+// Disable Dropzone auto discover
+Dropzone.autoDiscover = false;
+
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('document-upload-form');
-    const fileInput = document.getElementById('file-input');
-    const filePreview = document.getElementById('file-preview');
-    const generateBtn = document.getElementById('generate-btn');
-    const btnText = document.getElementById('btn-text');
-    const loadingSpinner = document.getElementById('loading-spinner');
     const processingStatus = document.getElementById('processing-status');
     const statusMessage = document.getElementById('status-message');
     const progressFill = document.getElementById('progress-fill');
+    const generateBtn = document.getElementById('generate-btn');
+    const btnText = document.getElementById('btn-text');
+    const loadingSpinner = document.getElementById('loading-spinner');
 
-    // File preview
-    fileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            filePreview.style.display = 'block';
-            filePreview.innerHTML = `
-                <div class="file-info">
-                    <i class="ri-file-line"></i>
-                    <span>${file.name}</span>
-                    <small>(${(file.size / 1024 / 1024).toFixed(2)} MB)</small>
-                </div>
-            `;
+    let uploadedFile = null;
+
+    // Get quiz configuration values
+    function getQuizConfig() {
+        return {
+            num_questions: document.getElementById('question-count').value,
+            question_type: document.getElementById('question-type').value,
+            language: document.getElementById('language').value
+        };
+    }
+
+    // Initialize Dropzone (upload only, no auto-processing)
+    const myDropzone = new Dropzone("#document-dropzone", {
+        url: "#", // Dummy URL since we won't auto-upload
+        autoProcessQueue: false, // Prevent auto-processing
+        paramName: "document",
+        maxFilesize: 10, // MB
+        maxFiles: 1,
+        acceptedFiles: ".pdf,.jpg,.jpeg,.png",
+        addRemoveLinks: true,
+        dictDefaultMessage: "Drop files here or click to upload",
+        dictFallbackMessage: "Your browser does not support drag'n'drop file uploads.",
+        dictFileTooBig: "File is too big ({{filesize}}MiB). Max filesize: {{maxFilesize}}MiB.",
+        dictInvalidFileType: "You can't upload files of this type. Only PDF, JPG, and PNG files are allowed.",
+        dictRemoveFile: "Remove file",
+
+        init: function() {
+            const dropzone = this;
+
+            // Handle file added (but don't upload yet)
+            this.on("addedfile", function(file) {
+                uploadedFile = file;
+                generateBtn.disabled = false;
+                generateBtn.style.opacity = '1';
+                console.log("File added:", file.name);
+            });
+
+            // Handle file removal
+            this.on("removedfile", function(file) {
+                uploadedFile = null;
+                generateBtn.disabled = true;
+                generateBtn.style.opacity = '0.6';
+                hideProcessingStatus();
+            });
+
+            // Handle processing when manually triggered
+            this.on("sending", function(file, xhr, formData) {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                formData.append('csrfmiddlewaretoken', csrfToken);
+
+                // Add quiz configuration
+                const config = getQuizConfig();
+                Object.keys(config).forEach(key => {
+                    if (config[key]) {
+                        formData.append(key, config[key]);
+                    }
+                });
+
+                // Show processing status
+                showProcessingStatus();
+            });
+
+            // Handle successful upload
+            this.on("success", function(file, response) {
+                if (response.success) {
+                    // Show success message
+                    showSuccessMessage(`Document processed successfully! Generated ${response.questions_generated} questions.`);
+
+                    // Redirect to results after a short delay
+                    setTimeout(() => {
+                        window.location.href = `{% url "dashboard:quiz_results" 0 %}`.replace('0', response.job_id);
+                    }, 2000);
+                } else {
+                    showErrorMessage(response.error || 'Processing failed');
+                    resetGenerateButton();
+                }
+            });
+
+            // Handle upload errors
+            this.on("error", function(file, errorMessage) {
+                showErrorMessage(typeof errorMessage === 'string' ? errorMessage : 'Processing failed');
+                resetGenerateButton();
+            });
         }
     });
 
-    // Form submission
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(form);
-        
+    // Generate button click handler
+    generateBtn.addEventListener('click', function() {
+        if (!uploadedFile) {
+            alert('Please upload a document first');
+            return;
+        }
+
         // Show loading state
         btnText.style.display = 'none';
         loadingSpinner.style.display = 'inline-block';
         generateBtn.disabled = true;
-        
-        // Submit to API
-        fetch('{% url "dashboard:api_process_document" %}', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Show processing status
-                form.style.display = 'none';
-                processingStatus.style.display = 'block';
-                
-                // Poll for job status
-                pollJobStatus(data.job_id);
-            } else {
-                alert('Error: ' + data.error);
-                resetForm();
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while processing the document.');
-            resetForm();
-        });
+
+        // Set the correct URL and process the file
+        myDropzone.options.url = "{% url 'dashboard:api_process_document' %}";
+        myDropzone.processQueue();
     });
 
-    function pollJobStatus(jobId) {
-        const pollInterval = setInterval(() => {
-            fetch(`{% url "dashboard:api_job_status" 0 %}`.replace('0', jobId))
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'completed') {
-                    clearInterval(pollInterval);
-                    window.location.href = `{% url "dashboard:quiz_results" 0 %}`.replace('0', jobId);
-                } else if (data.status === 'failed') {
-                    clearInterval(pollInterval);
-                    alert('Processing failed: ' + (data.error_message || 'Unknown error'));
-                    resetForm();
-                } else {
-                    // Update progress
-                    statusMessage.textContent = 'Processing... (' + data.status + ')';
-                    const progress = data.status === 'processing' ? 50 : 25;
-                    progressFill.style.width = progress + '%';
-                }
-            })
-            .catch(error => {
-                console.error('Polling error:', error);
-            });
-        }, 2000); // Poll every 2 seconds
+    // Helper functions for UI updates
+    function showProcessingStatus() {
+        processingStatus.style.display = 'block';
+        statusMessage.textContent = 'Processing document...';
+        progressFill.style.width = '50%';
     }
 
-    function resetForm() {
+    function hideProcessingStatus() {
+        processingStatus.style.display = 'none';
+        progressFill.style.width = '0%';
+    }
+
+    function showSuccessMessage(message) {
+        statusMessage.textContent = message;
+        progressFill.style.width = '100%';
+
+        // Change status icon to success
+        const statusIcon = document.querySelector('.status-icon i');
+        statusIcon.className = 'ri-check-line';
+        statusIcon.style.color = '#28a745';
+        statusIcon.style.animation = 'none';
+    }
+
+    function showErrorMessage(message) {
+        alert('Error: ' + message);
+        hideProcessingStatus();
+    }
+
+    function resetGenerateButton() {
         btnText.style.display = 'inline';
         loadingSpinner.style.display = 'none';
-        generateBtn.disabled = false;
-        processingStatus.style.display = 'none';
-        form.style.display = 'block';
+        generateBtn.disabled = uploadedFile ? false : true;
+        hideProcessingStatus();
     }
 });
 </script>
+
+<style>
+/* Quiz Configuration Styles */
+.quiz-options-form {
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.quiz-options-form h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.upload-section {
+    margin-bottom: 20px;
+}
+
+.upload-section h3 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.upload-description {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 15px;
+}
+
+/* Dropzone Customization */
+.dropzone {
+    border: 2px dashed #007bff;
+    border-radius: 10px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dropzone:hover {
+    border-color: #0056b3;
+}
+
+.dropzone .dz-message {
+    margin: 0;
+}
+
+.dropzone .upload-icon {
+    font-size: 3em;
+    color: #007bff;
+    margin-bottom: 15px;
+}
+
+.dropzone .dz-message h4 {
+    margin: 10px 0;
+    color: #333;
+    font-size: 1.2em;
+}
+
+.dropzone .dz-message p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9em;
+}
+
+/* Processing status styles */
+.processing-status {
+    text-align: center;
+    padding: 40px 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+.status-icon i {
+    font-size: 3em;
+    color: #007bff;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    margin-top: 20px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #007bff;
+    transition: width 0.3s ease;
+    border-radius: 4px;
+}
+
+/* Generate Button Styles */
+.generate-btn {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.generate-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.generate-btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none;
+}
+
+.generate-btn i {
+    font-size: 1.2em;
+}
+
+#loading-spinner {
+    display: none;
+}
+</style>
 
 {% endblock %}
