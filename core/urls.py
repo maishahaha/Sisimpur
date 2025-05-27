@@ -9,7 +9,8 @@ urlpatterns = [
     path("", include("frontend.urls")),
     path("auth/", include("authentication.urls")),
     path("app/", include("dashboard.urls")),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    path("api/brain/", include("apps.brain.urls")),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Add django-browser-reload URLs only in DEBUG mode
 if settings.DEBUG:

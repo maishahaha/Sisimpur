@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "authentication",
     "frontend",
     "dashboard",
+    "apps.brain",  # AI processing engine
 ]
 
 MIDDLEWARE = [
@@ -166,3 +167,42 @@ COMING_SOON = False
 
 # Add SITE_ID setting
 SITE_ID = 1
+
+# Sisimpur Brain Configuration
+BRAIN_CONFIG = {
+    # API Keys
+    'GEMINI_API_KEY': os.getenv('GOOGLE_API_KEY'),
+
+    # Rate limiting settings
+    'MAX_RETRIES': 5,
+    'INITIAL_RETRY_DELAY': 2,  # seconds
+    'MAX_RETRY_DELAY': 60,  # seconds
+    'RATE_LIMIT_BATCH_SIZE': 3,  # Number of chunks to process before cooling down
+    'RATE_LIMIT_COOLDOWN': 10,  # seconds between batches
+
+    # Model settings
+    'DEFAULT_GEMINI_MODEL': "models/gemini-1.5-flash",
+    'QA_GEMINI_MODEL': "models/gemini-1.5-flash",
+    'FALLBACK_GEMINI_MODEL': "models/gemini-1.5-flash",
+
+    # Document processing settings
+    'MIN_TEXT_LENGTH': 100,  # Minimum text length to consider a PDF as text-based
+
+    # Question type settings
+    'QUESTION_TYPE': "MULTIPLECHOICE",  # Options: "SHORT" or "MULTIPLECHOICE"
+    'ANSWER_OPTIONS': 4,  # Number of options for multiple choice questions
+}
+
+# File upload settings
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Brain processing directories
+BRAIN_TEMP_DIR = MEDIA_ROOT / 'brain' / 'temp_extracts'
+BRAIN_OUTPUT_DIR = MEDIA_ROOT / 'brain' / 'qa_outputs'
+BRAIN_UPLOADS_DIR = MEDIA_ROOT / 'brain' / 'uploads'
+
+# Create necessary directories
+BRAIN_TEMP_DIR.mkdir(parents=True, exist_ok=True)
+BRAIN_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+BRAIN_UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
