@@ -409,3 +409,98 @@ def list_jobs(request):
             'success': False,
             'error': 'An unexpected error occurred'
         }, status=500)
+
+
+# Development/Testing endpoints
+@login_required
+def dev_test_processing(request):
+    """
+    Development endpoint for quick testing (JSON response)
+    Usage: GET /api/brain/dev/test/?file=path/to/file.pdf&questions=5
+    """
+    if not request.user.is_staff:
+        return JsonResponse({'error': 'Admin access required'}, status=403)
+
+    file_path = request.GET.get('file')
+    num_questions = request.GET.get('questions', 5)
+    language = request.GET.get('language', 'auto')
+    question_type = request.GET.get('type', 'MULTIPLECHOICE')
+
+    if not file_path:
+        return JsonResponse({'error': 'file parameter required'}, status=400)
+
+    try:
+        from .brain_engine.processor import DocumentProcessor
+        import tempfile
+        import json
+
+        # Create a temporary job for testing
+        job = ProcessingJob.objects.create(
+            user=request.user,
+            document_name=f"dev_test_{file_path.split('/')[-1]}",
+            language=language,
+            num_questions=int(num_questions),
+            question_type=question_type,
+            status='processing'
+        )
+
+        # Process the document
+        processor = DocumentProcessor(language=language)
+        output_file = processor.process(file_path, num_questions=int(num_questions))
+
+        # Load and return results
+        with open(output_file, 'r', encoding='utf-8') as f:
+            qa_data = json.load(f)
+
+        job.mark_completed()
+
+        return JsonResponse({
+            'success': True,
+            'job_id': job.id,
+            'file_processed': file_path,
+            'questions_generated': len(qa_data.get('questions', [])),
+            'results': qa_data
+        })
+
+    except Exception as e:
+        if 'job' in locals():
+            job.mark_failed(str(e))
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+def dev_list_jobs(request):
+    """
+    Development endpoint to list jobs as JSON
+    Usage: GET /api/brain/dev/jobs/
+    """
+    if not request.user.is_staff:
+        return JsonResponse({'error': 'Admin access required'}, status=403)
+
+    jobs = ProcessingJob.objects.all().order_by('-created_at')[:20]  # Last 20 jobs
+
+    jobs_data = []
+    for job in jobs:
+        job_data = {
+            'id': job.id,
+            'document_name': job.document_name,
+            'status': job.status,
+            'language': job.language,
+            'question_type': job.question_type,
+            'created_at': job.created_at.isoformat(),
+            'questions_count': job.get_qa_pairs().count() if job.status == 'completed' else 0
+        }
+
+        if job.status == 'failed':
+            job_data['error'] = job.error_message
+
+        jobs_data.append(job_data)
+
+    return JsonResponse({
+        'success': True,
+        'jobs': jobs_data,
+        'total': jobs.count()
+    })

@@ -1,0 +1,190 @@
+{% extends 'dashboard_base.html' %} 
+{% load static %}
+{% block title %} Quiz Results - SISIMPUR {% endblock %}
+{% block content %}
+
+<div class="content-wrapper">
+  <div class="content-container">
+    {% if job and job.status == 'completed' %}
+    <div class="quiz-section">
+      <div class="page-header">
+        <div class="header-left">
+          <h1 class="page-title">{{ job.document_name }}</h1>
+          <p class="page-description">Generated {{ qa_pairs.count }} questions • {{ job.get_language_display }} • {{ job.get_question_type_display }}</p>
+        </div>
+        <div class="header-actions">
+          <a href="{% url 'brain:download_results' job.id %}" class="btn-secondary" download>
+            <i class="ri-download-line"></i>
+            Download JSON
+          </a>
+          <a href="{% url 'dashboard:my_quizzes' %}" class="btn-primary">
+            <i class="ri-arrow-left-line"></i>
+            Back to My Quizzes
+          </a>
+        </div>
+      </div>
+
+      <div class="quiz-info">
+        <div class="info-grid">
+          <div class="info-item">
+            <i class="ri-calendar-line"></i>
+            <span>Created: {{ job.created_at|date:"M d, Y H:i" }}</span>
+          </div>
+          <div class="info-item">
+            <i class="ri-time-line"></i>
+            <span>Completed: {{ job.completed_at|date:"M d, Y H:i" }}</span>
+          </div>
+          <div class="info-item">
+            <i class="ri-file-line"></i>
+            <span>Document Type: {{ job.get_document_type_display|default:"Auto-detected" }}</span>
+          </div>
+          {% if job.is_question_paper %}
+          <div class="info-item">
+            <i class="ri-book-line"></i>
+            <span>Question Paper Detected</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if qa_pairs %}
+      <div class="questions-container">
+        <div class="questions-header">
+          <h2>Generated Questions</h2>
+          <div class="view-options">
+            <button class="view-btn active" data-view="list">
+              <i class="ri-list-unordered"></i>
+              List View
+            </button>
+            <button class="view-btn" data-view="cards">
+              <i class="ri-layout-grid-line"></i>
+              Card View
+            </button>
+          </div>
+        </div>
+
+        <div class="questions-list" id="questions-container">
+          {% for qa in qa_pairs %}
+          <div class="question-item" data-question="{{ forloop.counter }}">
+            <div class="question-header">
+              <span class="question-number">Q{{ forloop.counter }}</span>
+              <span class="question-type">{{ qa.get_question_type_display }}</span>
+            </div>
+            
+            <div class="question-content">
+              <h3 class="question-text">{{ qa.question }}</h3>
+              
+              {% if qa.question_type == 'MULTIPLECHOICE' and qa.options %}
+              <div class="options-list">
+                {% for option in qa.options %}
+                <div class="option-item {% if option.0 == qa.correct_option %}correct-option{% endif %}">
+                  <span class="option-label">{{ option }}</span>
+                  {% if option.0 == qa.correct_option %}
+                  <i class="ri-check-line correct-icon"></i>
+                  {% endif %}
+                </div>
+                {% endfor %}
+              </div>
+              {% endif %}
+              
+              <div class="answer-section">
+                <h4>Answer:</h4>
+                <p class="answer-text">{{ qa.answer }}</p>
+              </div>
+              
+              {% if qa.confidence_score %}
+              <div class="confidence-score">
+                <span>Confidence: {{ qa.confidence_score|floatformat:1 }}%</span>
+                <div class="confidence-bar">
+                  <div class="confidence-fill" style="width: {{ qa.confidence_score }}%"></div>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="ri-question-line"></i>
+        </div>
+        <h3>No Questions Generated</h3>
+        <p>No questions were generated from this document.</p>
+      </div>
+      {% endif %}
+    </div>
+    
+    {% elif job and job.status == 'failed' %}
+    <div class="error-state">
+      <div class="error-icon">
+        <i class="ri-error-warning-line"></i>
+      </div>
+      <h2>Processing Failed</h2>
+      <p>{{ job.error_message|default:"An error occurred while processing the document." }}</p>
+      <div class="error-actions">
+        <a href="{% url 'dashboard:quiz_generator' %}" class="btn-primary">
+          <i class="ri-refresh-line"></i>
+          Try Again
+        </a>
+        <a href="{% url 'dashboard:my_quizzes' %}" class="btn-secondary">
+          <i class="ri-arrow-left-line"></i>
+          Back to My Quizzes
+        </a>
+      </div>
+    </div>
+    
+    {% elif job and job.status in 'pending,processing' %}
+    <div class="processing-state">
+      <div class="processing-icon">
+        <i class="ri-loader-4-line"></i>
+      </div>
+      <h2>Processing Document...</h2>
+      <p>Your document is being processed. This page will automatically refresh when complete.</p>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: {% if job.status == 'processing' %}50{% else %}25{% endif %}%"></div>
+      </div>
+    </div>
+    
+    <script>
+    // Auto-refresh for processing jobs
+    setTimeout(() => {
+        location.reload();
+    }, 5000);
+    </script>
+    
+    {% else %}
+    <div class="error-state">
+      <div class="error-icon">
+        <i class="ri-file-forbid-line"></i>
+      </div>
+      <h2>Quiz Not Found</h2>
+      <p>The requested quiz could not be found or you don't have permission to view it.</p>
+      <a href="{% url 'dashboard:my_quizzes' %}" class="btn-primary">
+        <i class="ri-arrow-left-line"></i>
+        Back to My Quizzes
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const viewButtons = document.querySelectorAll('.view-btn');
+    const questionsContainer = document.getElementById('questions-container');
+    
+    viewButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            viewButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const view = this.dataset.view;
+            questionsContainer.className = view === 'cards' ? 'questions-grid' : 'questions-list';
+        });
+    });
+});
+</script>
+
+{% endblock %}
