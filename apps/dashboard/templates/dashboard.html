@@ -60,6 +60,9 @@
               <h3>Upload Document</h3>
               <p class="upload-description">Upload a document first, then click Generate to process it</p>
 
+              <!-- CSRF token for Dropzone AJAX -->
+              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
               <div class="dropzone" id="document-dropzone">
                 <div class="dz-message" data-dz-message>
                   <div class="upload-icon">
@@ -159,26 +162,44 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
+    // Custom Dropzone preview template (only remove button, modern look)
+    const customPreviewTemplate = `
+      <div class="dz-preview dz-file-preview modern-preview">
+        <div class="dz-details">
+          <div class="dz-filename"><span data-dz-name></span></div>
+          <div class="dz-size" data-dz-size></div>
+        </div>
+        <div class="dz-remove-btn">
+          <a class="dz-remove" href="javascript:undefined;" data-dz-remove>
+            <i class="ri-close-line"></i> Remove file
+          </a>
+        </div>
+      </div>
+    `;
+
     // Initialize Dropzone (upload only, no auto-processing)
     const myDropzone = new Dropzone("#document-dropzone", {
         url: "#", // Dummy URL since we won't auto-upload
-        autoProcessQueue: false, // Prevent auto-processing
+        autoProcessQueue: false,
         paramName: "document",
         maxFilesize: 10, // MB
         maxFiles: 1,
         acceptedFiles: ".pdf,.jpg,.jpeg,.png",
-        addRemoveLinks: true,
         dictDefaultMessage: "Drop files here or click to upload",
         dictFallbackMessage: "Your browser does not support drag'n'drop file uploads.",
         dictFileTooBig: "File is too big ({{filesize}}MiB). Max filesize: {{maxFilesize}}MiB.",
         dictInvalidFileType: "You can't upload files of this type. Only PDF, JPG, and PNG files are allowed.",
         dictRemoveFile: "Remove file",
+        previewTemplate: customPreviewTemplate, // Use the modern template
 
         init: function() {
             const dropzone = this;
 
-            // Handle file added (but don't upload yet)
+            // Only allow one file at a time, replace if new one is added
             this.on("addedfile", function(file) {
+                if (this.files.length > 1) {
+                    this.removeFile(this.files[0]);
+                }
                 uploadedFile = file;
                 generateBtn.disabled = false;
                 generateBtn.style.opacity = '1';
@@ -212,6 +233,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Handle successful upload
             this.on("success", function(file, response) {
+                console.log("Dropzone success response:", response);
                 if (response.success) {
                     // Show success message
                     showSuccessMessage(`Document processed successfully! Generated ${response.questions_generated} questions.`);
@@ -227,7 +249,8 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             // Handle upload errors
-            this.on("error", function(file, errorMessage) {
+            this.on("error", function(file, errorMessage, xhr) {
+                console.error("Dropzone error:", errorMessage, xhr);
                 showErrorMessage(typeof errorMessage === 'string' ? errorMessage : 'Processing failed');
                 resetGenerateButton();
             });
@@ -245,6 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btnText.style.display = 'none';
         loadingSpinner.style.display = 'inline-block';
         generateBtn.disabled = true;
+        showProcessingStatus(); // Ensure processing status is shown immediately
 
         // Set the correct URL and process the file
         myDropzone.options.url = "{% url 'dashboard:api_process_document' %}";
@@ -708,6 +732,54 @@ function showNotification(message, type = 'info') {
     align-items: center;
     gap: 5px;
     flex-wrap: wrap;
+}
+
+/* Modern Dropzone Preview */
+.modern-preview {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #181c24;
+    border-radius: 8px;
+    padding: 18px 24px;
+    margin-top: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #23283a;
+    color: #fff;
+}
+.modern-preview .dz-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.modern-preview .dz-filename {
+    font-weight: 600;
+    font-size: 1.1em;
+}
+.modern-preview .dz-size {
+    font-size: 0.95em;
+    color: #aaa;
+}
+.modern-preview .dz-remove-btn {
+    display: flex;
+    align-items: center;
+}
+.modern-preview .dz-remove {
+    color: #ff4d4f;
+    background: none;
+    border: none;
+    font-weight: 500;
+    font-size: 1em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.modern-preview .dz-remove:hover {
+    color: #ff7875;
+    text-decoration: underline;
 }
 </style>
 
