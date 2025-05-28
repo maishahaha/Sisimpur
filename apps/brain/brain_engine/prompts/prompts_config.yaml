@@ -1,0 +1,74 @@
+# Sisimpur Brain Engine - Prompt Configuration
+# This file contains metadata and configuration for the prompt management system
+
+# Supported languages
+languages:
+  - english
+  - bengali
+
+# Document types
+document_types:
+  - context_document
+  - question_paper
+
+# Question types
+question_types:
+  - multiplechoice
+  - short
+  - mixed
+
+# Count modes
+count_modes:
+  - auto
+  - specific
+
+# Default settings
+default_answer_options: 4
+
+# Optimal question count thresholds based on text length
+optimal_question_thresholds:
+  very_short:
+    max_words: 100
+    questions: 2
+  short:
+    max_words: 500
+    questions: 5
+  medium:
+    max_words: 1000
+    questions: 8
+  long:
+    max_words: 2000
+    questions: 12
+  very_long:
+    questions: 15
+
+# Language-specific settings
+language_settings:
+  english:
+    option_labels: ["A", "B", "C", "D", "E", "F", "G", "H"]
+    difficulty_levels: ["easy", "medium", "hard"]
+  bengali:
+    option_labels: ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"]
+    difficulty_levels: ["সহজ", "মাঝারি", "কঠিন"]
+
+# Prompt module mapping
+prompt_modules:
+  english:
+    context_document:
+      multiplechoice_auto: "apps.brain.brain_engine.prompts.english.context_document.multiplechoice_auto"
+      multiplechoice_specific: "apps.brain.brain_engine.prompts.english.context_document.multiplechoice_specific"
+      short_auto: "apps.brain.brain_engine.prompts.english.context_document.short_auto"
+      short_specific: "apps.brain.brain_engine.prompts.english.context_document.short_specific"
+      mixed_auto: "apps.brain.brain_engine.prompts.english.context_document.mixed_auto"
+    question_paper:
+      multiplechoice_auto: "apps.brain.brain_engine.prompts.english.question_paper.multiplechoice_auto"
+      multiplechoice_specific: "apps.brain.brain_engine.prompts.english.question_paper.multiplechoice_specific"
+  bengali:
+    context_document:
+      multiplechoice_auto: "apps.brain.brain_engine.prompts.bengali.context_document.multiplechoice_auto"
+      multiplechoice_specific: "apps.brain.brain_engine.prompts.bengali.context_document.multiplechoice_specific"
+
+# Fallback configuration
+fallback:
+  primary: "mixed_auto"
+  secondary: "multiplechoice_auto"
