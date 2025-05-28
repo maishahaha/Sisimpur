@@ -91,11 +91,21 @@ def quiz_results(request, job_id):
         job = None
         qa_pairs = []
 
-    context = {
-        'job': job,
-        'qa_pairs': qa_pairs
-    }
-    return render(request, "quiz_results.html", context)
+    # Convert each QA pair to a dictionary (adjust keys to match actual attributes)
+    serialized_qa_pairs = [
+        {
+            'question': qa.question,
+            'answer': qa.answer,
+        } for qa in qa_pairs
+    ]
+
+    return JsonResponse({
+        'success': True,
+        'job_id': job_id,
+        'message': 'Document uploaded and processing started',
+        'questions_generated': len(serialized_qa_pairs),
+        'qa_pairs': serialized_qa_pairs,
+    })
 
 # API endpoints for AJAX calls
 @login_required(login_url='auth:signupin')
