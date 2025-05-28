@@ -91,20 +91,76 @@ def quiz_results(request, job_id):
         job = None
         qa_pairs = []
 
-    # Convert each QA pair to a dictionary (adjust keys to match actual attributes)
-    serialized_qa_pairs = [
-        {
+    # Convert each QA pair to a dictionary with full details
+    serialized_qa_pairs = []
+    for qa in qa_pairs:
+        qa_dict = {
             'question': qa.question,
             'answer': qa.answer,
-        } for qa in qa_pairs
-    ]
+            'question_type': qa.question_type,
+        }
+
+        # Add multiple choice specific fields
+        if qa.question_type == 'MULTIPLECHOICE' and qa.options:
+            qa_dict['options'] = qa.options
+            qa_dict['correct_option'] = qa.correct_option
+
+        # Add metadata if available
+        if qa.confidence_score is not None:
+            qa_dict['confidence_score'] = qa.confidence_score
+
+        serialized_qa_pairs.append(qa_dict)
+
+    # Prepare form settings and detected values
+    form_settings = {}
+    detected_values = {}
+    generated_values = {}
+
+    if job:
+        # Form settings (what user selected)
+        form_settings = {
+            'selected_language': job.language,
+            'selected_question_type': job.question_type,
+            'selected_num_questions': job.num_questions,
+            'selected_document_type': job.document_type,
+        }
+
+        # Detected values (what system detected)
+        metadata = job.processing_metadata or {}
+        detected_values = {
+            'detected_language': metadata.get('language', 'unknown'),
+            'detected_document_type': metadata.get('doc_type', 'unknown'),
+            'detected_is_question_paper': metadata.get('is_question_paper', False),
+            'detected_pdf_type': metadata.get('pdf_type'),
+            'file_size': metadata.get('file_size'),
+            'file_extension': metadata.get('extension'),
+        }
+
+        # Add human-readable labels
+        form_settings['selected_language_display'] = dict(job.LANGUAGE_CHOICES).get(job.language, job.language)
+        form_settings['selected_question_type_display'] = dict(job.QUESTION_TYPE_CHOICES).get(job.question_type, job.question_type)
+
+        detected_values['detected_language_display'] = {
+            'bengali': 'Bengali', 'english': 'English', 'unknown': 'Unknown'
+        }.get(detected_values['detected_language'], detected_values['detected_language'])
+
+        # Generated values (actual results)
+        generated_values = {
+            'generated_num_questions': len(serialized_qa_pairs),
+            'generated_question_types': list(set(qa.question_type for qa in qa_pairs)),
+            'processing_status': job.status,
+            'processing_time': (job.completed_at - job.created_at).total_seconds() if job.completed_at else None,
+        }
 
     return JsonResponse({
         'success': True,
         'job_id': job_id,
-        'message': 'Document uploaded and processing started',
+        'message': 'Quiz results retrieved successfully',
         'questions_generated': len(serialized_qa_pairs),
         'qa_pairs': serialized_qa_pairs,
+        'form_settings': form_settings,
+        'detected_values': detected_values,
+        'generated_values': generated_values,
     })
 
 # API endpoints for AJAX calls
@@ -158,8 +214,6 @@ def api_process_document(request):
         # Import brain models and create job
         from apps.brain.models import ProcessingJob
         from django.core.files.storage import default_storage
-        import os
-        from pathlib import Path
 
         # Create processing job
         job = ProcessingJob.objects.create(
@@ -186,6 +240,16 @@ def api_process_document(request):
 
             # Get full file path for processing
             full_file_path = default_storage.path(saved_path)
+
+            # Import document detector and detect metadata first
+            from apps.brain.brain_engine.utils.document_detector import detect_document_type
+            document_metadata = detect_document_type(full_file_path)
+
+            # Store detection metadata in job
+            job.processing_metadata = document_metadata
+            job.document_type = document_metadata.get('doc_type', 'unknown')
+            job.is_question_paper = document_metadata.get('is_question_paper', False)
+            job.save()
 
             # Import and use brain processor
             from apps.brain.brain_engine.processor import DocumentProcessor
@@ -222,11 +286,29 @@ def api_process_document(request):
             # Mark job as completed
             job.mark_completed()
 
+            # Prepare form settings and detected values for response
+            form_settings = {
+                'selected_language': language,
+                'selected_question_type': question_type,
+                'selected_num_questions': num_questions,
+            }
+
+            detected_values = {
+                'detected_language': document_metadata.get('language', 'unknown'),
+                'detected_document_type': document_metadata.get('doc_type', 'unknown'),
+                'detected_is_question_paper': document_metadata.get('is_question_paper', False),
+                'detected_pdf_type': document_metadata.get('pdf_type'),
+                'file_size': document_metadata.get('file_size'),
+                'file_extension': document_metadata.get('extension'),
+            }
+
             return JsonResponse({
                 'success': True,
                 'job_id': job.id,
-                'message': 'Document uploaded and processing started',
-                'questions_generated': len(qa_data.get('questions', []))
+                'message': 'Document processed successfully',
+                'questions_generated': len(qa_data.get('questions', [])),
+                'form_settings': form_settings,
+                'detected_values': detected_values,
             })
 
         except Exception as processing_error:
