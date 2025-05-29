@@ -20,7 +20,7 @@ Context Document:
 {text}
 
 Requirements:
-1. Generate an optimal number of questions based on content length (typically {num_questions} questions for this text)
+1. Generate maximum optimal number of questions based on content length (typically {num_questions} questions for this text)
 2. Create a balanced mix of multiple choice and short answer questions
 3. Multiple choice questions should have {answer_options} options ({option_labels_en})
 4. Short answer questions should have concise answers (1-3 sentences)

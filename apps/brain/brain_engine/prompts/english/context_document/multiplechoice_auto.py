@@ -20,7 +20,7 @@ Context Document:
 {text}
 
 Requirements:
-1. Generate an optimal number of questions based on content length (typically {num_questions} questions for this text)
+1. Generate maximum optimal number of questions based on content length (typically {num_questions} questions for this text)
 2. Each question should have {answer_options} options ({option_labels_en})
 3. Clearly indicate the correct answer
 4. Questions should test comprehensive understanding of the content

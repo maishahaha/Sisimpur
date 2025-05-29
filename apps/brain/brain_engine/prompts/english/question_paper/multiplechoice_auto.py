@@ -20,7 +20,7 @@ Original Question Paper:
 {text}
 
 Requirements:
-1. Generate an optimal number of questions based on the original paper's scope (typically {num_questions} questions)
+1. Generate specific number of questions as written on the given question paper (typically {num_questions} questions)
 2. Each question should have {answer_options} options ({option_labels_en})
 3. Maintain the same subject matter and difficulty level as the original
 4. Follow the style and format of the original question paper
