@@ -206,3 +206,23 @@ BRAIN_UPLOADS_DIR = MEDIA_ROOT / 'brain' / 'uploads'
 BRAIN_TEMP_DIR.mkdir(parents=True, exist_ok=True)
 BRAIN_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 BRAIN_UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+
+# OTP Configuration - Security Best Practices
+OTP_CONFIG = {
+    'OTP_LENGTH': 6,
+    'OTP_EXPIRY_MINUTES': 5,  # Reduced to 5 minutes for security
+    'MAX_OTP_ATTEMPTS': 3,
+    'RESEND_COOLDOWN_MINUTES': 2,
+    'MAX_HOURLY_ATTEMPTS': 5,  # Rate limiting: 5 OTP requests per hour per email/IP
+    'BLOCK_DURATION_HOURS': 1,  # Block duration after exceeding rate limit
+    'CLEANUP_INTERVAL_HOURS': 24,  # How often to clean up expired records
+}

@@ -9,7 +9,8 @@
     <link href="{% static 'css/background.css' %}" rel="stylesheet" />
     <link href="{% static 'css/dashboard.css' %}" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.min.css">
+    <!-- RemixIcon - fallback to local if CDN fails -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.css">
     {% block head %}{% endblock %}
 </head>
 
@@ -171,8 +172,8 @@
 
     {% block content %}{% endblock %}
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
-    <script src="..\static\js\background.js"></script>
-    <script src="..\static\js\dashboard.js"></script>
+    <script src="{% static 'js/background.js' %}"></script>
+    <script src="{% static 'js/dashboard.js' %}"></script>
     {% django_browser_reload_script %} {% block scripts %}{% endblock %}
 </body>
 

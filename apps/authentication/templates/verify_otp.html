@@ -1,0 +1,328 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Verify Email - SISIMPUR{% endblock %} {% block head %}
+<link
+  href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+  rel="stylesheet"
+/>
+<link href="{% static 'css/signupin.css' %}" rel="stylesheet" />
+<link href="{% static 'css/background.css' %}" rel="stylesheet" />
+<style>
+  .otp-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 40px 30px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .otp-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .otp-header .logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #4f46e5;
+    margin-bottom: 10px;
+    text-decoration: none;
+  }
+
+  .otp-header h2 {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 24px;
+  }
+
+  .otp-header p {
+    color: #666;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .email-highlight {
+    color: #4f46e5;
+    font-weight: 600;
+  }
+
+  .otp-input-group {
+    margin: 30px 0;
+  }
+
+  .otp-input {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    text-align: center;
+    border: 2px solid #e1e5e9;
+    border-radius: 10px;
+    letter-spacing: 8px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
+
+  .otp-input:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  }
+
+  .otp-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .btn-verify {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .btn-verify:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+  }
+
+  .btn-resend {
+    background: transparent;
+    color: #4f46e5;
+    border: 2px solid #4f46e5;
+    padding: 12px 30px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-resend:hover {
+    background: #4f46e5;
+    color: white;
+  }
+
+  .otp-info {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+
+  .otp-info h4 {
+    color: #4f46e5;
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+
+  .otp-info ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #666;
+  }
+
+  .otp-info li {
+    margin-bottom: 5px;
+  }
+
+  .back-link {
+    text-align: center;
+    margin-top: 30px;
+  }
+
+  .back-link a {
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+  }
+
+  .back-link a:hover {
+    color: #4f46e5;
+  }
+
+  .countdown {
+    text-align: center;
+    margin: 15px 0;
+    font-size: 14px;
+    color: #666;
+  }
+
+  .countdown.warning {
+    color: #ef4444;
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    .otp-container {
+      margin: 20px;
+      padding: 30px 20px;
+    }
+    
+    .otp-header h2 {
+      font-size: 20px;
+    }
+    
+    .otp-input {
+      font-size: 16px;
+      letter-spacing: 4px;
+    }
+  }
+</style>
+{% endblock %} 
+
+{% block content %}
+<!-- Background Elements -->
+<div class="bg-grid"></div>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="particles" id="particles"></div>
+
+<div class="container" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;">
+  <div class="otp-container">
+    <div class="otp-header">
+      <a class="logo" href="{% url 'home' %}">🧠 SISIMPUR</a>
+      <h2>Verify Your Email</h2>
+      <p>We've sent a verification code to<br><span class="email-highlight">{{ email }}</span></p>
+      <p>Hello <strong>{{ username }}</strong>, please enter the 6-digit code to activate your account.</p>
+    </div>
+
+    <!-- OTP Verification Form -->
+    <form method="post" id="otpForm">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="verify">
+      
+      <div class="otp-input-group">
+        <input 
+          type="text" 
+          name="otp_code" 
+          class="otp-input" 
+          placeholder="000000" 
+          maxlength="6" 
+          pattern="[0-9]{6}"
+          required
+          autocomplete="off"
+          id="otpInput"
+        />
+      </div>
+
+      <div class="otp-actions">
+        <button type="submit" class="btn-verify" id="verifyBtn">
+          <i class="bx bx-check-circle"></i> Verify Email
+        </button>
+      </div>
+    </form>
+
+    <!-- Resend Form -->
+    <form method="post" id="resendForm" style="margin-top: 15px;">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="resend">
+      
+      <div class="otp-actions">
+        <button type="submit" class="btn-resend" id="resendBtn">
+          <i class="bx bx-refresh"></i> Resend Code
+        </button>
+      </div>
+    </form>
+
+    <div class="countdown" id="countdown"></div>
+
+    <div class="otp-info">
+      <h4><i class="bx bx-info-circle"></i> Important Information</h4>
+      <ul>
+        <li>The verification code expires in <strong>10 minutes</strong></li>
+        <li>You have <strong>3 attempts</strong> to enter the correct code</li>
+        <li>Check your spam folder if you don't see the email</li>
+        <li>You can request a new code after 2 minutes</li>
+      </ul>
+    </div>
+
+    <div class="back-link">
+      <a href="{% url 'auth:signupin' %}">
+        <i class="bx bx-arrow-back"></i> Back to Sign Up
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const otpInput = document.getElementById('otpInput');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const resendBtn = document.getElementById('resendBtn');
+    const countdown = document.getElementById('countdown');
+    
+    // Auto-focus on OTP input
+    otpInput.focus();
+    
+    // Only allow numbers in OTP input
+    otpInput.addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+        
+        // Auto-submit when 6 digits are entered
+        if (this.value.length === 6) {
+            verifyBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            verifyBtn.innerHTML = '<i class="bx bx-check-circle"></i> Verifying...';
+            setTimeout(() => {
+                document.getElementById('otpForm').submit();
+            }, 500);
+        } else {
+            verifyBtn.style.background = 'linear-gradient(135deg, #4f46e5, #7c3aed)';
+            verifyBtn.innerHTML = '<i class="bx bx-check-circle"></i> Verify Email';
+        }
+    });
+    
+    // Countdown timer for resend (2 minutes)
+    let timeLeft = 120; // 2 minutes in seconds
+    
+    function updateCountdown() {
+        if (timeLeft > 0) {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            countdown.textContent = `You can request a new code in ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            countdown.className = 'countdown';
+            resendBtn.disabled = true;
+            resendBtn.style.opacity = '0.5';
+            timeLeft--;
+        } else {
+            countdown.textContent = 'You can now request a new verification code';
+            countdown.className = 'countdown warning';
+            resendBtn.disabled = false;
+            resendBtn.style.opacity = '1';
+            clearInterval(countdownInterval);
+        }
+    }
+    
+    // Start countdown
+    updateCountdown();
+    const countdownInterval = setInterval(updateCountdown, 1000);
+    
+    // Handle form submissions
+    document.getElementById('otpForm').addEventListener('submit', function() {
+        verifyBtn.disabled = true;
+        verifyBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Verifying...';
+    });
+    
+    document.getElementById('resendForm').addEventListener('submit', function() {
+        resendBtn.disabled = true;
+        resendBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Sending...';
+    });
+});
+</script>
+
+{% endblock %} 
+
+{% block scripts %}
+<script src="{% static 'js/background.js' %}"></script>
+{% endblock %}

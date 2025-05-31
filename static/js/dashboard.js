@@ -172,35 +172,48 @@ document.addEventListener('DOMContentLoaded', function() {
   const quizTextarea = document.querySelector('.quiz-textarea');
 
   // File Upload Handler
-  fileInput.addEventListener('change', (e) => {
-    const files = Array.from(e.target.files);
-    const fileNames = files.map(file => file.name).join(', ');
-    
-    // Here you would typically handle file upload
-    console.log('Selected files:', fileNames);
-  });
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      const fileNames = files.map(file => file.name).join(', ');
+
+      // Here you would typically handle file upload
+      console.log('Selected files:', fileNames);
+    });
+  }
 
   // Difficulty Button Handler
-  difficultyBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelector('.difficulty-btn.active').classList.remove('active');
-      btn.classList.add('active');
+  if (difficultyBtns.length > 0) {
+    difficultyBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const activeBtn = document.querySelector('.difficulty-btn.active');
+        if (activeBtn) {
+          activeBtn.classList.remove('active');
+        }
+        btn.classList.add('active');
+      });
     });
-  });
+  }
 
   // Generate Quiz Handler
-  generateBtn.addEventListener('click', () => {
-    const text = quizTextarea.value;
-    const questionCount = document.getElementById('question-count').value;
-    const examType = document.getElementById('exam-type').value;
-    const difficulty = document.querySelector('.difficulty-btn.active').dataset.difficulty;
-    
-    // Here you would typically handle quiz generation
-    console.log('Generating quiz with:', {
-      text,
-      questionCount,
-      examType,
-      difficulty
+  if (generateBtn) {
+    generateBtn.addEventListener('click', () => {
+      const text = quizTextarea ? quizTextarea.value : '';
+      const questionCountEl = document.getElementById('question-count');
+      const examTypeEl = document.getElementById('exam-type');
+      const activeDifficultyBtn = document.querySelector('.difficulty-btn.active');
+
+      const questionCount = questionCountEl ? questionCountEl.value : '';
+      const examType = examTypeEl ? examTypeEl.value : '';
+      const difficulty = activeDifficultyBtn ? activeDifficultyBtn.dataset.difficulty : '';
+
+      // Here you would typically handle quiz generation
+      console.log('Generating quiz with:', {
+        text,
+        questionCount,
+        examType,
+        difficulty
+      });
     });
-  });
+  }
 });

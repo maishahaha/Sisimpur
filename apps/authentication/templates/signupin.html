@@ -15,14 +15,15 @@
 
 <div class="container">
   <div class="form-box login">
-    <form action="#" method="post">
+    <form action="{% url 'auth:signupin' %}" method="post">
       {% csrf_token %}
+      <input type="hidden" name="action" value="login">
 
       <a class="logo" href="{% url 'home' %}">SISIMPUR</a>
       <h4>Welcome Back!</h4>
       <div class="input-box">
-        <input type="text" name="username" placeholder="Username" required />
-        <i class="bx bxs-user"></i>
+        <input type="email" name="email" placeholder="Gmail Address" required pattern="[a-zA-Z0-9._%+-]+@gmail\.com$" title="Please enter a valid Gmail address" />
+        <i class="bx bxs-envelope"></i>
       </div>
       <div class="input-box">
         <input
@@ -60,19 +61,54 @@
   </div>
 
   <div class="form-box register">
-    <form action="#" method="post">
+    <form action="{% url 'auth:signupin' %}" method="post">
       {% csrf_token %}
+      <input type="hidden" name="action" value="signup">
       <a class="logo" style="margin-bottom: 20px" href="{% url 'home' %}">
         SISIMPUR
       </a>
       <h4>Create an Account</h4>
       <div class="input-box">
-        <input type="text" name="username" placeholder="Username" required />
-        <i class="bx bxs-user"></i>
-      </div>
-      <div class="input-box">
-        <input type="email" name="email" placeholder="Email" required />
+        <input type="email" name="email" placeholder="Gmail Address (required)" required pattern="[a-zA-Z0-9._%+-]+@gmail\.com$" title="Please enter a valid Gmail address" id="emailInput" />
         <i class="bx bxs-envelope"></i>
+      </div>
+      <div style="font-size: 12px; color: #666; margin-top: -10px; margin-bottom: 15px; text-align: center;">
+        <i class="bx bx-info-circle"></i> Only Gmail addresses (@gmail.com) are accepted
+      </div>
+
+      <!-- Send OTP Button -->
+      <button type="button" class="btn btn-otp" id="sendOtpBtn" style="margin-bottom: 15px; background: #10b981;">
+        <i class="bx bx-mail-send"></i> Send Verification Code
+      </button>
+
+      <!-- Debug button (remove in production) -->
+      <button type="button" onclick="toggleOtpSection()" style="margin-bottom: 10px; padding: 5px 10px; background: #f59e0b; color: white; border: none; border-radius: 3px; font-size: 12px;">
+        Debug: Toggle OTP Section
+      </button>
+
+      <!-- OTP Verification Section (Hidden by default) -->
+      <div class="otp-verification" id="otpSection" style="display: none; margin-bottom: 15px;">
+        <div class="input-box">
+          <input
+            type="text"
+            name="otp_code"
+            placeholder="Enter 6-digit code"
+            maxlength="6"
+            pattern="[0-9]{6}"
+            id="otpInput"
+            autocomplete="off"
+          />
+          <i class="bx bx-shield-check"></i>
+        </div>
+        <div class="otp-actions" style="display: flex; gap: 10px; margin-bottom: 10px;">
+          <button type="button" class="btn-verify" id="verifyOtpBtn" style="flex: 1; padding: 8px; background: #4f46e5; color: white; border: none; border-radius: 5px; font-size: 14px;">
+            <i class="bx bx-check"></i> Verify
+          </button>
+          <button type="button" class="btn-resend" id="resendOtpBtn" style="flex: 1; padding: 8px; background: transparent; color: #4f46e5; border: 1px solid #4f46e5; border-radius: 5px; font-size: 14px;">
+            <i class="bx bx-refresh"></i> Resend
+          </button>
+        </div>
+        <div class="otp-status" id="otpStatus" style="font-size: 12px; text-align: center; margin-bottom: 10px;"></div>
       </div>
       <div class="input-box">
         <input
@@ -83,7 +119,24 @@
         />
         <i class="bx bxs-lock-alt"></i>
       </div>
-      <button type="submit" class="btn">Sign Up</button>
+      <div class="input-box">
+        <input
+          type="password"
+          name="password_confirm"
+          placeholder="Confirm Password"
+          required
+        />
+        <i class="bx bxs-lock-alt"></i>
+      </div>
+      <!-- Hidden field to track OTP verification -->
+      <input type="hidden" name="email_verified" id="emailVerified" value="false">
+
+      <button type="submit" class="btn" id="signupBtn" disabled style="opacity: 0.5; cursor: not-allowed;">
+        <i class="bx bx-lock"></i> Verify Email First
+      </button>
+
+
+
       <p>Or Sign Up With</p>
       <div class="social-icons">
         <a href="{% url 'auth:google_login' %}"
@@ -122,6 +175,279 @@
 {% endblock %} {% block scripts %}
 <script src="{% static 'js/signupin.js' %}"></script>
 <script src="{% static 'js/background.js' %}"></script>
+
+<!-- OTP Verification Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('OTP Script loaded');
+
+    const sendOtpBtn = document.getElementById('sendOtpBtn');
+    const otpSection = document.getElementById('otpSection');
+    const otpInput = document.getElementById('otpInput');
+    const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+    const resendOtpBtn = document.getElementById('resendOtpBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const emailInput = document.getElementById('emailInput');
+    const otpStatus = document.getElementById('otpStatus');
+    const emailVerified = document.getElementById('emailVerified');
+
+    console.log('Elements found:', {
+        sendOtpBtn: !!sendOtpBtn,
+        otpSection: !!otpSection,
+        otpInput: !!otpInput,
+        verifyOtpBtn: !!verifyOtpBtn,
+        emailInput: !!emailInput
+    });
+
+    let otpSent = false;
+    let emailVerifiedStatus = false;
+    let resendCooldown = false;
+
+    // Send OTP functionality
+    if (sendOtpBtn) {
+        sendOtpBtn.addEventListener('click', function() {
+            console.log('Send OTP button clicked');
+            const email = emailInput.value.trim();
+            console.log('Email value:', email);
+
+            // Validate inputs
+            if (!email) {
+                showStatus('Please enter your email address', 'error');
+                return;
+            }
+
+            if (!email.endsWith('@gmail.com')) {
+                showStatus('Only Gmail addresses are allowed', 'error');
+                return;
+            }
+
+            // Send OTP request
+            sendOtpBtn.disabled = true;
+            sendOtpBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Sending...';
+
+            console.log('Making AJAX request to send OTP');
+
+            // Make AJAX request to send OTP
+            fetch('{% url "auth:send_otp" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    email: email
+                })
+            })
+            .then(response => {
+                console.log('Response received:', response);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    otpSent = true;
+                    console.log('Showing OTP section');
+                    if (otpSection) {
+                        otpSection.style.display = 'block';
+                        console.log('OTP section display set to block');
+                    } else {
+                        console.error('OTP section not found!');
+                    }
+                    sendOtpBtn.innerHTML = '<i class="bx bx-check"></i> Code Sent';
+                    sendOtpBtn.style.background = '#10b981';
+                    showStatus('Verification code sent to ' + email, 'success');
+                    if (otpInput) {
+                        otpInput.focus();
+                    }
+                    startResendCooldown();
+                } else {
+                    showStatus(data.message || 'Failed to send verification code', 'error');
+                    sendOtpBtn.disabled = false;
+                    sendOtpBtn.innerHTML = '<i class="bx bx-mail-send"></i> Send Verification Code';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showStatus('Error sending verification code', 'error');
+                sendOtpBtn.disabled = false;
+                sendOtpBtn.innerHTML = '<i class="bx bx-mail-send"></i> Send Verification Code';
+            });
+        });
+    } else {
+        console.error('Send OTP button not found!');
+    }
+
+    // Verify OTP functionality
+    verifyOtpBtn.addEventListener('click', function() {
+        const otpCode = otpInput.value.trim();
+
+        if (!otpCode || otpCode.length !== 6) {
+            showStatus('Please enter a valid 6-digit code', 'error');
+            return;
+        }
+
+        verifyOtpBtn.disabled = true;
+        verifyOtpBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Verifying...';
+
+        // Verify OTP request
+        fetch('{% url "auth:verify_otp_ajax" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                email: emailInput.value,
+                otp_code: otpCode
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                emailVerifiedStatus = true;
+                emailVerified.value = 'true';
+
+                // Update UI
+                verifyOtpBtn.innerHTML = '<i class="bx bx-check"></i> Verified';
+                verifyOtpBtn.style.background = '#10b981';
+                otpInput.disabled = true;
+                otpInput.style.background = '#f0f9ff';
+
+                // Enable signup button
+                signupBtn.disabled = false;
+                signupBtn.style.opacity = '1';
+                signupBtn.style.cursor = 'pointer';
+                signupBtn.innerHTML = '<i class="bx bx-user-plus"></i> Sign Up';
+
+                showStatus('Email verified successfully!', 'success');
+            } else {
+                showStatus(data.message || 'Invalid verification code', 'error');
+                verifyOtpBtn.disabled = false;
+                verifyOtpBtn.innerHTML = '<i class="bx bx-check"></i> Verify';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showStatus('Error verifying code', 'error');
+            verifyOtpBtn.disabled = false;
+            verifyOtpBtn.innerHTML = '<i class="bx bx-check"></i> Verify';
+        });
+    });
+
+    // Auto-format OTP input
+    otpInput.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+        if (this.value.length === 6) {
+            verifyOtpBtn.click();
+        }
+    });
+
+    // Prevent form submission if email not verified
+    document.querySelector('form').addEventListener('submit', function(e) {
+        if (!emailVerifiedStatus) {
+            e.preventDefault();
+            showStatus('Please verify your email first', 'error');
+            return false;
+        }
+    });
+
+    // Helper functions
+    function showStatus(message, type) {
+        otpStatus.textContent = message;
+        otpStatus.className = 'otp-status ' + type;
+
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            otpStatus.textContent = '';
+            otpStatus.className = 'otp-status';
+        }, 5000);
+    }
+
+    function startResendCooldown() {
+        resendCooldown = true;
+        resendOtpBtn.disabled = true;
+
+        let timeLeft = 120; // 2 minutes
+        const interval = setInterval(() => {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            resendOtpBtn.innerHTML = `<i class="bx bx-time"></i> ${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            timeLeft--;
+
+            if (timeLeft < 0) {
+                clearInterval(interval);
+                resendCooldown = false;
+                resendOtpBtn.disabled = false;
+                resendOtpBtn.innerHTML = '<i class="bx bx-refresh"></i> Resend';
+            }
+        }, 1000);
+    }
+
+    // Debug function (remove in production)
+    window.toggleOtpSection = function() {
+        console.log('Debug: Toggle OTP section called');
+        const section = document.getElementById('otpSection');
+        if (section) {
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                console.log('Debug: OTP section shown');
+            } else {
+                section.style.display = 'none';
+                console.log('Debug: OTP section hidden');
+            }
+        } else {
+            console.error('Debug: OTP section not found!');
+        }
+    };
+});
+</script>
+
+<style>
+.otp-status {
+    padding: 8px;
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+.otp-status.success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #10b981;
+}
+
+.otp-status.error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #ef4444;
+}
+
+.otp-status.warning {
+    background: #fef3cd;
+    color: #92400e;
+    border: 1px solid #f59e0b;
+}
+
+.btn:disabled {
+    cursor: not-allowed !important;
+    opacity: 0.5 !important;
+}
+
+.otp-verification {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
 
 <!-- Main toast script -->
 <script>

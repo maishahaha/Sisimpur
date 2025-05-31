@@ -1,11 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout
-from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-import json
 
 @login_required(login_url='auth:signupin')
 def home(request):
@@ -24,13 +21,9 @@ def home(request):
     }
     return render(request, "dashboard.html", context)
 
-def logout_view(request):
-    """
-    Handle user logout
-    """
-    logout(request)
-    messages.success(request, "You have been successfully logged out.")
-    return redirect('auth:signupin')
+def logout_redirect(request):
+    """Redirect to auth logout"""
+    return redirect('auth:logout')
 
 @login_required(login_url='auth:signupin')
 def profile(request):
