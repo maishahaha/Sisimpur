@@ -65,22 +65,15 @@
 
           <div class="quiz-actions">
             {% if job.status == 'completed' %}
-              {% if job.can_start_exam %}
-                <a href="{% url 'dashboard:start_exam' job.id %}" class="btn-primary">
-                  <i class="ri-play-circle-line"></i>
-                  Start Exam
-                </a>
-              {% else %}
-                <a href="{% url 'dashboard:exam_result' job.latest_exam.session_id %}" class="btn-primary">
+              <a href="{% url 'dashboard:start_exam' job.id %}" class="btn-primary">
+                <i class="ri-play-circle-line"></i>
+                Start Exam
+              </a>
+              {% if job.latest_exam %}
+                <a href="{% url 'dashboard:exam_result' job.latest_exam.session_id %}" class="btn-secondary">
                   <i class="ri-eye-line"></i>
-                  View Results
+                  View Last Result
                 </a>
-                <div class="attempts-info">
-                  <small class="text-muted">
-                    <i class="ri-information-line"></i>
-                    {{ job.user_attempts }}/{{ job.max_attempts }} attempts used
-                  </small>
-                </div>
               {% endif %}
               <a href="{% url 'dashboard:start_flashcard' job.id %}" class="btn-secondary">
                 <i class="ri-stack-line"></i>

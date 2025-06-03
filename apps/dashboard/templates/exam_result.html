@@ -385,18 +385,11 @@
 
             <!-- Action Buttons -->
             <div class="action-buttons">
-                {% if can_retry %}
-                    <a href="{% url 'dashboard:start_exam' exam_session.processing_job.id %}" class="action-btn btn-retry">
-                        <i class="ri-refresh-line"></i>
-                        Retry Exam
-                    </a>
-                {% else %}
-                    <button class="action-btn btn-retry" disabled>
-                        <i class="ri-lock-line"></i>
-                        Max Attempts Reached
-                    </button>
-                {% endif %}
-                
+                <a href="{% url 'dashboard:start_exam' exam_session.processing_job.id %}" class="action-btn btn-retry">
+                    <i class="ri-refresh-line"></i>
+                    Retry Exam
+                </a>
+
                 <a href="{% url 'dashboard:my_quizzes' %}" class="action-btn btn-back">
                     <i class="ri-arrow-left-line"></i>
                     Back to Quizzes
@@ -409,14 +402,14 @@
                 {% for answer in answers %}
                     <div class="answer-item {% if answer.is_correct %}correct{% else %}incorrect{% endif %}">
                         <div class="answer-question">
-                            <strong>Q{{ answer.question_index|add:1 }}:</strong> {{ answer.question.question_text }}
+                            <strong>Q{{ answer.question_index|add:1 }}:</strong> {{ answer.question.question }}
                         </div>
                         <div class="answer-details">
                             <div class="user-answer {% if answer.is_correct %}correct{% endif %}">
                                 <strong>Your Answer:</strong> {{ answer.user_answer|default:"Not answered" }}
                             </div>
                             <div class="correct-answer">
-                                <strong>Correct Answer:</strong> {{ answer.question.correct_answer }}
+                                <strong>Correct Answer:</strong> {{ answer.question.answer }}
                             </div>
                         </div>
                     </div>

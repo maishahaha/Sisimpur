@@ -302,9 +302,9 @@
             <div class="exam-progress">
                 <span class="progress-info">Question {{ current_index|add:1 }} of {{ total_questions }}</span>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: {{ current_index|add:1|mul:100|div:total_questions }}%"></div>
+                    <div class="progress-fill" style="width: {{ progress_percentage }}%"></div>
                 </div>
-                <span class="progress-info">{{ current_index|add:1|mul:100|div:total_questions|floatformat:0 }}% Complete</span>
+                <span class="progress-info">{{ progress_percentage }}% Complete</span>
             </div>
 
             <!-- Question Container -->

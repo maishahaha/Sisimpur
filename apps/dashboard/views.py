@@ -8,6 +8,7 @@ from django.contrib import messages
 import uuid
 import random
 import json
+from .models import ExamSession
 
 @login_required(login_url='auth:signupin')
 def home(request):
@@ -69,30 +70,15 @@ def my_quizzes(request):
 
         jobs = ProcessingJob.objects.filter(user=request.user).order_by('-created_at')
 
-        # Get exam configuration
-        config = ExamConfiguration.get_current_config()
-
-        # Add exam attempt information to each job
-        jobs_with_attempts = []
+        # Add latest exam session info for results (no attempt limits)
         for job in jobs:
-            user_attempts = ExamSession.objects.filter(
-                user=request.user,
-                processing_job=job
-            ).count()
-
-            # Get the latest exam session for results
+            # Get the latest exam session for results only
             latest_exam = ExamSession.objects.filter(
                 user=request.user,
                 processing_job=job
             ).order_by('-started_at').first()
 
-            job.user_attempts = user_attempts
-            job.max_attempts = config.default_max_attempts
-            job.can_start_exam = user_attempts < config.default_max_attempts
             job.latest_exam = latest_exam
-            jobs_with_attempts.append(job)
-
-        jobs = jobs_with_attempts
     except:
         jobs = []
 
@@ -374,40 +360,46 @@ def start_exam(request, job_id):
     """
     Start a new exam session for a completed processing job
     """
+    print(f"DEBUG: start_exam called with job_id={job_id}, user={request.user}")
     try:
         from apps.brain.models import ProcessingJob
         from .models import ExamSession, ExamConfiguration
 
         # Get the processing job
         job = get_object_or_404(ProcessingJob, id=job_id, user=request.user)
+        print(f"DEBUG: Found job: {job}, status: {job.status}")
 
         if job.status != 'completed':
+            print(f"DEBUG: Job not completed, redirecting to my_quizzes")
             messages.error(request, 'Cannot start exam for incomplete quiz.')
             return redirect('dashboard:my_quizzes')
 
         # Get questions
         qa_pairs = job.get_qa_pairs()
+        print(f"DEBUG: Found {qa_pairs.count()} questions")
         if not qa_pairs.exists():
+            print(f"DEBUG: No questions found, redirecting to my_quizzes")
             messages.error(request, 'No questions found for this quiz.')
             return redirect('dashboard:my_quizzes')
 
         # Get configuration
         config = ExamConfiguration.get_current_config()
+        print(f"DEBUG: Got config: {config}")
 
-        # Check if user can retry (max attempts)
+        # Create new exam session (no attempt restrictions)
+        session_id = str(uuid.uuid4())
+        questions_list = list(qa_pairs.values_list('id', flat=True))
+        random.shuffle(questions_list)  # Randomize question order
+        print(f"DEBUG: Created session_id: {session_id}")
+        print(f"DEBUG: Questions list: {questions_list}")
+
+        # Get the next attempt number to avoid unique constraint violation
         user_attempts = ExamSession.objects.filter(
             user=request.user,
             processing_job=job
         ).count()
-
-        if user_attempts >= config.default_max_attempts:
-            messages.error(request, f'Maximum attempts ({config.default_max_attempts}) reached for this exam.')
-            return redirect('dashboard:my_quizzes')
-
-        # Create new exam session
-        session_id = str(uuid.uuid4())
-        questions_list = list(qa_pairs.values_list('id', flat=True))
-        random.shuffle(questions_list)  # Randomize question order
+        next_attempt_number = user_attempts + 1
+        print(f"DEBUG: Next attempt number: {next_attempt_number}")
 
         exam_session = ExamSession.objects.create(
             user=request.user,
@@ -416,14 +408,19 @@ def start_exam(request, job_id):
             total_questions=len(questions_list),
             time_limit_minutes=len(questions_list) * config.default_time_per_question_minutes,
             allow_navigation=config.allow_question_navigation,
-            max_attempts=config.default_max_attempts,
-            attempt_number=user_attempts + 1,
+            max_attempts=999,  # Unlimited
+            attempt_number=next_attempt_number,
             questions_order=questions_list
         )
+        print(f"DEBUG: Created exam session: {exam_session}")
+        print(f"DEBUG: Redirecting to exam_session with session_id: {session_id}")
 
         return redirect('dashboard:exam_session', session_id=session_id)
 
     except Exception as e:
+        print(f"DEBUG: Exception in start_exam: {str(e)}")
+        import traceback
+        print(f"DEBUG: Traceback: {traceback.format_exc()}")
         messages.error(request, f'Error starting exam: {str(e)}')
         return redirect('dashboard:my_quizzes')
 
@@ -433,19 +430,23 @@ def exam_session(request, session_id):
     """
     Display the exam interface for an active session
     """
+    print(f"DEBUG: exam_session called with session_id={session_id}, user={request.user}")
     try:
         from .models import ExamSession, ExamAnswer
         from apps.brain.models import QuestionAnswer
 
         # Get exam session
         exam_session = get_object_or_404(ExamSession, session_id=session_id, user=request.user)
+        print(f"DEBUG: Found exam session: {exam_session}, status: {exam_session.status}")
 
         # Check if session is still active
         if exam_session.status != 'active':
+            print(f"DEBUG: Session not active (status: {exam_session.status}), redirecting to exam_result")
             return redirect('dashboard:exam_result', session_id=session_id)
 
         # Check if session has expired
         if exam_session.is_expired():
+            print(f"DEBUG: Session expired, marking as expired and redirecting")
             exam_session.status = 'expired'
             exam_session.completed_at = timezone.now()
             exam_session.calculate_score()
@@ -454,8 +455,12 @@ def exam_session(request, session_id):
 
         # Get current question
         current_index = exam_session.current_question_index
+        print(f"DEBUG: Current question index: {current_index}, Total questions: {len(exam_session.questions_order)}")
+        print(f"DEBUG: Questions order: {exam_session.questions_order}")
+
         if current_index >= len(exam_session.questions_order):
             # All questions completed
+            print(f"DEBUG: All questions completed, marking exam as completed")
             exam_session.status = 'completed'
             exam_session.completed_at = timezone.now()
             exam_session.calculate_score()
@@ -463,7 +468,9 @@ def exam_session(request, session_id):
             return redirect('dashboard:exam_result', session_id=session_id)
 
         question_id = exam_session.questions_order[current_index]
+        print(f"DEBUG: Getting question with ID: {question_id}")
         current_question = get_object_or_404(QuestionAnswer, id=question_id)
+        print(f"DEBUG: Found question: {current_question.question}")
 
         # Get existing answer if any
         existing_answer = ExamAnswer.objects.filter(
@@ -480,10 +487,10 @@ def exam_session(request, session_id):
                 # Check if answer is correct
                 is_correct = False
                 if current_question.question_type == 'MULTIPLECHOICE':
-                    is_correct = user_answer.lower() == current_question.correct_answer.lower()
+                    is_correct = user_answer.lower() == current_question.answer.lower()
                 else:
                     # For short answers, simple string matching (can be enhanced)
-                    is_correct = user_answer.lower().strip() in current_question.correct_answer.lower()
+                    is_correct = user_answer.lower().strip() in current_question.answer.lower()
 
                 # Save or update answer
                 if existing_answer:
@@ -515,6 +522,9 @@ def exam_session(request, session_id):
 
             return redirect('dashboard:exam_session', session_id=session_id)
 
+        # Calculate progress percentage
+        progress_percentage = ((current_index + 1) / len(exam_session.questions_order)) * 100
+
         # Prepare context
         context = {
             'exam_session': exam_session,
@@ -526,11 +536,15 @@ def exam_session(request, session_id):
             'can_go_back': current_index > 0 and exam_session.allow_navigation,
             'can_go_next': current_index < len(exam_session.questions_order) - 1,
             'is_last_question': current_index == len(exam_session.questions_order) - 1,
+            'progress_percentage': round(progress_percentage, 1),
         }
 
         return render(request, 'exam_session.html', context)
 
     except Exception as e:
+        print(f"DEBUG: Exception in exam_session: {str(e)}")
+        import traceback
+        print(f"DEBUG: Traceback: {traceback.format_exc()}")
         messages.error(request, f'Error in exam session: {str(e)}')
         return redirect('dashboard:my_quizzes')
 
@@ -596,7 +610,6 @@ def exam_result(request, session_id):
             'correct_answers': correct_answers,
             'incorrect_answers': incorrect_answers,
             'unanswered_questions': total_questions - answered_questions,
-            'can_retry': exam_session.can_retry(),
         }
 
         print(f"DEBUG: Rendering exam_result.html template...")
@@ -753,18 +766,10 @@ def complete_flashcard(request, session_id):
         if request.method == 'POST':
             action = request.POST.get('action')
             if action == 'start_exam':
-                # Check if user can take exam (max attempts)
+                # Get configuration (no attempt restrictions)
                 config = ExamConfiguration.get_current_config()
-                user_attempts = ExamSession.objects.filter(
-                    user=request.user,
-                    processing_job=flashcard_session.processing_job
-                ).count()
 
-                if user_attempts >= config.default_max_attempts:
-                    messages.error(request, f'Maximum attempts ({config.default_max_attempts}) reached for this exam.')
-                    return redirect('dashboard:my_quizzes')
-
-                # Create new exam session
+                # Create new exam session (unlimited attempts)
                 exam_session_id = str(uuid.uuid4())
                 qa_pairs = flashcard_session.processing_job.get_qa_pairs()
                 questions_list = list(qa_pairs.values_list('id', flat=True))
@@ -777,8 +782,8 @@ def complete_flashcard(request, session_id):
                     total_questions=len(questions_list),
                     time_limit_minutes=len(questions_list) * config.default_time_per_question_minutes,
                     allow_navigation=config.allow_question_navigation,
-                    max_attempts=config.default_max_attempts,
-                    attempt_number=user_attempts + 1,
+                    max_attempts=999,  # Unlimited
+                    attempt_number=1,  # Always 1 since we don't track attempts
                     questions_order=questions_list
                 )
 
