@@ -1,0 +1,439 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+{% block title %}Exam - {{ exam_session.processing_job.document_name }} - SISIMPUR{% endblock %}
+
+{% block extra_head %}
+<style>
+/* Exam Session Styles */
+.exam-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background: rgba(15, 15, 35, 0.9);
+    border-radius: 16px;
+    border: 1px solid rgba(94, 23, 235, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.exam-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.exam-title {
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.exam-timer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    padding: 10px 15px;
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.exam-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.progress-info {
+    color: #aaaaaa;
+    font-size: 0.9rem;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    margin: 0 20px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #5e17eb, #00d4ff);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.question-container {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.question-number {
+    background: linear-gradient(135deg, #5e17eb, #7c3aed);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.question-type {
+    background: rgba(0, 212, 255, 0.1);
+    color: #00d4ff;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.question-text {
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.answer-section {
+    margin-bottom: 30px;
+}
+
+.answer-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.answer-option {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.answer-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(94, 23, 235, 0.5);
+}
+
+.answer-option.selected {
+    background: rgba(94, 23, 235, 0.2);
+    border-color: #5e17eb;
+}
+
+.answer-option input[type="radio"] {
+    margin-right: 12px;
+    accent-color: #5e17eb;
+}
+
+.answer-option label {
+    color: #ffffff;
+    cursor: pointer;
+    flex: 1;
+    font-weight: 500;
+}
+
+.text-answer {
+    width: 100%;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 1rem;
+    resize: vertical;
+    min-height: 100px;
+    transition: border-color 0.3s ease;
+}
+
+.text-answer:focus {
+    outline: none;
+    border-color: #5e17eb;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-previous {
+    background: rgba(108, 117, 125, 0.2);
+    color: #6c757d;
+    border: 1px solid rgba(108, 117, 125, 0.3);
+}
+
+.btn-previous:hover:not(:disabled) {
+    background: rgba(108, 117, 125, 0.3);
+    color: #ffffff;
+}
+
+.btn-next {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+.btn-next:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-1px);
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    color: white;
+}
+
+.btn-submit:hover {
+    background: linear-gradient(135deg, #1e7e34, #155724);
+    transform: translateY(-1px);
+}
+
+.warning-message {
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    color: #ffc107;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .exam-container {
+        margin: 10px;
+        padding: 15px;
+    }
+    
+    .exam-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .exam-progress {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .progress-bar {
+        margin: 10px 0;
+    }
+    
+    .question-header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .navigation-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .nav-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="content-container">
+        <div class="exam-container">
+            <!-- Exam Header -->
+            <div class="exam-header">
+                <h1 class="exam-title">{{ exam_session.processing_job.document_name }}</h1>
+                <div class="exam-timer">
+                    <i class="ri-timer-line"></i>
+                    <span id="timer-display">{{ remaining_time|floatformat:0 }}s</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="exam-progress">
+                <span class="progress-info">Question {{ current_index|add:1 }} of {{ total_questions }}</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ current_index|add:1|mul:100|div:total_questions }}%"></div>
+                </div>
+                <span class="progress-info">{{ current_index|add:1|mul:100|div:total_questions|floatformat:0 }}% Complete</span>
+            </div>
+
+            <!-- Question Container -->
+            <div class="question-container">
+                <div class="question-header">
+                    <span class="question-number">Question {{ current_index|add:1 }}</span>
+                    <span class="question-type">{{ current_question.get_question_type_display }}</span>
+                </div>
+
+                <div class="question-text">
+                    {{ current_question.question_text }}
+                </div>
+
+                <form method="post" id="exam-form">
+                    {% csrf_token %}
+                    <div class="answer-section">
+                        {% if current_question.question_type == 'MULTIPLECHOICE' %}
+                            <div class="answer-options">
+                                {% for option in current_question.options %}
+                                    <div class="answer-option" onclick="selectOption(this)">
+                                        <input type="radio" name="answer" value="{{ option }}" id="option_{{ forloop.counter }}"
+                                               {% if existing_answer and existing_answer.user_answer == option %}checked{% endif %}>
+                                        <label for="option_{{ forloop.counter }}">{{ option }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <textarea name="answer" class="text-answer" placeholder="Enter your answer here..."
+                                      required>{% if existing_answer %}{{ existing_answer.user_answer }}{% endif %}</textarea>
+                        {% endif %}
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="navigation-buttons">
+                        <button type="submit" name="action" value="previous" class="nav-btn btn-previous"
+                                {% if not can_go_back %}disabled{% endif %}>
+                            <i class="ri-arrow-left-line"></i>
+                            Previous
+                        </button>
+
+                        <div style="flex: 1;"></div>
+
+                        {% if is_last_question %}
+                            <button type="submit" name="action" value="submit" class="nav-btn btn-submit">
+                                <i class="ri-check-line"></i>
+                                Submit Exam
+                            </button>
+                        {% else %}
+                            <button type="submit" name="action" value="next" class="nav-btn btn-next">
+                                Next
+                                <i class="ri-arrow-right-line"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+
+            <!-- Warning for time -->
+            {% if remaining_time < 300 %}
+            <div class="warning-message">
+                <i class="ri-alarm-warning-line"></i>
+                <span>Warning: Less than 5 minutes remaining!</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Timer functionality
+let remainingTime = {{ remaining_time }};
+const timerDisplay = document.getElementById('timer-display');
+
+function updateTimer() {
+    if (remainingTime <= 0) {
+        // Auto-submit when time expires
+        document.getElementById('exam-form').submit();
+        return;
+    }
+    
+    const minutes = Math.floor(remainingTime / 60);
+    const seconds = remainingTime % 60;
+    timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    
+    remainingTime--;
+}
+
+// Update timer every second
+setInterval(updateTimer, 1000);
+
+// Option selection for multiple choice
+function selectOption(element) {
+    // Remove selected class from all options
+    document.querySelectorAll('.answer-option').forEach(opt => {
+        opt.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked option
+    element.classList.add('selected');
+    
+    // Check the radio button
+    const radio = element.querySelector('input[type="radio"]');
+    radio.checked = true;
+}
+
+// Auto-save functionality (optional enhancement)
+let autoSaveTimer;
+function autoSave() {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => {
+        // Could implement auto-save here
+        console.log('Auto-save triggered');
+    }, 5000);
+}
+
+// Add auto-save to form inputs
+document.querySelectorAll('input, textarea').forEach(input => {
+    input.addEventListener('input', autoSave);
+});
+
+// Prevent accidental page refresh
+window.addEventListener('beforeunload', function(e) {
+    e.preventDefault();
+    e.returnValue = 'Are you sure you want to leave? Your progress may be lost.';
+});
+
+// Remove beforeunload when form is submitted
+document.getElementById('exam-form').addEventListener('submit', function() {
+    window.removeEventListener('beforeunload', function() {});
+});
+</script>
+{% endblock %}

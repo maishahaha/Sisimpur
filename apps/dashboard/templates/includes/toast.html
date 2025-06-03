@@ -1,0 +1,208 @@
+<!-- Toast Notification Container -->
+<div id="toast-container" class="toast-container"></div>
+
+<style>
+/* Toast Notification Styles */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.toast {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 320px;
+    max-width: 400px;
+    transform: translateX(100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.toast.show {
+    transform: translateX(0);
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    gap: 12px;
+}
+
+.toast-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.toast-message {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: #333;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    color: #666;
+}
+
+.toast-close:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    animation: toast-progress linear;
+    transform-origin: left;
+}
+
+@keyframes toast-progress {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+}
+
+/* Toast Types */
+.toast-success {
+    border-left: 4px solid #28a745;
+}
+
+.toast-success .toast-icon {
+    color: #28a745;
+}
+
+.toast-error {
+    border-left: 4px solid #dc3545;
+}
+
+.toast-error .toast-icon {
+    color: #dc3545;
+}
+
+.toast-warning {
+    border-left: 4px solid #ffc107;
+}
+
+.toast-warning .toast-icon {
+    color: #ffc107;
+}
+
+.toast-info {
+    border-left: 4px solid #17a2b8;
+}
+
+.toast-info .toast-icon {
+    color: #17a2b8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .toast-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+    }
+    
+    .toast {
+        min-width: auto;
+        max-width: none;
+    }
+}
+</style>
+
+<script>
+// Toast Notification System
+function showToast(message, type = 'info', duration = 4000) {
+    const toastContainer = document.getElementById('toast-container');
+    
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    
+    // Toast content
+    toast.innerHTML = `
+        <div class="toast-content">
+            <i class="ri-${getToastIcon(type)}-line toast-icon"></i>
+            <span class="toast-message">${message}</span>
+            <button class="toast-close" onclick="closeToast(this)">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        <div class="toast-progress"></div>
+    `;
+    
+    // Add to container
+    toastContainer.appendChild(toast);
+    
+    // Show with animation
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 100);
+    
+    // Auto remove
+    const progressBar = toast.querySelector('.toast-progress');
+    progressBar.style.animationDuration = `${duration}ms`;
+    
+    setTimeout(() => {
+        closeToast(toast.querySelector('.toast-close'));
+    }, duration);
+}
+
+function getToastIcon(type) {
+    switch(type) {
+        case 'success': return 'check-circle';
+        case 'error': return 'error-warning';
+        case 'warning': return 'alert-triangle';
+        case 'info': return 'information';
+        default: return 'information';
+    }
+}
+
+function closeToast(closeBtn) {
+    const toast = closeBtn.closest('.toast');
+    toast.classList.remove('show');
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+        }
+    }, 300);
+}
+
+// Show Django messages as toasts
+document.addEventListener('DOMContentLoaded', function() {
+    const djangoMessages = document.querySelectorAll('.django-message');
+    djangoMessages.forEach(function(messageEl) {
+        const message = messageEl.textContent.trim();
+        const type = messageEl.getAttribute('data-type') || 'info';
+        if (message) {
+            showToast(message, type);
+        }
+    });
+});
+
+// Global toast function for use in other scripts
+window.showToast = showToast;
+</script>

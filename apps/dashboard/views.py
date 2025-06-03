@@ -1,8 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.utils import timezone
+from django.contrib import messages
+import uuid
+import random
+import json
 
 @login_required(login_url='auth:signupin')
 def home(request):
@@ -60,7 +65,34 @@ def my_quizzes(request):
     """
     try:
         from apps.brain.models import ProcessingJob
+        from .models import ExamSession, ExamConfiguration
+
         jobs = ProcessingJob.objects.filter(user=request.user).order_by('-created_at')
+
+        # Get exam configuration
+        config = ExamConfiguration.get_current_config()
+
+        # Add exam attempt information to each job
+        jobs_with_attempts = []
+        for job in jobs:
+            user_attempts = ExamSession.objects.filter(
+                user=request.user,
+                processing_job=job
+            ).count()
+
+            # Get the latest exam session for results
+            latest_exam = ExamSession.objects.filter(
+                user=request.user,
+                processing_job=job
+            ).order_by('-started_at').first()
+
+            job.user_attempts = user_attempts
+            job.max_attempts = config.default_max_attempts
+            job.can_start_exam = user_attempts < config.default_max_attempts
+            job.latest_exam = latest_exam
+            jobs_with_attempts.append(job)
+
+        jobs = jobs_with_attempts
     except:
         jobs = []
 
@@ -331,3 +363,444 @@ def api_job_status(request, job_id):
             'success': False,
             'error': f'Brain processing not available: {str(e)}'
         }, status=500)
+
+
+# ============================================================================
+# EXAM FUNCTIONALITY
+# ============================================================================
+
+@login_required(login_url='auth:signupin')
+def start_exam(request, job_id):
+    """
+    Start a new exam session for a completed processing job
+    """
+    try:
+        from apps.brain.models import ProcessingJob
+        from .models import ExamSession, ExamConfiguration
+
+        # Get the processing job
+        job = get_object_or_404(ProcessingJob, id=job_id, user=request.user)
+
+        if job.status != 'completed':
+            messages.error(request, 'Cannot start exam for incomplete quiz.')
+            return redirect('dashboard:my_quizzes')
+
+        # Get questions
+        qa_pairs = job.get_qa_pairs()
+        if not qa_pairs.exists():
+            messages.error(request, 'No questions found for this quiz.')
+            return redirect('dashboard:my_quizzes')
+
+        # Get configuration
+        config = ExamConfiguration.get_current_config()
+
+        # Check if user can retry (max attempts)
+        user_attempts = ExamSession.objects.filter(
+            user=request.user,
+            processing_job=job
+        ).count()
+
+        if user_attempts >= config.default_max_attempts:
+            messages.error(request, f'Maximum attempts ({config.default_max_attempts}) reached for this exam.')
+            return redirect('dashboard:my_quizzes')
+
+        # Create new exam session
+        session_id = str(uuid.uuid4())
+        questions_list = list(qa_pairs.values_list('id', flat=True))
+        random.shuffle(questions_list)  # Randomize question order
+
+        exam_session = ExamSession.objects.create(
+            user=request.user,
+            processing_job=job,
+            session_id=session_id,
+            total_questions=len(questions_list),
+            time_limit_minutes=len(questions_list) * config.default_time_per_question_minutes,
+            allow_navigation=config.allow_question_navigation,
+            max_attempts=config.default_max_attempts,
+            attempt_number=user_attempts + 1,
+            questions_order=questions_list
+        )
+
+        return redirect('dashboard:exam_session', session_id=session_id)
+
+    except Exception as e:
+        messages.error(request, f'Error starting exam: {str(e)}')
+        return redirect('dashboard:my_quizzes')
+
+
+@login_required(login_url='auth:signupin')
+def exam_session(request, session_id):
+    """
+    Display the exam interface for an active session
+    """
+    try:
+        from .models import ExamSession, ExamAnswer
+        from apps.brain.models import QuestionAnswer
+
+        # Get exam session
+        exam_session = get_object_or_404(ExamSession, session_id=session_id, user=request.user)
+
+        # Check if session is still active
+        if exam_session.status != 'active':
+            return redirect('dashboard:exam_result', session_id=session_id)
+
+        # Check if session has expired
+        if exam_session.is_expired():
+            exam_session.status = 'expired'
+            exam_session.completed_at = timezone.now()
+            exam_session.calculate_score()
+            exam_session.save()
+            return redirect('dashboard:exam_result', session_id=session_id)
+
+        # Get current question
+        current_index = exam_session.current_question_index
+        if current_index >= len(exam_session.questions_order):
+            # All questions completed
+            exam_session.status = 'completed'
+            exam_session.completed_at = timezone.now()
+            exam_session.calculate_score()
+            exam_session.save()
+            return redirect('dashboard:exam_result', session_id=session_id)
+
+        question_id = exam_session.questions_order[current_index]
+        current_question = get_object_or_404(QuestionAnswer, id=question_id)
+
+        # Get existing answer if any
+        existing_answer = ExamAnswer.objects.filter(
+            exam_session=exam_session,
+            question=current_question
+        ).first()
+
+        # Handle form submission
+        if request.method == 'POST':
+            user_answer = request.POST.get('answer', '').strip()
+            action = request.POST.get('action', 'next')
+
+            if user_answer:
+                # Check if answer is correct
+                is_correct = False
+                if current_question.question_type == 'MULTIPLECHOICE':
+                    is_correct = user_answer.lower() == current_question.correct_answer.lower()
+                else:
+                    # For short answers, simple string matching (can be enhanced)
+                    is_correct = user_answer.lower().strip() in current_question.correct_answer.lower()
+
+                # Save or update answer
+                if existing_answer:
+                    existing_answer.user_answer = user_answer
+                    existing_answer.is_correct = is_correct
+                    existing_answer.save()
+                else:
+                    ExamAnswer.objects.create(
+                        exam_session=exam_session,
+                        question=current_question,
+                        question_index=current_index,
+                        user_answer=user_answer,
+                        is_correct=is_correct
+                    )
+
+            # Handle navigation
+            if action == 'next' and current_index < len(exam_session.questions_order) - 1:
+                exam_session.current_question_index += 1
+                exam_session.save()
+            elif action == 'previous' and current_index > 0 and exam_session.allow_navigation:
+                exam_session.current_question_index -= 1
+                exam_session.save()
+            elif action == 'submit':
+                exam_session.status = 'completed'
+                exam_session.completed_at = timezone.now()
+                exam_session.calculate_score()
+                exam_session.save()
+                return redirect('dashboard:exam_result', session_id=session_id)
+
+            return redirect('dashboard:exam_session', session_id=session_id)
+
+        # Prepare context
+        context = {
+            'exam_session': exam_session,
+            'current_question': current_question,
+            'current_index': current_index,
+            'total_questions': len(exam_session.questions_order),
+            'existing_answer': existing_answer,
+            'remaining_time': exam_session.get_remaining_time_seconds(),
+            'can_go_back': current_index > 0 and exam_session.allow_navigation,
+            'can_go_next': current_index < len(exam_session.questions_order) - 1,
+            'is_last_question': current_index == len(exam_session.questions_order) - 1,
+        }
+
+        return render(request, 'exam_session.html', context)
+
+    except Exception as e:
+        messages.error(request, f'Error in exam session: {str(e)}')
+        return redirect('dashboard:my_quizzes')
+
+
+@login_required(login_url='auth:signupin')
+def submit_exam(request, session_id):
+    """
+    Submit exam and redirect to results
+    """
+    try:
+        from .models import ExamSession
+
+        exam_session = get_object_or_404(ExamSession, session_id=session_id, user=request.user)
+
+        if exam_session.status == 'active':
+            exam_session.status = 'completed'
+            exam_session.completed_at = timezone.now()
+            exam_session.calculate_score()
+            exam_session.save()
+
+        return redirect('dashboard:exam_result', session_id=session_id)
+
+    except Exception as e:
+        messages.error(request, f'Error submitting exam: {str(e)}')
+        return redirect('dashboard:my_quizzes')
+
+
+@login_required(login_url='auth:signupin')
+def exam_result(request, session_id):
+    """
+    Display exam results
+    """
+    print(f"DEBUG: exam_result called with session_id={session_id}, user={request.user}")
+    try:
+        from .models import ExamSession, ExamAnswer
+
+        exam_session = get_object_or_404(ExamSession, session_id=session_id, user=request.user)
+        print(f"DEBUG: Found exam session: {exam_session}")
+        print(f"DEBUG: Exam session status: {exam_session.status}")
+        print(f"DEBUG: Exam session completed_at: {exam_session.completed_at}")
+
+        if exam_session.status == 'active':
+            print(f"DEBUG: Status is active, redirecting to exam_session")
+            return redirect('dashboard:exam_session', session_id=session_id)
+
+        # Get all answers
+        print(f"DEBUG: Getting exam answers...")
+        answers = ExamAnswer.objects.filter(exam_session=exam_session).order_by('question_index')
+        print(f"DEBUG: Found {answers.count()} answers")
+
+        # Calculate detailed statistics
+        total_questions = exam_session.total_questions
+        answered_questions = answers.count()
+        correct_answers = answers.filter(is_correct=True).count()
+        incorrect_answers = answered_questions - correct_answers
+        print(f"DEBUG: Stats - Total: {total_questions}, Answered: {answered_questions}, Correct: {correct_answers}, Incorrect: {incorrect_answers}")
+
+        context = {
+            'exam_session': exam_session,
+            'answers': answers,
+            'total_questions': total_questions,
+            'answered_questions': answered_questions,
+            'correct_answers': correct_answers,
+            'incorrect_answers': incorrect_answers,
+            'unanswered_questions': total_questions - answered_questions,
+            'can_retry': exam_session.can_retry(),
+        }
+
+        print(f"DEBUG: Rendering exam_result.html template...")
+        return render(request, 'exam_result.html', context)
+
+    except Exception as e:
+        print(f"DEBUG: Exception in exam_result: {str(e)}")
+        import traceback
+        print(f"DEBUG: Traceback: {traceback.format_exc()}")
+        messages.error(request, f'Error displaying exam results: {str(e)}')
+        return redirect('dashboard:my_quizzes')
+
+
+# ============================================================================
+# FLASHCARD FUNCTIONALITY
+# ============================================================================
+
+@login_required(login_url='auth:signupin')
+def start_flashcard(request, job_id):
+    """
+    Start a new flashcard session for a completed processing job
+    """
+    try:
+        from apps.brain.models import ProcessingJob
+        from .models import FlashcardSession, ExamConfiguration
+
+        # Get the processing job
+        job = get_object_or_404(ProcessingJob, id=job_id, user=request.user)
+
+        if job.status != 'completed':
+            messages.error(request, 'Cannot start flashcards for incomplete quiz.')
+            return redirect('dashboard:my_quizzes')
+
+        # Get questions
+        qa_pairs = job.get_qa_pairs()
+        if not qa_pairs.exists():
+            messages.error(request, 'No questions found for this quiz.')
+            return redirect('dashboard:my_quizzes')
+
+        # Get configuration
+        config = ExamConfiguration.get_current_config()
+
+        # Create new flashcard session
+        session_id = str(uuid.uuid4())
+        cards_list = list(qa_pairs.values_list('id', flat=True))
+        random.shuffle(cards_list)  # Randomize card order
+
+        flashcard_session = FlashcardSession.objects.create(
+            user=request.user,
+            processing_job=job,
+            session_id=session_id,
+            total_cards=len(cards_list),
+            time_per_card_seconds=config.default_flashcard_time_seconds,
+            auto_advance=config.auto_advance_flashcards,
+            cards_order=cards_list
+        )
+
+        return redirect('dashboard:flashcard_session', session_id=session_id)
+
+    except Exception as e:
+        messages.error(request, f'Error starting flashcards: {str(e)}')
+        return redirect('dashboard:my_quizzes')
+
+
+@login_required(login_url='auth:signupin')
+def flashcard_session(request, session_id):
+    """
+    Display the flashcard interface for an active session
+    """
+    try:
+        from .models import FlashcardSession, FlashcardProgress
+        from apps.brain.models import QuestionAnswer
+
+        # Get flashcard session
+        flashcard_session = get_object_or_404(FlashcardSession, session_id=session_id, user=request.user)
+
+        # Check if session is completed
+        if flashcard_session.status != 'active':
+            return redirect('dashboard:complete_flashcard', session_id=session_id)
+
+        # Get current card
+        current_index = flashcard_session.current_card_index
+        if current_index >= len(flashcard_session.cards_order):
+            # All cards completed
+            flashcard_session.status = 'completed'
+            flashcard_session.completed_at = timezone.now()
+            flashcard_session.save()
+            return redirect('dashboard:complete_flashcard', session_id=session_id)
+
+        card_id = flashcard_session.cards_order[current_index]
+        current_card = get_object_or_404(QuestionAnswer, id=card_id)
+
+        # Handle form submission (next card)
+        if request.method == 'POST':
+            action = request.POST.get('action', 'next')
+            was_skipped = action == 'skip'
+
+            # Record progress for current card
+            FlashcardProgress.objects.update_or_create(
+                flashcard_session=flashcard_session,
+                question=current_card,
+                defaults={
+                    'card_index': current_index,
+                    'was_skipped': was_skipped,
+                    'time_spent_seconds': 60  # Default time, can be enhanced with JS timing
+                }
+            )
+
+            # Move to next card
+            flashcard_session.current_card_index += 1
+            flashcard_session.cards_studied += 1
+            flashcard_session.save()
+
+            # Check if this was the last card
+            if flashcard_session.current_card_index >= len(flashcard_session.cards_order):
+                flashcard_session.status = 'completed'
+                flashcard_session.completed_at = timezone.now()
+                flashcard_session.save()
+                return redirect('dashboard:complete_flashcard', session_id=session_id)
+
+            return redirect('dashboard:flashcard_session', session_id=session_id)
+
+        # Prepare context
+        context = {
+            'flashcard_session': flashcard_session,
+            'current_card': current_card,
+            'current_index': current_index,
+            'total_cards': len(flashcard_session.cards_order),
+            'progress_percentage': ((current_index) / len(flashcard_session.cards_order)) * 100,
+            'is_last_card': current_index == len(flashcard_session.cards_order) - 1,
+        }
+
+        return render(request, 'flashcard_session.html', context)
+
+    except Exception as e:
+        messages.error(request, f'Error in flashcard session: {str(e)}')
+        return redirect('dashboard:my_quizzes')
+
+
+@login_required(login_url='auth:signupin')
+def complete_flashcard(request, session_id):
+    """
+    Display flashcard completion page and redirect to exam
+    """
+    try:
+        from .models import FlashcardSession, ExamSession, ExamConfiguration
+
+        flashcard_session = get_object_or_404(FlashcardSession, session_id=session_id, user=request.user)
+
+        if flashcard_session.status == 'active':
+            return redirect('dashboard:flashcard_session', session_id=session_id)
+
+        # Check if user wants to start exam
+        if request.method == 'POST':
+            action = request.POST.get('action')
+            if action == 'start_exam':
+                # Check if user can take exam (max attempts)
+                config = ExamConfiguration.get_current_config()
+                user_attempts = ExamSession.objects.filter(
+                    user=request.user,
+                    processing_job=flashcard_session.processing_job
+                ).count()
+
+                if user_attempts >= config.default_max_attempts:
+                    messages.error(request, f'Maximum attempts ({config.default_max_attempts}) reached for this exam.')
+                    return redirect('dashboard:my_quizzes')
+
+                # Create new exam session
+                exam_session_id = str(uuid.uuid4())
+                qa_pairs = flashcard_session.processing_job.get_qa_pairs()
+                questions_list = list(qa_pairs.values_list('id', flat=True))
+                random.shuffle(questions_list)
+
+                ExamSession.objects.create(
+                    user=request.user,
+                    processing_job=flashcard_session.processing_job,
+                    session_id=exam_session_id,
+                    total_questions=len(questions_list),
+                    time_limit_minutes=len(questions_list) * config.default_time_per_question_minutes,
+                    allow_navigation=config.allow_question_navigation,
+                    max_attempts=config.default_max_attempts,
+                    attempt_number=user_attempts + 1,
+                    questions_order=questions_list
+                )
+
+                return redirect('dashboard:exam_session', session_id=exam_session_id)
+
+            elif action == 'back_to_quizzes':
+                return redirect('dashboard:my_quizzes')
+
+        # Get progress statistics
+        progress_records = flashcard_session.card_progress.all()
+        total_time_spent = sum(p.time_spent_seconds for p in progress_records)
+
+        context = {
+            'flashcard_session': flashcard_session,
+            'total_time_spent': total_time_spent,
+            'cards_studied': flashcard_session.cards_studied,
+            'total_cards': flashcard_session.total_cards,
+            'progress_percentage': flashcard_session.get_progress_percentage(),
+        }
+
+        return render(request, 'flashcard_complete.html', context)
+
+    except Exception as e:
+        messages.error(request, f'Error completing flashcards: {str(e)}')
+        return redirect('dashboard:my_quizzes')

@@ -1,16 +1,349 @@
 {% extends 'dashboard_base.html' %}
+{% load static %}
 
 {% block title %}Profile - SISIMPUR{% endblock %}
 
+{% block head %}
+<style>
+/* Profile Page Styles */
+.profile-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.profile-header {
+  background: linear-gradient(135deg, rgba(94, 23, 235, 0.9), rgba(124, 58, 237, 0.9));
+  border-radius: 16px;
+  padding: 40px;
+  margin-bottom: 30px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+  opacity: 0.3;
+}
+
+.profile-avatar {
+  position: relative;
+  z-index: 2;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  margin: 0 auto 20px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-avatar i {
+  font-size: 3rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.profile-name {
+  position: relative;
+  z-index: 2;
+  color: white;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.profile-role {
+  position: relative;
+  z-index: 2;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+.profile-stats {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 30px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: white;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.profile-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.profile-card {
+  background: rgba(15, 15, 35, 0.9);
+  border: 1px solid rgba(94, 23, 235, 0.3);
+  border-radius: 16px;
+  padding: 30px;
+  transition: all 0.3s ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border-color: rgba(94, 23, 235, 0.5);
+}
+
+.card-title {
+  color: #ffffff;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-title i {
+  color: #5e17eb;
+  font-size: 1.4rem;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  color: #aaaaaa;
+  font-size: 0.9rem;
+}
+
+.info-value {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.achievement-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: rgba(94, 23, 235, 0.1);
+  border: 1px solid rgba(94, 23, 235, 0.2);
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.achievement-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5e17eb, #7c3aed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.achievement-info h4 {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.achievement-info p {
+  color: #aaaaaa;
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.edit-profile-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 3;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profile-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .profile-stats {
+    gap: 20px;
+  }
+
+  .profile-header {
+    padding: 30px 20px;
+  }
+
+  .profile-name {
+    font-size: 1.6rem;
+  }
+
+  .stat-number {
+    font-size: 1.4rem;
+  }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h1>My Profile</h1>
-    <div class="profile-content">
-        <div class="profile-info">
-            <h2>{{ user.get_full_name|default:user.username }}</h2>
-            <p>Email: {{ user.email }}</p>
-            <p>Member since: {{ user.date_joined|date:"F j, Y" }}</p>
+<div class="content-wrapper">
+  <div class="content-container">
+    <div class="profile-container">
+      <!-- Profile Header -->
+      <div class="profile-header">
+        <button class="btn-secondary edit-profile-btn">
+          <i class="ri-edit-line"></i>
+          Edit Profile
+        </button>
+
+        <div class="profile-avatar">
+          {% if user.profile.avatar %}
+            <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name|default:user.username }}" />
+          {% else %}
+            <i class="ri-user-line"></i>
+          {% endif %}
         </div>
+
+        <h1 class="profile-name">{{ user.get_full_name|default:user.username }}</h1>
+        <p class="profile-role">
+          {% if user.is_staff %}
+            <i class="ri-shield-star-line"></i> Administrator
+          {% else %}
+            <i class="ri-user-line"></i> Member
+          {% endif %}
+        </p>
+
+        <div class="profile-stats">
+          <div class="stat-item">
+            <span class="stat-number">12</span>
+            <span class="stat-label">Quizzes Completed</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">85%</span>
+            <span class="stat-label">Average Score</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">7</span>
+            <span class="stat-label">Study Streak</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Content -->
+      <div class="profile-content">
+        <!-- Personal Information -->
+        <div class="profile-card">
+          <h2 class="card-title">
+            <i class="ri-user-line"></i>
+            Personal Information
+          </h2>
+
+          <div class="info-item">
+            <span class="info-label">Full Name</span>
+            <span class="info-value">{{ user.get_full_name|default:user.username }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Email Address</span>
+            <span class="info-value">{{ user.email }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Username</span>
+            <span class="info-value">{{ user.username }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Member Since</span>
+            <span class="info-value">{{ user.date_joined|date:"F j, Y" }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Last Login</span>
+            <span class="info-value">{{ user.last_login|date:"M j, Y H:i"|default:"Never" }}</span>
+          </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="profile-card">
+          <h2 class="card-title">
+            <i class="ri-trophy-line"></i>
+            Achievements
+          </h2>
+
+          <div class="achievement-item">
+            <div class="achievement-icon">
+              <i class="ri-star-line"></i>
+            </div>
+            <div class="achievement-info">
+              <h4>First Quiz Completed</h4>
+              <p>Completed your first quiz successfully</p>
+            </div>
+          </div>
+
+          <div class="achievement-item">
+            <div class="achievement-icon">
+              <i class="ri-fire-line"></i>
+            </div>
+            <div class="achievement-info">
+              <h4>Study Streak</h4>
+              <p>7 days consecutive study sessions</p>
+            </div>
+          </div>
+
+          <div class="achievement-item">
+            <div class="achievement-icon">
+              <i class="ri-medal-line"></i>
+            </div>
+            <div class="achievement-info">
+              <h4>High Scorer</h4>
+              <p>Achieved 90%+ score in a quiz</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %} 
+{% endblock %}

@@ -171,7 +171,14 @@
                   </div>
                   <div class="job-actions">
                     {% if job.status == 'completed' %}
-                      <a href="{% url 'dashboard:quiz_results' job.id %}" class="btn-small btn-primary">View Results</a>
+                      <a href="{% url 'dashboard:start_exam' job.id %}" class="btn-small btn-primary">
+                        <i class="ri-play-circle-line"></i>
+                        Start Exam
+                      </a>
+                      <a href="{% url 'dashboard:start_flashcard' job.id %}" class="btn-small btn-secondary">
+                        <i class="ri-stack-line"></i>
+                        Start Flashcard
+                      </a>
                       <button class="btn-small btn-danger" onclick="deleteQuiz({{ job.id }}, '{{ job.document_name|escapejs }}')">
                         <i class="ri-delete-bin-line"></i>
                       </button>
@@ -1437,6 +1444,17 @@ function showNotification(message, type = 'info') {
 
 .btn-small.btn-primary:hover {
     background-color: #0056b3;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-small.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-small.btn-secondary:hover {
+    background-color: #5a6268;
     color: white;
     text-decoration: none;
 }

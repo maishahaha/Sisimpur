@@ -1,15 +1,470 @@
 {% extends 'dashboard_base.html' %}
+{% load static %}
 
 {% block title %}Settings - SISIMPUR{% endblock %}
 
+{% block head %}
+<style>
+/* Settings Page Styles */
+.settings-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.settings-nav {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.settings-tab {
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  color: #aaaaaa;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.settings-tab.active {
+  color: #5e17eb;
+  border-bottom-color: #5e17eb;
+}
+
+.settings-tab:hover {
+  color: #ffffff;
+}
+
+.settings-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+}
+
+.settings-card {
+  background: rgba(15, 15, 35, 0.9);
+  border: 1px solid rgba(94, 23, 235, 0.3);
+  border-radius: 16px;
+  padding: 30px;
+  transition: all 0.3s ease;
+}
+
+.settings-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border-color: rgba(94, 23, 235, 0.5);
+}
+
+.card-title {
+  color: #ffffff;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-title i {
+  color: #5e17eb;
+  font-size: 1.4rem;
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-info {
+  flex: 1;
+}
+
+.setting-label {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.setting-description {
+  color: #aaaaaa;
+  font-size: 0.9rem;
+}
+
+.setting-control {
+  margin-left: 20px;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  width: 50px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toggle-switch.active {
+  background: linear-gradient(135deg, #5e17eb, #7c3aed);
+}
+
+.toggle-switch::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.toggle-switch.active::before {
+  transform: translateX(26px);
+}
+
+/* Select Dropdown */
+.setting-select {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #ffffff;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  min-width: 120px;
+}
+
+.setting-select:focus {
+  outline: none;
+  border-color: #5e17eb;
+  box-shadow: 0 0 0 2px rgba(94, 23, 235, 0.2);
+}
+
+/* Input Field */
+.setting-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #ffffff;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  min-width: 200px;
+}
+
+.setting-input:focus {
+  outline: none;
+  border-color: #5e17eb;
+  box-shadow: 0 0 0 2px rgba(94, 23, 235, 0.2);
+}
+
+.setting-input::placeholder {
+  color: #aaaaaa;
+}
+
+/* Danger Zone */
+.danger-zone {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.danger-zone .card-title {
+  color: #ef4444;
+}
+
+.danger-zone .card-title i {
+  color: #ef4444;
+}
+
+.btn-danger-outline {
+  background: transparent;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-danger-outline:hover {
+  background: #ef4444;
+  color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .settings-nav {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .setting-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .setting-control {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .setting-input,
+  .setting-select {
+    width: 100%;
+  }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h1>Settings</h1>
-    <div class="settings-content">
-        <div class="settings-section">
-            <h2>Account Settings</h2>
-            <p>Settings page coming soon...</p>
+<div class="content-wrapper">
+  <div class="content-container">
+    <div class="settings-container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">Settings</h1>
+      </div>
+
+      <p class="page-description">Customize your SISIMPUR experience</p>
+
+      <!-- Settings Navigation -->
+      <div class="settings-nav">
+        <button class="settings-tab active" data-tab="general">
+          <i class="ri-settings-line"></i>
+          General
+        </button>
+        <button class="settings-tab" data-tab="notifications">
+          <i class="ri-notification-line"></i>
+          Notifications
+        </button>
+        <button class="settings-tab" data-tab="privacy">
+          <i class="ri-shield-line"></i>
+          Privacy
+        </button>
+        <button class="settings-tab" data-tab="account">
+          <i class="ri-user-line"></i>
+          Account
+        </button>
+      </div>
+
+      <!-- Settings Content -->
+      <div class="settings-content">
+        <!-- General Settings -->
+        <div class="settings-card" id="general-settings">
+          <h2 class="card-title">
+            <i class="ri-settings-line"></i>
+            General Settings
+          </h2>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Language</div>
+              <div class="setting-description">Choose your preferred language</div>
+            </div>
+            <div class="setting-control">
+              <select class="setting-select">
+                <option value="en">English</option>
+                <option value="bn">বাংলা</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Theme</div>
+              <div class="setting-description">Switch between light and dark mode</div>
+            </div>
+            <div class="setting-control">
+              <div class="toggle-switch active" onclick="toggleTheme(this)"></div>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Auto-save Progress</div>
+              <div class="setting-description">Automatically save your quiz progress</div>
+            </div>
+            <div class="setting-control">
+              <div class="toggle-switch active" onclick="toggleSetting(this)"></div>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Study Reminders</div>
+              <div class="setting-description">Get daily study reminders</div>
+            </div>
+            <div class="setting-control">
+              <div class="toggle-switch" onclick="toggleSetting(this)"></div>
+            </div>
+          </div>
         </div>
+
+        <!-- Quiz Settings -->
+        <div class="settings-card">
+          <h2 class="card-title">
+            <i class="ri-question-line"></i>
+            Quiz Settings
+          </h2>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Default Question Type</div>
+              <div class="setting-description">Your preferred question format</div>
+            </div>
+            <div class="setting-control">
+              <select class="setting-select">
+                <option value="MULTIPLECHOICE">Multiple Choice</option>
+                <option value="SHORT">Short Answer</option>
+                <option value="MIXED">Mixed</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Default Question Count</div>
+              <div class="setting-description">Number of questions to generate</div>
+            </div>
+            <div class="setting-control">
+              <input type="number" class="setting-input" value="10" min="5" max="50">
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Timer per Question</div>
+              <div class="setting-description">Time limit for each question (seconds)</div>
+            </div>
+            <div class="setting-control">
+              <input type="number" class="setting-input" value="60" min="30" max="300">
+            </div>
+          </div>
+        </div>
+
+        <!-- Notification Settings -->
+        <div class="settings-card">
+          <h2 class="card-title">
+            <i class="ri-notification-line"></i>
+            Notifications
+          </h2>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Email Notifications</div>
+              <div class="setting-description">Receive updates via email</div>
+            </div>
+            <div class="setting-control">
+              <div class="toggle-switch active" onclick="toggleSetting(this)"></div>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Quiz Completion</div>
+              <div class="setting-description">Notify when quiz processing is complete</div>
+            </div>
+            <div class="setting-control">
+              <div class="toggle-switch active" onclick="toggleSetting(this)"></div>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Study Streaks</div>
+              <div class="setting-description">Celebrate your study achievements</div>
+            </div>
+            <div class="setting-control">
+              <div class="toggle-switch" onclick="toggleSetting(this)"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="settings-card danger-zone">
+          <h2 class="card-title">
+            <i class="ri-error-warning-line"></i>
+            Danger Zone
+          </h2>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Delete All Quiz Data</div>
+              <div class="setting-description">Permanently delete all your quizzes and progress</div>
+            </div>
+            <div class="setting-control">
+              <button class="btn-danger-outline" onclick="confirmDeleteData()">
+                Delete Data
+              </button>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <div class="setting-label">Delete Account</div>
+              <div class="setting-description">Permanently delete your account and all data</div>
+            </div>
+            <div class="setting-control">
+              <button class="btn-danger-outline" onclick="confirmDeleteAccount()">
+                Delete Account
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %} 
+
+<script>
+function toggleSetting(element) {
+  element.classList.toggle('active');
+  // Here you would typically send an AJAX request to save the setting
+}
+
+function toggleTheme(element) {
+  element.classList.toggle('active');
+  // Here you would implement theme switching logic
+}
+
+function confirmDeleteData() {
+  if (confirm('Are you sure you want to delete all your quiz data? This action cannot be undone.')) {
+    // Implement delete data logic
+    alert('Feature coming soon!');
+  }
+}
+
+function confirmDeleteAccount() {
+  if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+    // Implement delete account logic
+    alert('Feature coming soon!');
+  }
+}
+
+// Tab switching functionality
+document.querySelectorAll('.settings-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    // Remove active class from all tabs
+    document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+    // Add active class to clicked tab
+    this.classList.add('active');
+
+    // Here you would show/hide different settings sections based on the tab
+  });
+});
+</script>
+{% endblock %}

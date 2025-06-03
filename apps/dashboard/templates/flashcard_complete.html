@@ -1,0 +1,467 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+{% block title %}Flashcards Complete - {{ flashcard_session.processing_job.document_name }} - SISIMPUR{% endblock %}
+
+{% block extra_head %}
+<style>
+/* Flashcard Complete Styles */
+.complete-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.complete-header {
+    background: rgba(15, 15, 35, 0.9);
+    border-radius: 16px;
+    border: 1px solid rgba(94, 23, 235, 0.3);
+    padding: 40px 30px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.complete-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(94, 23, 235, 0.1), rgba(0, 212, 255, 0.1));
+    z-index: 1;
+}
+
+.complete-content {
+    position: relative;
+    z-index: 2;
+}
+
+.success-icon {
+    font-size: 4rem;
+    color: #10b981;
+    margin-bottom: 20px;
+    animation: successPulse 2s infinite ease-in-out;
+}
+
+.complete-title {
+    color: #ffffff;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    background: linear-gradient(90deg, #10b981, #059669);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.complete-subtitle {
+    color: #aaaaaa;
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+}
+
+.study-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    color: #aaaaaa;
+    font-size: 0.9rem;
+}
+
+.stat-item.cards .stat-value {
+    color: #00d4ff;
+}
+
+.stat-item.time .stat-value {
+    color: #fbbf24;
+}
+
+.stat-item.progress .stat-value {
+    color: #10b981;
+}
+
+.next-step {
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 12px;
+    padding: 25px;
+    margin: 30px 0;
+}
+
+.next-step-title {
+    color: #00d4ff;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.next-step-text {
+    color: #aaaaaa;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 180px;
+    justify-content: center;
+}
+
+.btn-exam {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.btn-exam:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+.btn-back {
+    background: rgba(108, 117, 125, 0.2);
+    color: #6c757d;
+    border: 1px solid rgba(108, 117, 125, 0.3);
+}
+
+.btn-back:hover {
+    background: rgba(108, 117, 125, 0.3);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.motivational-message {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 30px 0;
+    color: #10b981;
+    font-style: italic;
+    font-size: 1.1rem;
+}
+
+.progress-circle {
+    width: 120px;
+    height: 120px;
+    margin: 20px auto;
+    position: relative;
+}
+
+.progress-circle svg {
+    transform: rotate(-90deg);
+    width: 120px;
+    height: 120px;
+}
+
+.progress-circle .bg-circle {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 8;
+}
+
+.progress-circle .progress-ring {
+    fill: none;
+    stroke: url(#progressGradient);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 377;
+    stroke-dashoffset: 377;
+    animation: drawProgress 2s ease-out forwards;
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+@keyframes successPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+@keyframes drawProgress {
+    to {
+        stroke-dashoffset: calc(377 - (377 * {{ progress_percentage }}) / 100);
+    }
+}
+
+/* Celebration particles */
+.celebration-particle {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(45deg, #10b981, #00d4ff);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1000;
+    animation: celebrate 3s ease-out forwards;
+}
+
+@keyframes celebrate {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100vh) scale(0);
+        opacity: 0;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .complete-container {
+        padding: 10px;
+    }
+    
+    .complete-header {
+        padding: 30px 20px;
+    }
+    
+    .complete-title {
+        font-size: 1.8rem;
+    }
+    
+    .study-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .action-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .success-icon {
+        font-size: 3rem;
+    }
+}
+
+/* Floating animation for background elements */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.floating-element {
+    animation: float 6s ease-in-out infinite;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="content-container">
+        <div class="complete-container">
+            <!-- Completion Header -->
+            <div class="complete-header">
+                <div class="complete-content">
+                    <div class="success-icon floating-element">
+                        <i class="ri-check-double-line"></i>
+                    </div>
+                    <h1 class="complete-title">Study Session Complete!</h1>
+                    <p class="complete-subtitle">{{ flashcard_session.processing_job.document_name }}</p>
+                    
+                    <!-- Progress Circle -->
+                    <div class="progress-circle">
+                        <svg>
+                            <defs>
+                                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <circle class="bg-circle" cx="60" cy="60" r="60" />
+                            <circle class="progress-ring" cx="60" cy="60" r="60" />
+                        </svg>
+                        <div class="progress-text">{{ progress_percentage|floatformat:0 }}%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Study Statistics -->
+            <div class="study-stats">
+                <div class="stat-item cards">
+                    <div class="stat-value">{{ cards_studied }}</div>
+                    <div class="stat-label">Cards Studied</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ total_cards }}</div>
+                    <div class="stat-label">Total Cards</div>
+                </div>
+                <div class="stat-item time">
+                    <div class="stat-value">{{ total_time_spent|floatformat:0 }}s</div>
+                    <div class="stat-label">Time Spent</div>
+                </div>
+                <div class="stat-item progress">
+                    <div class="stat-value">{{ progress_percentage|floatformat:0 }}%</div>
+                    <div class="stat-label">Completion</div>
+                </div>
+            </div>
+
+            <!-- Motivational Message -->
+            <div class="motivational-message">
+                <i class="ri-star-line"></i>
+                Great job! You've completed your study session. Now it's time to test your knowledge with an exam.
+            </div>
+
+            <!-- Next Step -->
+            <div class="next-step">
+                <h2 class="next-step-title">
+                    <i class="ri-graduation-cap-line"></i>
+                    Ready for the Exam?
+                </h2>
+                <p class="next-step-text">
+                    You've studied all the flashcards! Now put your knowledge to the test with a timed exam. 
+                    The exam will help reinforce what you've learned and measure your understanding.
+                </p>
+                
+                <!-- Action Buttons -->
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="action-buttons">
+                        <button type="submit" name="action" value="start_exam" class="action-btn btn-exam">
+                            <i class="ri-play-circle-line"></i>
+                            Start Exam Now
+                        </button>
+                        
+                        <button type="submit" name="action" value="back_to_quizzes" class="action-btn btn-back">
+                            <i class="ri-arrow-left-line"></i>
+                            Back to Quizzes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Create celebration particles
+document.addEventListener('DOMContentLoaded', function() {
+    createCelebrationEffect();
+});
+
+function createCelebrationEffect() {
+    for (let i = 0; i < 30; i++) {
+        setTimeout(() => {
+            createParticle();
+        }, i * 100);
+    }
+}
+
+function createParticle() {
+    const particle = document.createElement('div');
+    particle.className = 'celebration-particle';
+    
+    // Random position
+    particle.style.left = Math.random() * 100 + 'vw';
+    particle.style.top = '100vh';
+    
+    // Random colors
+    const colors = ['#10b981', '#00d4ff', '#5e17eb', '#fbbf24'];
+    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+    
+    // Random size
+    const size = Math.random() * 6 + 4;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    
+    document.body.appendChild(particle);
+    
+    // Remove particle after animation
+    setTimeout(() => {
+        if (particle.parentNode) {
+            particle.parentNode.removeChild(particle);
+        }
+    }, 3000);
+}
+
+// Add floating animation to stats
+document.querySelectorAll('.stat-item').forEach((item, index) => {
+    item.style.animationDelay = (index * 0.2) + 's';
+    item.classList.add('floating-element');
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        document.querySelector('.btn-exam').click();
+    } else if (e.key === 'Escape') {
+        e.preventDefault();
+        document.querySelector('.btn-back').click();
+    }
+});
+
+// Add success sound effect (optional)
+function playSuccessSound() {
+    // You can add audio here if needed
+    console.log('🎉 Study session completed successfully!');
+}
+
+playSuccessSound();
+</script>
+{% endblock %}

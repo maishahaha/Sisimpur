@@ -1,0 +1,539 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+{% block title %}Flashcards - {{ flashcard_session.processing_job.document_name }} - SISIMPUR{% endblock %}
+
+{% block head %}
+<style>
+/* Flashcard Session Styles */
+.flashcard-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.flashcard-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(15, 15, 35, 0.9);
+    border-radius: 16px;
+    border: 1px solid rgba(94, 23, 235, 0.3);
+}
+
+.flashcard-title {
+    color: #ffffff;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.flashcard-subtitle {
+    color: #aaaaaa;
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+.progress-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.progress-info {
+    color: #aaaaaa;
+    font-size: 0.9rem;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    margin: 0 20px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #5e17eb, #00d4ff);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.card-timer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 8px;
+    padding: 10px 15px;
+    color: #00d4ff;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.flashcard {
+    perspective: 1000px;
+    margin-bottom: 30px;
+}
+
+.flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    cursor: pointer;
+}
+
+.flashcard.flipped .flashcard-inner {
+    transform: rotateY(180deg);
+}
+
+.flashcard-front, .flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.flashcard-front {
+    background: linear-gradient(135deg, rgba(94, 23, 235, 0.9), rgba(124, 58, 237, 0.9));
+    border: 1px solid rgba(94, 23, 235, 0.5);
+}
+
+.flashcard-back {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.9), rgba(59, 130, 246, 0.9));
+    border: 1px solid rgba(0, 212, 255, 0.5);
+    transform: rotateY(180deg);
+}
+
+.card-label {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.card-content {
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 500;
+    line-height: 1.6;
+    text-align: center;
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+.card-hint {
+    position: absolute;
+    bottom: 20px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.card-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.control-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn-flip {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-flip:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.navigation-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn-skip {
+    background: rgba(108, 117, 125, 0.2);
+    color: #6c757d;
+    border: 1px solid rgba(108, 117, 125, 0.3);
+}
+
+.btn-skip:hover {
+    background: rgba(108, 117, 125, 0.3);
+    color: #ffffff;
+}
+
+.btn-next {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+.btn-next:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-1px);
+}
+
+.btn-finish {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    color: white;
+}
+
+.btn-finish:hover {
+    background: linear-gradient(135deg, #1e7e34, #155724);
+    transform: translateY(-1px);
+}
+
+.study-tips {
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    color: #ffc107;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Auto-advance indicator */
+.auto-advance-indicator {
+    position: fixed;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    background: rgba(15, 15, 35, 0.9);
+    border: 1px solid rgba(94, 23, 235, 0.3);
+    border-radius: 8px;
+    padding: 15px;
+    color: #ffffff;
+    font-size: 0.9rem;
+    z-index: 100;
+}
+
+.auto-progress {
+    width: 4px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin: 10px auto;
+    overflow: hidden;
+}
+
+.auto-progress-fill {
+    width: 100%;
+    height: 0%;
+    background: linear-gradient(180deg, #5e17eb, #00d4ff);
+    border-radius: 2px;
+    transition: height 0.1s linear;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .flashcard-container {
+        padding: 10px;
+    }
+    
+    .flashcard-inner {
+        height: 300px;
+    }
+    
+    .card-content {
+        font-size: 1.1rem;
+    }
+    
+    .progress-section {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .progress-bar {
+        margin: 10px 0;
+    }
+    
+    .navigation-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .nav-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .auto-advance-indicator {
+        position: static;
+        transform: none;
+        margin: 20px auto;
+        max-width: 200px;
+    }
+    
+    .auto-progress {
+        width: 100px;
+        height: 4px;
+    }
+}
+
+/* Animation for card flip */
+@keyframes cardFlip {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(180deg); }
+}
+
+/* Pulse animation for timer */
+@keyframes timerPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.timer-warning {
+    animation: timerPulse 1s infinite;
+    background: rgba(239, 68, 68, 0.1) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: #ef4444 !important;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="content-container">
+        <div class="flashcard-container">
+            <!-- Header -->
+            <div class="flashcard-header">
+                <h1 class="flashcard-title">Study Session</h1>
+                <p class="flashcard-subtitle">{{ flashcard_session.processing_job.document_name }}</p>
+                
+                <!-- Progress -->
+                <div class="progress-section">
+                    <span class="progress-info">Card {{ current_index|add:1 }} of {{ total_cards }}</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ progress_percentage }}%"></div>
+                    </div>
+                    <span class="progress-info">{{ progress_percentage|floatformat:0 }}% Complete</span>
+                </div>
+            </div>
+
+            <!-- Timer -->
+            <div class="card-timer" id="card-timer">
+                <i class="ri-timer-line"></i>
+                <span id="timer-display">{{ flashcard_session.time_per_card_seconds }}s</span>
+            </div>
+
+            <!-- Study Tips -->
+            <div class="study-tips">
+                <i class="ri-lightbulb-line"></i>
+                Click the card to flip and see the answer. Take your time to understand the content.
+            </div>
+
+            <!-- Flashcard -->
+            <div class="flashcard" id="flashcard" onclick="flipCard()">
+                <div class="flashcard-inner">
+                    <!-- Front (Question) -->
+                    <div class="flashcard-front">
+                        <div class="card-label">Question</div>
+                        <div class="card-content">
+                            {{ current_card.question_text }}
+                        </div>
+                        <div class="card-hint">Click to reveal answer</div>
+                    </div>
+                    
+                    <!-- Back (Answer) -->
+                    <div class="flashcard-back">
+                        <div class="card-label">Answer</div>
+                        <div class="card-content">
+                            {{ current_card.correct_answer }}
+                            {% if current_card.question_type == 'MULTIPLECHOICE' and current_card.options %}
+                                <div style="margin-top: 20px; font-size: 1rem;">
+                                    <strong>Options:</strong><br>
+                                    {% for option in current_card.options %}
+                                        <div style="margin: 5px 0;">{{ option }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-hint">Study this carefully</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Controls -->
+            <div class="card-controls">
+                <button class="control-btn btn-flip" onclick="flipCard()">
+                    <i class="ri-refresh-line"></i>
+                    Flip Card
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <form method="post" id="flashcard-form">
+                {% csrf_token %}
+                <div class="navigation-controls">
+                    <button type="submit" name="action" value="skip" class="nav-btn btn-skip">
+                        <i class="ri-skip-forward-line"></i>
+                        Skip
+                    </button>
+
+                    <div style="flex: 1;"></div>
+
+                    {% if is_last_card %}
+                        <button type="submit" name="action" value="next" class="nav-btn btn-finish">
+                            <i class="ri-check-line"></i>
+                            Finish Study
+                        </button>
+                    {% else %}
+                        <button type="submit" name="action" value="next" class="nav-btn btn-next">
+                            Next Card
+                            <i class="ri-arrow-right-line"></i>
+                        </button>
+                    {% endif %}
+                </div>
+            </form>
+
+            <!-- Auto-advance Indicator -->
+            {% if flashcard_session.auto_advance %}
+            <div class="auto-advance-indicator">
+                <div style="text-align: center;">Auto-advance</div>
+                <div class="auto-progress">
+                    <div class="auto-progress-fill" id="auto-progress"></div>
+                </div>
+                <div style="text-align: center; font-size: 0.8rem;">in <span id="auto-timer">60</span>s</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Timer and auto-advance functionality
+let timeRemaining = {{ flashcard_session.time_per_card_seconds }};
+let autoAdvanceTime = {{ flashcard_session.time_per_card_seconds }};
+const timerDisplay = document.getElementById('timer-display');
+const autoTimer = document.getElementById('auto-timer');
+const autoProgress = document.getElementById('auto-progress');
+const cardTimer = document.getElementById('card-timer');
+let isFlipped = false;
+
+function updateTimer() {
+    if (timeRemaining <= 0) {
+        {% if flashcard_session.auto_advance %}
+        // Auto-advance to next card
+        document.getElementById('flashcard-form').submit();
+        {% endif %}
+        return;
+    }
+    
+    timerDisplay.textContent = timeRemaining + 's';
+    
+    // Update auto-advance indicator
+    if (autoTimer && autoProgress) {
+        autoTimer.textContent = timeRemaining;
+        const progressPercent = ((autoAdvanceTime - timeRemaining) / autoAdvanceTime) * 100;
+        autoProgress.style.height = progressPercent + '%';
+    }
+    
+    // Warning when time is low
+    if (timeRemaining <= 10) {
+        cardTimer.classList.add('timer-warning');
+    }
+    
+    timeRemaining--;
+}
+
+// Start timer
+const timerInterval = setInterval(updateTimer, 1000);
+
+// Flip card functionality
+function flipCard() {
+    const flashcard = document.getElementById('flashcard');
+    flashcard.classList.toggle('flipped');
+    isFlipped = !isFlipped;
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    switch(e.key) {
+        case ' ':
+        case 'Enter':
+            e.preventDefault();
+            flipCard();
+            break;
+        case 'ArrowRight':
+        case 'n':
+            e.preventDefault();
+            document.querySelector('button[value="next"]').click();
+            break;
+        case 's':
+            e.preventDefault();
+            document.querySelector('button[value="skip"]').click();
+            break;
+    }
+});
+
+// Prevent accidental navigation
+window.addEventListener('beforeunload', function(e) {
+    e.preventDefault();
+    e.returnValue = 'Are you sure you want to leave? Your study progress may be lost.';
+});
+
+// Remove beforeunload when form is submitted
+document.getElementById('flashcard-form').addEventListener('submit', function() {
+    clearInterval(timerInterval);
+    window.removeEventListener('beforeunload', function() {});
+});
+
+// Auto-flip card after 5 seconds for better UX
+setTimeout(() => {
+    if (!isFlipped) {
+        flipCard();
+    }
+}, 5000);
+</script>
+{% endblock %}

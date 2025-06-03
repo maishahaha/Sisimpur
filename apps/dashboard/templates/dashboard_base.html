@@ -158,6 +158,10 @@
                 </div>
             </header>
 
+            <!-- Page Content -->
+            {% block content %}{% endblock %}
+        </main>
+
     {% include 'includes/toast.html' %}
 
     <!-- Django Messages (hidden) -->
@@ -170,7 +174,6 @@
         {% endfor %} {% endif %}
     </div>
 
-    {% block content %}{% endblock %}
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
     <script src="{% static 'js/background.js' %}"></script>
     <script src="{% static 'js/dashboard.js' %}"></script>
