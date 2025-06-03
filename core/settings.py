@@ -36,7 +36,7 @@ ALLOWED_HOSTS = ["*"]
 # Google OAuth2 settings
 GOOGLE_OAUTH2_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID')
 GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET')
-GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/auth/google-callback/'
+GOOGLE_OAUTH2_REDIRECT_URI = 'https://sisimpur.onrender.com/auth/google-callback/'
 
 # Allow insecure transport for OAuth in development
 if DEBUG:
