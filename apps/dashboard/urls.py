@@ -9,6 +9,7 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('settings/', views.settings, name='settings'),
     path('help/', views.help, name='help'),
+    path('leaderboard/', views.leaderboard, name='leaderboard'),
 
     # Brain/Quiz functionality
     path('quiz-generator/', views.quiz_generator, name='quiz_generator'),

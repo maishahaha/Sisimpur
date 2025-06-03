@@ -352,6 +352,128 @@ def api_job_status(request, job_id):
 
 
 # ============================================================================
+# LEADERBOARD FUNCTIONALITY
+# ============================================================================
+
+@login_required(login_url='auth:signupin')
+def leaderboard(request):
+    """
+    Display global leaderboard with user rankings based on exam performance
+    """
+    from django.db.models import Count, Avg, Sum, Q
+    from django.contrib.auth.models import User
+    from datetime import datetime, timedelta
+
+    # Get filter parameter
+    filter_type = request.GET.get('filter', 'all')
+
+    # Calculate date range based on filter
+    now = timezone.now()
+    if filter_type == 'week':
+        start_date = now - timedelta(days=7)
+    elif filter_type == 'month':
+        start_date = now - timedelta(days=30)
+    elif filter_type == 'year':
+        start_date = now - timedelta(days=365)
+    else:
+        start_date = None
+
+    # Base queryset for exam sessions
+    exam_sessions = ExamSession.objects.filter(status='completed')
+    if start_date:
+        exam_sessions = exam_sessions.filter(completed_at__gte=start_date)
+
+    # Calculate user statistics
+    user_stats = User.objects.annotate(
+        total_exams=Count('exam_sessions', filter=Q(exam_sessions__in=exam_sessions)),
+        total_score=Sum('exam_sessions__total_score', filter=Q(exam_sessions__in=exam_sessions)),
+        avg_percentage=Avg('exam_sessions__percentage_score', filter=Q(exam_sessions__in=exam_sessions)),
+        total_credit_points=Sum('exam_sessions__credit_points', filter=Q(exam_sessions__in=exam_sessions))
+    ).filter(
+        total_exams__gt=0  # Only users who have taken exams
+    ).order_by('-total_score', '-avg_percentage', '-total_exams')
+
+    # Add rank and badge to each user
+    leaderboard_data = []
+    for rank, user in enumerate(user_stats, 1):
+        # Determine badge based on performance
+        avg_score = user.avg_percentage or 0
+        total_exams = user.total_exams or 0
+
+        if avg_score >= 95 and total_exams >= 20:
+            badge = 'champion'
+            badge_label = 'Champion'
+        elif avg_score >= 90 and total_exams >= 15:
+            badge = 'expert'
+            badge_label = 'Expert'
+        elif avg_score >= 85 and total_exams >= 10:
+            badge = 'master'
+            badge_label = 'Master'
+        elif avg_score >= 75 and total_exams >= 5:
+            badge = 'pro'
+            badge_label = 'Pro'
+        else:
+            badge = 'beginner'
+            badge_label = 'Beginner'
+
+        # Determine user title based on performance
+        if avg_score >= 95:
+            title = 'Quiz Master'
+        elif avg_score >= 90:
+            title = 'Knowledge Seeker'
+        elif avg_score >= 85:
+            title = 'Study Enthusiast'
+        elif avg_score >= 75:
+            title = 'Quick Learner'
+        elif avg_score >= 65:
+            title = 'Rising Star'
+        else:
+            title = 'Knowledge Hunter'
+
+        leaderboard_data.append({
+            'rank': rank,
+            'user': user,
+            'title': title,
+            'total_score': user.total_score or 0,
+            'total_exams': total_exams,
+            'avg_percentage': round(avg_score, 1) if avg_score else 0,
+            'total_credit_points': user.total_credit_points or 0,
+            'badge': badge,
+            'badge_label': badge_label,
+            'is_current_user': user == request.user
+        })
+
+    # Calculate global statistics
+    total_users = User.objects.filter(exam_sessions__status='completed').distinct().count()
+    active_users_week = User.objects.filter(
+        exam_sessions__status='completed',
+        exam_sessions__completed_at__gte=now - timedelta(days=7)
+    ).distinct().count()
+    total_exams_completed = ExamSession.objects.filter(status='completed').count()
+
+    # Find current user's position
+    current_user_rank = None
+    current_user_data = None
+    for item in leaderboard_data:
+        if item['is_current_user']:
+            current_user_rank = item['rank']
+            current_user_data = item
+            break
+
+    context = {
+        'leaderboard_data': leaderboard_data[:50],  # Top 50 users
+        'current_user_rank': current_user_rank,
+        'current_user_data': current_user_data,
+        'filter_type': filter_type,
+        'total_users': total_users,
+        'active_users_week': active_users_week,
+        'total_exams_completed': total_exams_completed,
+    }
+
+    return render(request, 'leaderboard.html', context)
+
+
+# ============================================================================
 # EXAM FUNCTIONALITY
 # ============================================================================
 
