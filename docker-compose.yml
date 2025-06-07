@@ -1,11 +1,10 @@
 services:
   web:
     build: .
-    container_name: sisimpur
     command: python3 manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/app
     ports:
-      - "8000:8000"
+      - mode: ingress
+        target: 8000
+        published: 8000
     environment:
       - DEBUG=1
