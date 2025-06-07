@@ -1,0 +1,13 @@
+Django==5.0.9
+google_api_python_client==2.137.0
+google_auth_oauthlib==1.2.1
+opencv_python==4.10.0.84
+PyYAML==6.0.2
+dotenv
+django_browser_reload
+easyocr
+google-generativeai
+fitz
+uv
+tools
+pdf2image
