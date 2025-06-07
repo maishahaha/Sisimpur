@@ -24,7 +24,7 @@ distro==1.9.0
 Django==5.2.1
 django-browser-reload==1.18.0
 dotenv==0.9.9
-easyocr @ git+https://github.com/JaidedAI/EasyOCR.git@c4f3cd7225efd4f85451bd8b4a7646ae9a092420
+easyocr==1.7.2
 EbookLib==0.18
 et_xmlfile==2.0.0
 executing==2.2.0
