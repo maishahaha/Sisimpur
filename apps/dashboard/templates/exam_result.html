@@ -406,10 +406,33 @@
                         </div>
                         <div class="answer-details">
                             <div class="user-answer {% if answer.is_correct %}correct{% endif %}">
-                                <strong>Your Answer:</strong> {{ answer.user_answer|default:"Not answered" }}
+                                <strong>Your Answer:</strong>
+                                {% if answer.question.question_type == 'MULTIPLECHOICE' and answer.user_answer %}
+                                    {% for option in answer.question.options %}
+                                        {% if option|slice:":1" == answer.user_answer %}
+                                            {{ option }}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if not answer.user_answer %}Not answered{% endif %}
+                                {% else %}
+                                    {{ answer.user_answer|default:"Not answered" }}
+                                {% endif %}
                             </div>
                             <div class="correct-answer">
-                                <strong>Correct Answer:</strong> {{ answer.question.answer }}
+                                <strong>Correct Answer:</strong>
+                                {% if answer.question.question_type == 'MULTIPLECHOICE' %}
+                                    {% if answer.question.correct_option %}
+                                        {% for option in answer.question.options %}
+                                            {% if option|slice:":1" == answer.question.correct_option %}
+                                                {{ option }}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        {{ answer.question.answer }}
+                                    {% endif %}
+                                {% else %}
+                                    {{ answer.question.answer }}
+                                {% endif %}
                             </div>
                         </div>
                     </div>

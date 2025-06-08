@@ -608,11 +608,23 @@ def exam_session(request, session_id):
             if user_answer:
                 # Check if answer is correct
                 is_correct = False
+                print(f"DEBUG: Checking answer - Question: '{current_question.question[:50]}...', User: '{user_answer}', Type: '{current_question.question_type}', CorrectOption: '{current_question.correct_option}', Answer: '{current_question.answer}'")
+
                 if current_question.question_type == 'MULTIPLECHOICE':
-                    is_correct = user_answer.lower() == current_question.answer.lower()
+                    # For multiple choice, compare with correct_option field (A, B, C, D)
+                    if current_question.correct_option:
+                        is_correct = user_answer.upper().strip() == current_question.correct_option.upper().strip()
+                        print(f"DEBUG: Multiple choice comparison - '{user_answer.upper().strip()}' == '{current_question.correct_option.upper().strip()}' = {is_correct}")
+                    else:
+                        # Fallback: compare with answer text if correct_option is not set
+                        is_correct = user_answer.lower().strip() == current_question.answer.lower().strip()
+                        print(f"DEBUG: Multiple choice fallback - '{user_answer.lower().strip()}' == '{current_question.answer.lower().strip()}' = {is_correct}")
                 else:
                     # For short answers, simple string matching (can be enhanced)
                     is_correct = user_answer.lower().strip() in current_question.answer.lower()
+                    print(f"DEBUG: Short answer comparison - '{user_answer.lower().strip()}' in '{current_question.answer.lower()}' = {is_correct}")
+
+                print(f"DEBUG: Final is_correct = {is_correct}")
 
                 # Save or update answer
                 if existing_answer:
@@ -716,6 +728,10 @@ def exam_result(request, session_id):
         print(f"DEBUG: Getting exam answers...")
         answers = ExamAnswer.objects.filter(exam_session=exam_session).order_by('question_index')
         print(f"DEBUG: Found {answers.count()} answers")
+
+        # Debug each answer
+        for i, answer in enumerate(answers):
+            print(f"DEBUG: Answer {i+1}: Question='{answer.question.question[:50]}...', User='{answer.user_answer}', Correct='{answer.question.answer}', CorrectOption='{answer.question.correct_option}', Type='{answer.question.question_type}', IsCorrect={answer.is_correct}")
 
         # Calculate detailed statistics
         total_questions = exam_session.total_questions

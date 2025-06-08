@@ -21,33 +21,9 @@ try:
 except ImportError:
     Image = None
 
-try:
-    import numpy as np
-except ImportError:
-    np = None
-
-try:
-    import easyocr
-except ImportError:
-    easyocr = None
-
 from ..config import MIN_TEXT_LENGTH
 
 logger = logging.getLogger("sisimpur.brain.detector")
-
-# EasyOCR reader will be initialized when needed
-OCR_LANGUAGES = ["en", "bn"]
-reader = None
-
-
-def get_ocr_reader():
-    """Get or initialize the EasyOCR reader."""
-    global reader
-    if reader is None:
-        if easyocr is None:
-            raise ImportError("EasyOCR is not installed. Please install it with: pip install easyocr")
-        reader = easyocr.Reader(OCR_LANGUAGES, gpu=False)
-    return reader
 
 
 def detect_language(text: str) -> str:
@@ -190,25 +166,23 @@ def detect_document_type(file_path: str) -> Dict[str, Any]:
                 if len(image_list) > 0 and len(page_text.strip()) < 50:
                     is_scanned_pdf = True
 
-                    # OCR on first image using EasyOCR
+                    # OCR on first image using LLM
                     try:
-                        if Image is None or np is None:
-                            logger.warning("PIL or numpy not available, skipping OCR")
+                        if Image is None:
+                            logger.warning("PIL not available, skipping OCR")
                             continue
                         xref = image_list[0][0]
                         base_image = doc.extract_image(xref)
                         image = Image.open(io.BytesIO(base_image["image"]))
-                        img_array = np.array(image)
-                        ocr_reader = get_ocr_reader()
-                        ocr_results = ocr_reader.readtext(
-                            img_array, detail=0, paragraph=True
-                        )
-                        ocr_text = "\n".join(ocr_results)
+
+                        # Use LLM OCR
+                        from .ocr_utils import llm_ocr_extract
+                        ocr_text = llm_ocr_extract(image, language_code="eng")
 
                         if len(ocr_text.strip()) > len(page_text.strip()):
                             text_content += "\n" + ocr_text
                     except Exception as e:
-                        logger.warning(f"OCR error: {e}")
+                        logger.warning(f"LLM OCR error: {e}")
 
                 # Early language detection
                 if page_num == 0 and text_content.strip():
@@ -234,16 +208,14 @@ def detect_document_type(file_path: str) -> Dict[str, Any]:
             doc.close()
 
         elif file_ext in [".jpg", ".jpeg", ".png"]:
-            if Image is None or np is None:
-                raise ImportError("PIL or numpy not available for image processing")
+            if Image is None:
+                raise ImportError("PIL not available for image processing")
             metadata["doc_type"] = "image"
             img = Image.open(file_path)
-            img_array = np.array(img)
 
-            # OCR with EasyOCR
-            ocr_reader = get_ocr_reader()
-            ocr_results = ocr_reader.readtext(img_array, detail=0, paragraph=True)
-            ocr_text = "\n".join(ocr_results)
+            # OCR with LLM
+            from .ocr_utils import llm_ocr_extract
+            ocr_text = llm_ocr_extract(img, language_code="eng")
 
             metadata["language"] = detect_language(ocr_text)
             metadata["is_question_paper"] = detect_question_paper(

@@ -325,8 +325,8 @@
                             <div class="answer-options">
                                 {% for option in current_question.options %}
                                     <div class="answer-option" onclick="selectOption(this)">
-                                        <input type="radio" name="answer" value="{{ option }}" id="option_{{ forloop.counter }}"
-                                               {% if existing_answer and existing_answer.user_answer == option %}checked{% endif %}>
+                                        <input type="radio" name="answer" value="{{ option|slice:':1' }}" id="option_{{ forloop.counter }}"
+                                               {% if existing_answer and existing_answer.user_answer == option|slice:':1' %}checked{% endif %}>
                                         <label for="option_{{ forloop.counter }}">{{ option }}</label>
                                     </div>
                                 {% endfor %}
@@ -425,15 +425,26 @@ document.querySelectorAll('input, textarea').forEach(input => {
     input.addEventListener('input', autoSave);
 });
 
+// Track if form is being submitted to prevent beforeunload dialog
+let isFormSubmitting = false;
+
 // Prevent accidental page refresh
-window.addEventListener('beforeunload', function(e) {
+function handleBeforeUnload(e) {
+    // Don't show dialog if form is being submitted
+    if (isFormSubmitting) {
+        return;
+    }
     e.preventDefault();
     e.returnValue = 'Are you sure you want to leave? Your progress may be lost.';
-});
+}
+
+window.addEventListener('beforeunload', handleBeforeUnload);
 
 // Remove beforeunload when form is submitted
 document.getElementById('exam-form').addEventListener('submit', function() {
-    window.removeEventListener('beforeunload', function() {});
+    isFormSubmitting = true;
+    // Remove the event listener properly
+    window.removeEventListener('beforeunload', handleBeforeUnload);
 });
 </script>
 {% endblock %}

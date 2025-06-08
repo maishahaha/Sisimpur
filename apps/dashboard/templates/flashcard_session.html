@@ -378,24 +378,16 @@
                     <div class="flashcard-front">
                         <div class="card-label">Question</div>
                         <div class="card-content">
-                            {{ current_card.question_text }}
+                            {{ current_card.question }}
                         </div>
                         <div class="card-hint">Click to reveal answer</div>
                     </div>
-                    
+
                     <!-- Back (Answer) -->
                     <div class="flashcard-back">
                         <div class="card-label">Answer</div>
                         <div class="card-content">
-                            {{ current_card.correct_answer }}
-                            {% if current_card.question_type == 'MULTIPLECHOICE' and current_card.options %}
-                                <div style="margin-top: 20px; font-size: 1rem;">
-                                    <strong>Options:</strong><br>
-                                    {% for option in current_card.options %}
-                                        <div style="margin: 5px 0;">{{ option }}</div>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+                            {{ current_card.answer }}
                         </div>
                         <div class="card-hint">Study this carefully</div>
                     </div>
@@ -517,16 +509,27 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
+// Track if form is being submitted to prevent beforeunload dialog
+let isFormSubmitting = false;
+
 // Prevent accidental navigation
-window.addEventListener('beforeunload', function(e) {
+function handleBeforeUnload(e) {
+    // Don't show dialog if form is being submitted
+    if (isFormSubmitting) {
+        return;
+    }
     e.preventDefault();
     e.returnValue = 'Are you sure you want to leave? Your study progress may be lost.';
-});
+}
+
+window.addEventListener('beforeunload', handleBeforeUnload);
 
 // Remove beforeunload when form is submitted
 document.getElementById('flashcard-form').addEventListener('submit', function() {
+    isFormSubmitting = true;
     clearInterval(timerInterval);
-    window.removeEventListener('beforeunload', function() {});
+    // Remove the event listener properly
+    window.removeEventListener('beforeunload', handleBeforeUnload);
 });
 
 // Auto-flip card after 5 seconds for better UX

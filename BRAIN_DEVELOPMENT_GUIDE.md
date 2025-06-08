@@ -176,8 +176,8 @@ curl -X POST http://localhost:8000/api/brain/process/document/ \
 # Required environment variables
 export GOOGLE_API_KEY="your-gemini-api-key"
 
-# Install dependencies
-pip install google-generativeai PyMuPDF pillow opencv-python easyocr pdf2image
+# Install dependencies (LLM-based OCR, no EasyOCR needed)
+pip install google-generativeai PyMuPDF pillow opencv-python-headless pdf2image
 ```
 
 ### **Database:**

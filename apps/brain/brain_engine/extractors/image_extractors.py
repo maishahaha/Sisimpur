@@ -3,12 +3,11 @@ import re
 import numpy as np
 import cv2
 from PIL import Image
-import easyocr
 
 from .base import BaseExtractor
 from ..utils.api_utils import api
 from ..config import DEFAULT_GEMINI_MODEL
-from ..utils.ocr_utils import ocr_with_fallback
+from ..utils.ocr_utils import llm_ocr_extract
 
 logger = logging.getLogger("sisimpur.brain.extractors.image")
 
@@ -20,21 +19,19 @@ class ImageExtractor(BaseExtractor):
             "ben": "bn",
             "eng": "en",
         }
-        self.easyocr_lang = self.lang_map.get(self.language, self.language)
-        self.reader = None  # Will be initialized when needed
-
-    def get_reader(self):
-        """Get or initialize the EasyOCR reader."""
-        if self.reader is None:
-            langs = [self.easyocr_lang]
-            self.reader = easyocr.Reader(langs, gpu=False)
-        return self.reader
+        self.llm_lang = self.lang_map.get(self.language, self.language)
 
     def extract(self, file_path: str) -> str:
         try:
-            img = cv2.imread(file_path)
-            img = self._deskew_image(img)
-            text = self._extract_with_layout_ocr(img)
+            # Load image using PIL for LLM processing
+            img = Image.open(file_path)
+
+            # Check if it's likely a question paper
+            is_question_paper = self._detect_question_paper(img)
+
+            # Extract text using LLM
+            text = llm_ocr_extract(img, self.llm_lang, is_question_paper)
+
             self.save_to_temp(text, file_path)
             return text
         except Exception as e:
@@ -58,6 +55,23 @@ class ImageExtractor(BaseExtractor):
                 M = cv2.getRotationMatrix2D(center, median_angle, 1.0)
                 img = cv2.warpAffine(img, M, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
         return img
+
+    def _detect_question_paper(self, img: Image.Image) -> bool:
+        """
+        Detect if the image is likely a question paper using a quick LLM check.
+        """
+        try:
+            # Use a simple prompt to check if it's a question paper
+            prompt = (
+                "Look at this image and determine if it's a question paper or exam. "
+                "Answer only 'YES' if it contains questions, question numbers, or multiple choice options. "
+                "Answer only 'NO' if it's regular text, notes, or other content."
+            )
+            response = api.generate_content([prompt, img], model_name=DEFAULT_GEMINI_MODEL)
+            return response.text.strip().upper() == "YES"
+        except Exception as e:
+            logger.warning(f"Question paper detection failed: {e}")
+            return False
 
     def _preprocess_image(self, img):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -168,11 +182,9 @@ class ImageExtractor(BaseExtractor):
             Extracted text
         """
         # First, try to detect if this is a question paper using a simple heuristic
-        # We'll use a small portion of the image to check
+        # Use LLM to detect if it's a question paper
         try:
-            # Get a small sample of text to check if it's a question paper
-            sample_text = ocr_with_fallback(img, language_code='ben')
-            is_likely_question_paper = self._is_likely_question_paper(sample_text)
+            is_likely_question_paper = self._detect_question_paper(img)
         except Exception:
             is_likely_question_paper = False
 
@@ -202,9 +214,7 @@ class ImageExtractor(BaseExtractor):
             return response.text
         except Exception as e:
             logger.error(f"Error using Gemini for OCR: {e}")
-            # Fallback to EasyOCR
-            logger.info("Falling back to OCR Utils")
-            return ocr_with_fallback(img, language_code='ben')
+            raise RuntimeError(f"LLM OCR failed: {e}")
 
     def _is_likely_question_paper(self, text: str) -> bool:
         """

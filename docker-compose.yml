@@ -19,8 +19,6 @@ services:
       - DJANGO_SETTINGS_MODULE=core.settings
       - PYTHONPATH=/app:/app/apps
       - DOCKER_ENV=1
-      - TORCH_HOME=/tmp/torch
-      - TRANSFORMERS_CACHE=/tmp/transformers
     env_file:
       - .env.docker
     restart: unless-stopped

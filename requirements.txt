@@ -1,5 +1,5 @@
-# CPU-Optimized Requirements for SISIMPUR
-# This file contains minimal dependencies for CPU-only operation
+# LLM-Optimized Requirements for SISIMPUR
+# This file contains minimal dependencies for LLM-based OCR
 
 # Core Django and web framework
 Django==5.0.9
@@ -16,12 +16,9 @@ PyMuPDF
 pdf2image
 PyYAML
 
-# Image processing (CPU optimized - headless versions)
+# Image processing (minimal - no OCR dependencies)
 opencv-python-headless
 Pillow
-
-# EasyOCR core (will install CPU-only PyTorch automatically)
-easyocr
 
 # Build and utility tools
 setuptools
