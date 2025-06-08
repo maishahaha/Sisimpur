@@ -4,6 +4,32 @@
 
 {% block extra_head %}
 <style>
+/* Consistent Header Styles */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.page-title {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.page-description {
+    color: #8892b0;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
 /* Leaderboard Styles */
 .leaderboard-container {
     max-width: 1200px;
@@ -11,37 +37,15 @@
     padding: 20px;
 }
 
-.leaderboard-header {
-    text-align: center;
-    margin-bottom: 40px;
-    padding: 30px;
-    background: rgba(15, 15, 35, 0.9);
-    border-radius: 16px;
-    border: 1px solid rgba(94, 23, 235, 0.3);
-}
-
-.leaderboard-title {
-    color: #ffffff;
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-    background: linear-gradient(135deg, #5e17eb, #00d4ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.leaderboard-subtitle {
-    color: #aaaaaa;
-    font-size: 1.1rem;
-    margin-bottom: 20px;
-}
-
 .stats-overview {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .stat-card {
@@ -98,6 +102,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 500;
+    text-decoration: none;
 }
 
 .filter-btn:hover,
@@ -105,6 +110,8 @@
     background: linear-gradient(135deg, #5e17eb, #7c3aed);
     border-color: #5e17eb;
     transform: translateY(-2px);
+    color: #ffffff;
+    text-decoration: none;
 }
 
 .leaderboard-table {
@@ -368,25 +375,25 @@
 <div class="content-wrapper">
     <div class="content-container">
         <div class="leaderboard-container">
-            <!-- Header -->
-            <div class="leaderboard-header">
-                <h1 class="leaderboard-title">🏆 Global Leaderboard</h1>
-                <p class="leaderboard-subtitle">Compete with learners worldwide and climb to the top!</p>
-                
-                <!-- Stats Overview -->
-                <div class="stats-overview">
-                    <div class="stat-card total">
-                        <div class="stat-value">{{ total_users|default:0 }}</div>
-                        <div class="stat-label">Total Players</div>
-                    </div>
-                    <div class="stat-card active">
-                        <div class="stat-value">{{ active_users_week|default:0 }}</div>
-                        <div class="stat-label">Active This Week</div>
-                    </div>
-                    <div class="stat-card exams">
-                        <div class="stat-value">{{ total_exams_completed|default:0 }}</div>
-                        <div class="stat-label">Exams Completed</div>
-                    </div>
+            <!-- Consistent Header Design -->
+            <div class="page-header">
+                <h1 class="page-title">🏆 Global Leaderboard</h1>
+            </div>
+            <p class="page-description">Compete with learners worldwide and climb to the top!</p>
+            
+            <!-- Stats Overview -->
+            <div class="stats-overview">
+                <div class="stat-card total">
+                    <div class="stat-value">{{ total_users|default:0 }}</div>
+                    <div class="stat-label">Total Players</div>
+                </div>
+                <div class="stat-card active">
+                    <div class="stat-value">{{ active_users_week|default:0 }}</div>
+                    <div class="stat-label">Active This Week</div>
+                </div>
+                <div class="stat-card exams">
+                    <div class="stat-value">{{ total_exams_completed|default:0 }}</div>
+                    <div class="stat-label">Exams Completed</div>
                 </div>
             </div>
 
@@ -408,7 +415,7 @@
                     <div class="desktop-only">Avg Score</div>
                     <div>Badge</div>
                 </div>
-                
+
                 <div class="leaderboard-list">
                     {% if leaderboard_data %}
                         {% for item in leaderboard_data %}
@@ -459,14 +466,14 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', function() {
         // Remove active class from all buttons
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        
+
         // Add active class to clicked button
         this.classList.add('active');
-        
+
         // Here you would typically make an AJAX call to filter the leaderboard
         const filter = this.dataset.filter;
         console.log('Filtering by:', filter);
-        
+
         // Add loading animation or update leaderboard data
         // filterLeaderboard(filter);
     });
@@ -484,7 +491,7 @@ document.addEventListener('DOMContentLoaded', function() {
     items.forEach((item, index) => {
         item.style.opacity = '0';
         item.style.transform = 'translateY(20px)';
-        
+
         setTimeout(() => {
             item.style.transition = 'all 0.5s ease';
             item.style.opacity = '1';

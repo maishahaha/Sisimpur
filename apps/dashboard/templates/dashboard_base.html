@@ -37,40 +37,22 @@
 
             <nav class="sidebar-nav">
                 <ul>
-                    <li class="nav-item active">
+                    <li class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
                         <a href="{% url 'dashboard:home' %}">
                             <i class="ri-question-answer-line"></i>
                             <span class="nav-text">New Quiz</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item {% if request.resolver_match.url_name == 'my_quizzes' %}active{% endif %}">
                         <a href="{% url 'dashboard:my_quizzes' %}">
                             <i class="ri-file-list-3-line"></i>
                             <span class="nav-text">My Quizzes</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}">
                         <a href="{% url 'dashboard:leaderboard' %}">
                             <i class="ri-medal-line"></i>
                             <span class="nav-text">Leaderboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#daily-boost">
-                            <i class="ri-rocket-line"></i>
-                            <span class="nav-text">Daily Memory Boost</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#my-topics">
-                            <i class="ri-book-open-line"></i>
-                            <span class="nav-text">My Topics</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#stats">
-                            <i class="ri-bar-chart-line"></i>
-                            <span class="nav-text">Stats</span>
                         </a>
                     </li>
                 </ul>
@@ -103,15 +85,15 @@
                         </button>
                         <div class="language-dropdown" id="language-dropdown">
                             <a href="#" class="language-option active" data-lang="en-us">
-                                <img src="..\static\images\Flag_of_the_United_States.svg.png" alt="US Flag">
+                                <img src="{% static 'images/Flag_of_the_United_States.svg.png' %}" alt="US Flag">
                                 <span>English (US)</span>
                             </a>
                             <a href="#" class="language-option" data-lang="en-gb">
-                                <img src="..\static\images\Flag_of_the_United_Kingdom_(3-5).svg.png" alt="UK Flag">
+                                <img src="{% static 'images/Flag_of_the_United_Kingdom_(3-5).svg.png' %}" alt="UK Flag">
                                 <span>English (UK)</span>
                             </a>
                             <a href="#" class="language-option" data-lang="bn">
-                                <img src="..\static\images\Flag_of_Bangladesh.svg.png">
+                                <img src="{% static 'images/Flag_of_Bangladesh.svg.png' %}" alt="Bangladesh Flag">
                                 <span>বাংলা (Bangladesh)</span>
                             </a>
                         </div>
