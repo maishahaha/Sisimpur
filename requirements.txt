@@ -1,13 +1,28 @@
+# CPU-Optimized Requirements for SISIMPUR
+# This file contains minimal dependencies for CPU-only operation
+
+# Core Django and web framework
 Django==5.0.9
-google_api_python_client==2.137.0
-google_auth_oauthlib==1.2.1
-opencv_python==4.10.0.84
-PyYAML==6.0.2
-dotenv
 django_browser_reload
-easyocr
+python-dotenv
+
+# Google APIs and AI
+google_api_python_client
+google_auth_oauthlib
 google-generativeai
-fitz
-uv
-tools
+
+# Document processing
+PyMuPDF
 pdf2image
+PyYAML
+
+# Image processing (CPU optimized - headless versions)
+opencv-python-headless
+Pillow
+
+# EasyOCR core (will install CPU-only PyTorch automatically)
+easyocr
+
+# Build and utility tools
+setuptools
+wheel

@@ -1,10 +1,28 @@
 services:
   web:
-    build: .
-    command: python3 manage.py runserver 0.0.0.0:8000
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      sh -c "python3 manage.py makemigrations &&
+             python3 manage.py migrate &&
+             python3 manage.py collectstatic --noinput &&
+             python3 manage.py runserver 0.0.0.0:8000"
     ports:
-      - mode: ingress
-        target: 8000
-        published: 8000
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - /app/venv
+      - /app/__pycache__
     environment:
       - DEBUG=1
+      - DJANGO_SETTINGS_MODULE=core.settings
+      - PYTHONPATH=/app:/app/apps
+      - DOCKER_ENV=1
+      - TORCH_HOME=/tmp/torch
+      - TRANSFORMERS_CACHE=/tmp/transformers
+    env_file:
+      - .env.docker
+    restart: unless-stopped
+    stdin_open: true
+    tty: true

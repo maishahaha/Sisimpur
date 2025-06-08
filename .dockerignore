@@ -47,15 +47,15 @@ ENV/
 # Django
 *.log
 local_settings.py
-db.sqlite3
-media/
+# db.sqlite3  # Allow for development
+# media/      # Allow for development
 staticfiles/
 static_root/
 static_cdn/
 static_collected/
 
-# Environment variables
-.env
+# Environment variables (allow .env for Docker)
+# .env
 
 # VS Code / IDEs
 .vscode/
@@ -82,9 +82,9 @@ coverage.xml
 .cache
 pytestdebug.log
 
-# Migrations (optional if you regenerate them)
-**/migrations/*.py
-!**/migrations/__init__.py
+# Migrations (allow for development)
+# **/migrations/*.py
+# !**/migrations/__init__.py
 
 # Bootstrap static frontend (basic use)
 *.map
