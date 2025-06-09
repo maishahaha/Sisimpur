@@ -120,6 +120,56 @@ class QuestionAnswer(models.Model):
     def __str__(self):
         return f"Q: {self.question[:50]}..."
     
+    def get_formatted_options(self):
+        """
+        Get options in the new structured format
+        Converts old format ["ক) বায়ু", "খ) জল"] to new format [{"key": "ক", "text": "বায়ু"}]
+        """
+        if not self.options:
+            return []
+
+        formatted_options = []
+        for option in self.options:
+            if isinstance(option, dict) and 'key' in option and 'text' in option:
+                # Already in new format
+                formatted_options.append(option)
+            elif isinstance(option, str):
+                # Old format - convert to new format
+                if ')' in option and len(option) > 2:
+                    key = option.split(')')[0].strip()
+                    text = option.split(')', 1)[1].strip()
+                    formatted_options.append({"key": key, "text": text})
+                else:
+                    # Fallback for malformed options
+                    formatted_options.append({"key": str(len(formatted_options) + 1), "text": option})
+            else:
+                # Fallback for unknown format
+                formatted_options.append({"key": str(len(formatted_options) + 1), "text": str(option)})
+
+        return formatted_options
+
+    def get_legacy_options(self):
+        """
+        Get options in the old string format for backward compatibility
+        Converts new format [{"key": "ক", "text": "বায়ু"}] to old format ["ক) বায়ু"]
+        """
+        if not self.options:
+            return []
+
+        legacy_options = []
+        for option in self.options:
+            if isinstance(option, dict) and 'key' in option and 'text' in option:
+                # New format - convert to old format
+                legacy_options.append(f"{option['key']}) {option['text']}")
+            elif isinstance(option, str):
+                # Already in old format
+                legacy_options.append(option)
+            else:
+                # Fallback
+                legacy_options.append(str(option))
+
+        return legacy_options
+
     def to_dict(self):
         """Convert to dictionary for JSON serialization"""
         data = {
@@ -127,12 +177,12 @@ class QuestionAnswer(models.Model):
             'answer': self.answer,
             'question_type': self.question_type,
         }
-        
+
         if self.question_type == 'MULTIPLECHOICE' and self.options:
-            data['options'] = self.options
+            data['options'] = self.get_formatted_options()  # Use new format
             data['correct_option'] = self.correct_option
-        
+
         if self.confidence_score is not None:
             data['confidence_score'] = self.confidence_score
-            
+
         return data

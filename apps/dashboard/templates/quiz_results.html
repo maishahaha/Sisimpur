@@ -76,10 +76,10 @@
               
               {% if qa.question_type == 'MULTIPLECHOICE' and qa.options %}
               <div class="options-list">
-                {% for option in qa.options %}
-                <div class="option-item {% if option.0 == qa.correct_option %}correct-option{% endif %}">
-                  <span class="option-label">{{ option }}</span>
-                  {% if option.0 == qa.correct_option %}
+                {% for option in qa.get_formatted_options %}
+                <div class="option-item {% if option.key == qa.correct_option %}correct-option{% endif %}">
+                  <span class="option-label">{{ option.key }}) {{ option.text }}</span>
+                  {% if option.key == qa.correct_option %}
                   <i class="ri-check-line correct-icon"></i>
                   {% endif %}
                 </div>

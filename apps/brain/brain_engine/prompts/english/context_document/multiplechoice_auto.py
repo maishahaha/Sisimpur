@@ -34,7 +34,24 @@ Format your response as JSON:
   "questions": [
     {{
       "question": "Question text here?",
-      "options": ["A) Option 1", "B) Option 2", "C) Option 3", "D) Option 4"],
+      "options": [
+        {{
+          "key": "A",
+          "text": "Option 1"
+        }},
+        {{
+          "key": "B",
+          "text": "Option 2"
+        }},
+        {{
+          "key": "C",
+          "text": "Option 3"
+        }},
+        {{
+          "key": "D",
+          "text": "Option 4"
+        }}
+      ],
       "answer": "Option 1",
       "correct_option": "A",
       "difficulty": "medium",

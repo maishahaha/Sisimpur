@@ -323,11 +323,11 @@
                     <div class="answer-section">
                         {% if current_question.question_type == 'MULTIPLECHOICE' %}
                             <div class="answer-options">
-                                {% for option in current_question.options %}
+                                {% for option in current_question.get_formatted_options %}
                                     <div class="answer-option" onclick="selectOption(this)">
-                                        <input type="radio" name="answer" value="{{ option|slice:':1' }}" id="option_{{ forloop.counter }}"
-                                               {% if existing_answer and existing_answer.user_answer == option|slice:':1' %}checked{% endif %}>
-                                        <label for="option_{{ forloop.counter }}">{{ option }}</label>
+                                        <input type="radio" name="answer" value="{{ option.key }}" id="option_{{ forloop.counter }}"
+                                               {% if existing_answer and existing_answer.user_answer == option.key %}checked{% endif %}>
+                                        <label for="option_{{ forloop.counter }}">{{ option.key }}) {{ option.text }}</label>
                                     </div>
                                 {% endfor %}
                             </div>

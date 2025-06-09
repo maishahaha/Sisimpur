@@ -32,6 +32,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://arpan8925-web--8000.prod1.defang.dev",
     "https://*.defang.dev",
     "https://*.defang.io",
+    "http://127.0.0.1:8000/",
 ]
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -45,9 +46,9 @@ GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET')
 
 # Dynamic redirect URI based on environment
 if os.getenv('DOCKER_ENV'):
-    GOOGLE_OAUTH2_REDIRECT_URI = 'https://arpan8925-web--8000.prod1.defang.dev/auth/google-callback/'
+    GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/auth/google-callback/'
 else:
-    GOOGLE_OAUTH2_REDIRECT_URI = 'https://arpan8925-web--8000.prod1.defang.dev/auth/google-callback/'
+    GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/auth/google-callback/'
 
 # Allow insecure transport for OAuth in development
 if DEBUG:
