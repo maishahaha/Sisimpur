@@ -32,6 +32,9 @@ RUN uv pip install --system --no-cache-dir -r requirements.txt
 # Copy the rest of the application code
 COPY . .
 
+# Make health check script executable
+RUN chmod +x /app/healthcheck.py
+
 # Create necessary directories
 RUN mkdir -p /app/media/brain/temp_extracts && \
     mkdir -p /app/media/brain/qa_outputs && \

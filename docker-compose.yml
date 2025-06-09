@@ -15,7 +15,7 @@ services:
       - /app/venv
       - /app/__pycache__
     environment:
-      - DEBUG=1
+      - DEBUG=0
       - DJANGO_SETTINGS_MODULE=core.settings
       - PYTHONPATH=/app:/app/apps
       - DOCKER_ENV=1
@@ -24,3 +24,9 @@ services:
     restart: unless-stopped
     stdin_open: true
     tty: true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthz/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  

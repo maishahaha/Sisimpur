@@ -28,8 +28,14 @@ sys.path.insert(0, str(BASE_DIR / "apps"))  # 👈 adds apps/ to Python path
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', "django-insecure-#m17e$1!_ky@zv6bpq_#s^b*caz-sog5pcdi5l44n9y5!39zb#")
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://arpan8925-web--8000.prod1.defang.dev",
+    "https://*.defang.dev",
+    "https://*.defang.io",
+]
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True  # Temporarily enable for debugging
 
 ALLOWED_HOSTS = ["*"]
 
@@ -39,9 +45,9 @@ GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET')
 
 # Dynamic redirect URI based on environment
 if os.getenv('DOCKER_ENV'):
-    GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/auth/google-callback/'
+    GOOGLE_OAUTH2_REDIRECT_URI = 'https://arpan8925-web--8000.prod1.defang.dev/auth/google-callback/'
 else:
-    GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/auth/google-callback/'
+    GOOGLE_OAUTH2_REDIRECT_URI = 'https://arpan8925-web--8000.prod1.defang.dev/auth/google-callback/'
 
 # Allow insecure transport for OAuth in development
 if DEBUG:
@@ -86,6 +92,8 @@ if DEBUG:
         "django_browser_reload.middleware.BrowserReloadMiddleware",
     )
 
+# Keep it simple for now - no production optimizations
+
 ROOT_URLCONF = "core.urls"
 
 TEMPLATES = [
@@ -114,6 +122,7 @@ WSGI_APPLICATION = "core.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# Database - Simple SQLite for production
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -230,4 +239,26 @@ OTP_CONFIG = {
     'MAX_HOURLY_ATTEMPTS': 5,  # Rate limiting: 5 OTP requests per hour per email/IP
     'BLOCK_DURATION_HOURS': 1,  # Block duration after exceeding rate limit
     'CLEANUP_INTERVAL_HOURS': 24,  # How often to clean up expired records
+}
+
+# Logging configuration for debugging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
 }

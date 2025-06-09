@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.timezone import datetime
 import json
@@ -134,3 +134,11 @@ def submit_and_subscribe(request):
             'error': 'An unexpected error occurred',
             'details': 'Please try again later or contact support if the problem persists.'
         }, status=500)
+
+
+def health_check(request):
+    """
+    Simple health check endpoint for load balancer
+    """
+    print("Health check endpoint accessed")
+    return HttpResponse("OK", status=200)

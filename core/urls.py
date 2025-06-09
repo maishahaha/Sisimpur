@@ -2,10 +2,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from apps.frontend.views import health_check
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("healthz/", health_check, name="health_check"),  # Health check endpoint
+    path("health/", health_check, name="health_check_alt"),  # Alternative health check
+    path("ping/", health_check, name="ping"),  # Simple ping endpoint
     path("", include("frontend.urls")),
     path("auth/", include("authentication.urls")),
     path("app/", include("dashboard.urls")),
