@@ -307,9 +307,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Show success message
                     showSuccessMessage(`Document processed successfully! Generated ${response.questions_generated} questions.`);
 
-                    // Redirect to results after a short delay
+                    // Reload the current page after a short delay to show updated quiz list
                     setTimeout(() => {
-                        window.location.href = `{% url "dashboard:quiz_results" 0 %}`.replace('0', response.job_id);
+                        window.location.reload();
                     }, 2000);
                 } else {
                     showErrorMessage(response.error || 'Processing failed');

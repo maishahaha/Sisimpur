@@ -163,16 +163,29 @@ def quiz_results(request, job_id):
             'processing_time': (job.completed_at - job.created_at).total_seconds() if job.completed_at else None,
         }
 
-    return JsonResponse({
-        'success': True,
-        'job_id': job_id,
-        'message': 'Quiz results retrieved successfully',
-        'questions_generated': len(serialized_qa_pairs),
-        'qa_pairs': serialized_qa_pairs,
+    # Check if this is an AJAX request (for API usage)
+    if request.headers.get('Accept') == 'application/json' or request.GET.get('format') == 'json':
+        return JsonResponse({
+            'success': True,
+            'job_id': job_id,
+            'message': 'Quiz results retrieved successfully',
+            'questions_generated': len(serialized_qa_pairs),
+            'qa_pairs': serialized_qa_pairs,
+            'form_settings': form_settings,
+            'detected_values': detected_values,
+            'generated_values': generated_values,
+        })
+
+    # Render template for regular page access
+    context = {
+        'job': job,
+        'qa_pairs': qa_pairs,
+        'serialized_qa_pairs': serialized_qa_pairs,
         'form_settings': form_settings,
         'detected_values': detected_values,
         'generated_values': generated_values,
-    })
+    }
+    return render(request, "quiz_results.html", context)
 
 # API endpoints for AJAX calls
 @login_required(login_url='auth:signupin')
