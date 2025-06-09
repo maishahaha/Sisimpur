@@ -44,11 +44,17 @@ ALLOWED_HOSTS = ["*"]
 GOOGLE_OAUTH2_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID')
 GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET')
 
-# Dynamic redirect URI based on environment
+# # Activate this in localhost docker environment
+# if os.getenv('DOCKER_ENV'):
+#     GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/auth/google-callback/'
+# else:
+#     GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/auth/google-callback/'
+
+# activate this in dfang io push
 if os.getenv('DOCKER_ENV'):
-    GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/auth/google-callback/'
+    GOOGLE_OAUTH2_REDIRECT_URI = 'https://arpan8925-web--8000.prod1.defang.dev/auth/google-callback/'
 else:
-    GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/auth/google-callback/'
+    GOOGLE_OAUTH2_REDIRECT_URI = 'https://arpan8925-web--8000.prod1.defang.dev/auth/google-callback/'
 
 # Allow insecure transport for OAuth in development
 if DEBUG:
