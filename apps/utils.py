@@ -17,6 +17,11 @@ def send_webhook(event_type, payload, webhook_url):
     """
 
     try:
+        # Check if webhook URL is a placeholder
+        if webhook_url.startswith("PLACEHOLDER_"):
+            logging.warning(f"Webhook URL is a placeholder: {webhook_url}")
+            return {"success": False, "message": f"Webhook URL not configured: {webhook_url}"}
+
         # Create webhook instance
         webhook = DiscordWebhook(
             url=webhook_url,

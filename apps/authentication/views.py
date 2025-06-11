@@ -190,7 +190,13 @@ def handle_signup(request):
         login(request, user)
 
         # Send Discord webhook notification
-        send_user_signup_webhook(user)
+        try:
+            print(f"DEBUG: Sending Discord webhook for user signup")
+            webhook_result = send_user_signup_webhook(user)
+            print(f"DEBUG: Webhook result: {webhook_result}")
+        except Exception as webhook_error:
+            print(f"DEBUG: Webhook error: {str(webhook_error)}")
+            # Don't let webhook errors break the signup process
         messages.success(request, f"Welcome to Sisimpur, {user.email}! Your account has been created successfully.")
         return redirect('dashboard:home')
 
