@@ -85,7 +85,7 @@ def send_webhook(event_type, payload, webhook_url):
         return {"success": False, "message": f"Discord webhook error: {str(e)}"}
 
 
-def send_user_signup_webhook(user, webhook_url="PLACEHOLDER_SIGNUP_WEBHOOK_URL"):
+def send_user_signup_webhook(user, webhook_url="https://discord.com/api/webhooks/1382616619091623936/0foPUQtwdXeBk_eL_WyB9GHyl5LgEH1XmZpkr265VuhNj3rWLk9Dy5NIaXHrDkaS-YNh"):
     """
     Send a specialized webhook for user signups with enhanced formatting.
 
@@ -108,7 +108,7 @@ def send_user_signup_webhook(user, webhook_url="PLACEHOLDER_SIGNUP_WEBHOOK_URL")
     return send_webhook("user_signup", payload, webhook_url)
 
 
-def send_user_login_webhook(user, login_method="email", webhook_url="PLACEHOLDER_LOGIN_WEBHOOK_URL"):
+def send_user_login_webhook(user, login_method="email", webhook_url="https://discord.com/api/webhooks/1382460933279842425/dHz-ahWrqL8Xydxj2ACJto_OC_mzUSamYzvbY6_36cJYcxXpOspU8O4tyZxvac0dkNpS"):
     """
     Send a specialized webhook for user logins.
 
@@ -158,7 +158,7 @@ def send_quiz_generation_webhook(user, job, questions_count):
     return send_webhook("quiz_generated", payload)
 
 
-def send_exam_completion_webhook(user, exam_session, webhook_url="PLACEHOLDER_EXAM_WEBHOOK_URL"):
+def send_exam_completion_webhook(user, exam_session, webhook_url="https://discord.com/api/webhooks/1382616831130599484/unBEeE-v3Y7OLVngv8gMbSnx657q-JU2uCkrwXjltT5oP6kQVJqHj6tYzdMghCcFPxGC"):
     """
     Send a webhook for exam completion events.
 
@@ -185,7 +185,7 @@ def send_exam_completion_webhook(user, exam_session, webhook_url="PLACEHOLDER_EX
     return send_webhook("exam_completed", payload, webhook_url)
 
 
-def send_document_processing_success_webhook(user, job, questions_count, webhook_url="PLACEHOLDER_PROCESSING_SUCCESS_WEBHOOK_URL"):
+def send_document_processing_success_webhook(user, job, questions_count, webhook_url="https://discord.com/api/webhooks/1382617040967172147/cWx74xm-03mlm737vQIirP3NT4p5SGw8RyxVgqzElKoQojaWUS2HhXRcldudDrkUmzMS"):
     """
     Send a webhook for successful document processing.
 
@@ -215,7 +215,7 @@ def send_document_processing_success_webhook(user, job, questions_count, webhook
     return send_webhook("document_processing_success", payload, webhook_url)
 
 
-def send_document_processing_failed_webhook(user, job, error_message, webhook_url="PLACEHOLDER_PROCESSING_FAILED_WEBHOOK_URL"):
+def send_document_processing_failed_webhook(user, job, error_message, webhook_url="https://discord.com/api/webhooks/1382617040967172147/cWx74xm-03mlm737vQIirP3NT4p5SGw8RyxVgqzElKoQojaWUS2HhXRcldudDrkUmzMS"):
     """
     Send a webhook for failed document processing.
 
@@ -244,7 +244,7 @@ def send_document_processing_failed_webhook(user, job, error_message, webhook_ur
     return send_webhook("document_processing_failed", payload, webhook_url)
 
 
-def send_normal_signin_webhook(user, webhook_url="PLACEHOLDER_SIGNIN_WEBHOOK_URL"):
+def send_normal_signin_webhook(user, webhook_url="https://discord.com/api/webhooks/1382460933279842425/dHz-ahWrqL8Xydxj2ACJto_OC_mzUSamYzvbY6_36cJYcxXpOspU8O4tyZxvac0dkNpS"):
     """
     Send a webhook for normal email/password sign in.
 
@@ -268,7 +268,7 @@ def send_normal_signin_webhook(user, webhook_url="PLACEHOLDER_SIGNIN_WEBHOOK_URL
     return send_webhook("normal_signin", payload, webhook_url)
 
 
-def send_google_signin_webhook(user, webhook_url="PLACEHOLDER_GOOGLE_SIGNIN_WEBHOOK_URL"):
+def send_google_signin_webhook(user, webhook_url="https://discord.com/api/webhooks/1382460933279842425/dHz-ahWrqL8Xydxj2ACJto_OC_mzUSamYzvbY6_36cJYcxXpOspU8O4tyZxvac0dkNpS"):
     """
     Send a webhook for Google OAuth sign in.
 
