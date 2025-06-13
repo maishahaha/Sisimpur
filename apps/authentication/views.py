@@ -75,42 +75,56 @@ def signupin(request):
 
 def handle_login(request):
     """Handle user login"""
+    print(f"DEBUG: handle_login called")
     email = request.POST.get('email', '').strip()
     password = request.POST.get('password', '')
 
+    print(f"DEBUG: Login attempt - email={email}, password_provided={bool(password)}")
+
     # Validate input
     if not email or not password:
+        print(f"DEBUG: Login validation failed - missing email or password")
         messages.error(request, "Please enter both email and password.")
         return render(request, "signupin.html")
 
     # Validate Gmail requirement
-    if not email.endswith('@gmail.com'):
-        messages.error(request, "Only Gmail addresses (@gmail.com) are allowed.")
+    if not (email.endswith('@gmail.com') or email.endswith('@googlemail.com')):
+        messages.error(request, "Only Gmail addresses (@gmail.com or @googlemail.com) are allowed.")
         return render(request, "signupin.html")
 
     # Find user by email and authenticate
     try:
         user_obj = User.objects.get(email=email)
+        print(f"DEBUG: Found user object - username={user_obj.username}, is_active={user_obj.is_active}")
         user = authenticate(request, username=user_obj.username, password=password)
+        print(f"DEBUG: Authentication result - user={user}")
     except User.DoesNotExist:
+        print(f"DEBUG: User not found for email={email}")
         user = None
 
     if user is not None:
         if user.is_active:
+            print(f"DEBUG: User is active, logging in")
             login(request, user)
 
             # Send Discord webhook notification for normal sign in
-            send_normal_signin_webhook(user)
+            try:
+                send_normal_signin_webhook(user)
+            except Exception as e:
+                print(f"DEBUG: Webhook error: {e}")
 
             messages.success(request, f"Welcome back, {user.get_full_name() or user.email}!")
 
             # Redirect to next page if specified, otherwise dashboard
             next_page = request.GET.get('next', 'dashboard:home')
+            print(f"DEBUG: Redirecting to {next_page}")
             return redirect(next_page)
         else:
+            print(f"DEBUG: User account is disabled")
             messages.error(request, "Your account has been disabled.")
             return render(request, "signupin.html")
     else:
+        print(f"DEBUG: Authentication failed - invalid credentials")
         messages.error(request, "Invalid email or password.")
         return render(request, "signupin.html")
 
@@ -148,8 +162,8 @@ def handle_signup(request):
 
     if not email:
         errors.append("Email is required.")
-    elif not email.endswith('@gmail.com'):
-        errors.append("Only Gmail addresses (@gmail.com) are allowed.")
+    elif not (email.endswith('@gmail.com') or email.endswith('@googlemail.com')):
+        errors.append("Only Gmail addresses (@gmail.com or @googlemail.com) are allowed.")
 
     if not password:
         errors.append("Password is required.")
