@@ -471,9 +471,9 @@ def send_otp_ajax(request):
         logger.info(f"Request from IP: {client_ip}")
 
         # Validate email
-        if not email or not email.endswith('@gmail.com'):
+        if not email or not (email.endswith('@gmail.com') or email.endswith('@googlemail.com')):
             logger.warning(f"Invalid email format: {email}")
-            return JsonResponse({'success': False, 'message': 'Only Gmail addresses are allowed'})
+            return JsonResponse({'success': False, 'message': 'Only Gmail addresses (@gmail.com or @googlemail.com) are allowed'})
 
         # Check rate limiting
         from .models import OTPRateLimit
