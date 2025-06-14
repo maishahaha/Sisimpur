@@ -10,9 +10,9 @@ urlpatterns = [
     path("healthz/", health_check, name="health_check"),  # Health check endpoint
     path("health/", health_check, name="health_check_alt"),  # Alternative health check
     path("ping/", health_check, name="ping"),  # Simple ping endpoint
-    path("", include("frontend.urls")),
-    path("auth/", include("authentication.urls")),
-    path("app/", include("dashboard.urls")),
+    path("", include("apps.frontend.urls")),
+    path("auth/", include("apps.authentication.urls")),
+    path("app/", include("apps.dashboard.urls")),
     path("api/brain/", include("apps.brain.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

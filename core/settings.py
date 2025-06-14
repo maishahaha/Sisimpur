@@ -69,9 +69,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",  # Required for social auth
-    "authentication",
-    "frontend",
-    "dashboard",
+    "apps.authentication",
+    "apps.frontend",
+    "apps.dashboard",
     "apps.brain",  # AI processing engine
 ]
 

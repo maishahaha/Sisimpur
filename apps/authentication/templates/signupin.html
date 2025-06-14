@@ -22,7 +22,7 @@
       <a class="logo" href="{% url 'home' %}">SISIMPUR</a>
       <h4>Welcome Back!</h4>
       <div class="input-box">
-        <input type="email" name="email" placeholder="Gmail Address" required pattern="[a-zA-Z0-9._%+-]+@gmail\.com$" title="Please enter a valid Gmail address" />
+        <input type="email" name="email" placeholder="Gmail Address" required pattern="[a-zA-Z0-9._%+\-]+@(gmail|googlemail)\.com" title="Please enter a valid Gmail address" />
         <i class="bx bxs-envelope"></i>
       </div>
       <div class="input-box">
@@ -37,7 +37,7 @@
       <div class="forget-link">
         <a href="#">Forgot Password?</a>
       </div>
-      <button type="submit" class="btn">Sign In</button>
+      <button type="button" class="btn" onclick="handleLoginClick(this)">Sign In</button>
 
       <p>Or Sign In With</p>
       <div class="social-icons">
@@ -69,11 +69,11 @@
       </a>
       <h4>Create an Account</h4>
       <div class="input-box">
-        <input type="email" name="email" placeholder="Gmail Address (required)" required pattern="[a-zA-Z0-9._%+-]+@gmail\.com$" title="Please enter a valid Gmail address" id="emailInput" />
+        <input type="email" name="email" placeholder="Gmail Address (required)" required pattern="[a-zA-Z0-9._%+\-]+@(gmail|googlemail)\.com" title="Please enter a valid Gmail address" id="emailInput" />
         <i class="bx bxs-envelope"></i>
       </div>
       <div style="font-size: 12px; color: #666; margin-top: -10px; margin-bottom: 15px; text-align: center;">
-        <i class="bx bx-info-circle"></i> Only Gmail addresses (@gmail.com) are accepted
+        <i class="bx bx-info-circle"></i> Only Gmail addresses (@gmail.com or @googlemail.com) are accepted
       </div>
 
       <!-- Send OTP Button -->
@@ -176,10 +176,184 @@
 <script src="{% static 'js/signupin.js' %}"></script>
 <script src="{% static 'js/background.js' %}"></script>
 
+<!-- Simple Login Handler - Isolated Script -->
+<script>
+console.log('DEBUG: Login script loading...');
+
+function handleLoginClick(button) {
+    console.log('DEBUG: handleLoginClick called');
+
+    try {
+        const email = document.querySelector('.form-box.login input[name="email"]').value.trim();
+        const password = document.querySelector('.form-box.login input[name="password"]').value;
+        const csrfToken = document.querySelector('.form-box.login input[name="csrfmiddlewaretoken"]').value;
+
+        console.log('DEBUG: Login data:', { email, password: password ? '***' : 'empty', csrfToken: csrfToken ? 'found' : 'missing' });
+
+        if (!email || !password) {
+            alert('Please enter both email and password');
+            return;
+        }
+
+        button.disabled = true;
+        button.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Signing In...';
+
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('action', 'login');
+        formData.append('csrfmiddlewaretoken', csrfToken);
+
+        console.log('DEBUG: Submitting login');
+
+        fetch('/auth/signupin/', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            console.log('DEBUG: Response:', response.status, response.redirected);
+            if (response.redirected) {
+                console.log('DEBUG: Redirecting to:', response.url);
+                window.location.href = response.url;
+                return;
+            }
+            return response.text();
+        })
+        .then(html => {
+            if (html) {
+                console.log('DEBUG: Got HTML response, checking for errors');
+                if (html.includes('Invalid email or password') || html.includes('error')) {
+                    alert('Login failed: Invalid email or password');
+                } else {
+                    alert('Login failed: Unexpected response');
+                }
+            }
+            button.disabled = false;
+            button.innerHTML = 'Sign In';
+        })
+        .catch(error => {
+            console.error('DEBUG: Login error:', error);
+            alert('Login failed: ' + error.message);
+            button.disabled = false;
+            button.innerHTML = 'Sign In';
+        });
+    } catch (error) {
+        console.error('DEBUG: Error in handleLoginClick:', error);
+        alert('Login error: ' + error.message);
+        button.disabled = false;
+        button.innerHTML = 'Sign In';
+    }
+}
+
+console.log('DEBUG: handleLoginClick function defined:', typeof handleLoginClick);
+window.handleLoginClick = handleLoginClick;
+console.log('DEBUG: handleLoginClick added to window:', typeof window.handleLoginClick);
+</script>
+
 <!-- OTP Verification Script -->
 <script>
+// Global function to force login submission (defined outside DOMContentLoaded)
+console.log('DEBUG: Defining forceLoginSubmit function');
+window.forceLoginSubmit = function(button) {
+    console.log('DEBUG: forceLoginSubmit called');
+
+    const loginForm = document.querySelector('.form-box.login form');
+    if (!loginForm) {
+        console.error('DEBUG: Login form not found in forceLoginSubmit');
+        return;
+    }
+
+    const email = loginForm.querySelector('input[name="email"]').value.trim();
+    const password = loginForm.querySelector('input[name="password"]').value;
+    const csrfToken = loginForm.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+    console.log('DEBUG: Login data:', { email, password: password ? '***' : 'empty', csrfToken: csrfToken ? 'found' : 'missing' });
+
+    // Validate inputs
+    if (!email || !password) {
+        alert('Please enter both email and password');
+        return;
+    }
+
+    // Disable button to prevent double submission
+    button.disabled = true;
+    button.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Signing In...';
+
+    // Create form data
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('action', 'login');
+    formData.append('csrfmiddlewaretoken', csrfToken);
+
+    console.log('DEBUG: Submitting login via fetch');
+
+    // Submit via fetch
+    fetch('/auth/signupin/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': csrfToken
+        }
+    })
+    .then(response => {
+        console.log('DEBUG: Login response received:', response);
+        console.log('DEBUG: Response status:', response.status);
+        console.log('DEBUG: Response redirected:', response.redirected);
+        console.log('DEBUG: Response URL:', response.url);
+
+        if (response.redirected) {
+            console.log('DEBUG: Login successful, redirecting to:', response.url);
+            window.location.href = response.url;
+            return;
+        }
+
+        return response.text();
+    })
+    .then(html => {
+        if (html) {
+            console.log('DEBUG: Login response HTML received');
+
+            // Parse response for error messages
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const errorMessages = doc.querySelectorAll('.django-message[data-type="error"], .alert-danger');
+
+            if (errorMessages.length > 0) {
+                const errorText = Array.from(errorMessages).map(msg => msg.textContent.trim()).join('. ');
+                console.log('DEBUG: Login error:', errorText);
+
+                if (typeof window.showToast === 'function') {
+                    window.showToast('error', 'Login Failed', errorText);
+                } else {
+                    alert('Login failed: ' + errorText);
+                }
+            } else {
+                console.log('DEBUG: No error messages found, checking for success');
+                // If no errors but also no redirect, something went wrong
+                alert('Login failed: Unexpected response');
+            }
+        }
+
+        // Re-enable button
+        button.disabled = false;
+        button.innerHTML = 'Sign In';
+    })
+    .catch(error => {
+        console.error('DEBUG: Login fetch error:', error);
+        alert('Login failed: ' + error.message);
+
+        // Re-enable button
+        button.disabled = false;
+        button.innerHTML = 'Sign In';
+    });
+};
+
+console.log('DEBUG: forceLoginSubmit function defined:', typeof window.forceLoginSubmit);
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('OTP Script loaded');
+    console.log('DEBUG: forceLoginSubmit available in DOMContentLoaded:', typeof window.forceLoginSubmit);
 
     const sendOtpBtn = document.getElementById('sendOtpBtn');
     const otpSection = document.getElementById('otpSection');
@@ -196,8 +370,20 @@ document.addEventListener('DOMContentLoaded', function() {
         otpSection: !!otpSection,
         otpInput: !!otpInput,
         verifyOtpBtn: !!verifyOtpBtn,
-        emailInput: !!emailInput
+        emailInput: !!emailInput,
+        signupBtn: !!signupBtn,
+        otpStatus: !!otpStatus,
+        emailVerified: !!emailVerified
     });
+
+    // Test if button is clickable
+    if (sendOtpBtn) {
+        console.log('Send OTP button found, adding test click handler');
+        sendOtpBtn.style.border = '2px solid red'; // Visual indicator for debugging
+        setTimeout(() => {
+            sendOtpBtn.style.border = ''; // Remove after 3 seconds
+        }, 3000);
+    }
 
     let otpSent = false;
     let emailVerifiedStatus = false;
@@ -212,38 +398,57 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Validate inputs
             if (!email) {
+                console.log('DEBUG: Email validation failed - empty email');
                 showStatus('Please enter your email address', 'error');
                 return;
             }
 
-            if (!email.endsWith('@gmail.com')) {
-                showStatus('Only Gmail addresses are allowed', 'error');
+            if (!email.endsWith('@gmail.com') && !email.endsWith('@googlemail.com')) {
+                console.log('DEBUG: Email validation failed - not Gmail domain');
+                showStatus('Only Gmail addresses (@gmail.com or @googlemail.com) are allowed', 'error');
                 return;
             }
+
+            console.log('DEBUG: Email validation passed, proceeding with OTP request');
 
             // Send OTP request
             sendOtpBtn.disabled = true;
             sendOtpBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Sending...';
 
-            console.log('Making AJAX request to send OTP');
+            console.log('DEBUG: Button disabled, making AJAX request to send OTP');
 
             // Make AJAX request to send OTP
-            fetch('{% url "auth:send_otp" %}', {
+            const otpUrl = '{% url "auth:send_otp" %}';
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            console.log('DEBUG: OTP URL:', otpUrl);
+            console.log('DEBUG: CSRF Token:', csrfToken ? 'Found' : 'Missing');
+            console.log('DEBUG: Request payload:', { email: email });
+
+            fetch(otpUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    'X-CSRFToken': csrfToken
                 },
                 body: JSON.stringify({
                     email: email
                 })
             })
             .then(response => {
-                console.log('Response received:', response);
+                console.log('DEBUG: Response received:', response);
+                console.log('DEBUG: Response status:', response.status);
+                console.log('DEBUG: Response ok:', response.ok);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 return response.json();
             })
             .then(data => {
-                console.log('Response data:', data);
+                console.log('DEBUG: Response data:', data);
+                console.log('DEBUG: Data type:', typeof data);
+                console.log('DEBUG: Data success:', data.success);
                 if (data.success) {
                     otpSent = true;
                     console.log('Showing OTP section');
@@ -267,8 +472,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                showStatus('Error sending verification code', 'error');
+                console.error('DEBUG: Fetch error:', error);
+                console.error('DEBUG: Error message:', error.message);
+                console.error('DEBUG: Error stack:', error.stack);
+                showStatus('Error sending verification code: ' + error.message, 'error');
                 sendOtpBtn.disabled = false;
                 sendOtpBtn.innerHTML = '<i class="bx bx-mail-send"></i> Send Verification Code';
             });
@@ -278,7 +485,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Verify OTP functionality
-    verifyOtpBtn.addEventListener('click', function() {
+    if (verifyOtpBtn) {
+        verifyOtpBtn.addEventListener('click', function() {
         const otpCode = otpInput.value.trim();
 
         if (!otpCode || otpCode.length !== 6) {
@@ -333,16 +541,21 @@ document.addEventListener('DOMContentLoaded', function() {
             verifyOtpBtn.innerHTML = '<i class="bx bx-check"></i> Verify';
         });
     });
+    } else {
+        console.error('Verify OTP button not found!');
+    }
 
     // Auto-format OTP input
-    otpInput.addEventListener('input', function() {
-        this.value = this.value.replace(/[^0-9]/g, '');
-        if (this.value.length === 6) {
-            verifyOtpBtn.click();
-        }
-    });
+    if (otpInput) {
+        otpInput.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length === 6 && verifyOtpBtn) {
+                verifyOtpBtn.click();
+            }
+        });
+    }
 
-    // Add signup button click handler for debugging
+    // Add signup button click handler to trigger form submission
     if (signupBtn) {
         signupBtn.addEventListener('click', function(e) {
             console.log('DEBUG: Signup button clicked');
@@ -360,11 +573,22 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show loading state ONLY after validation passes
             this.disabled = true;
             this.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Creating Account...';
+
+            // Trigger form submission
+            console.log('DEBUG: Triggering form submission');
+            const form = document.querySelector('.form-box.register form');
+            if (form) {
+                // Create and dispatch a submit event
+                const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+                form.dispatchEvent(submitEvent);
+            } else {
+                console.error('DEBUG: Form not found!');
+            }
         });
     }
 
-    // Prevent form submission if email not verified
-    document.querySelector('form').addEventListener('submit', function(e) {
+    // Handle form submission with AJAX for better UX
+    document.querySelector('.form-box.register form').addEventListener('submit', function(e) {
         console.log('DEBUG: Form submission attempted');
         console.log('DEBUG: emailVerifiedStatus =', emailVerifiedStatus);
 
@@ -376,7 +600,113 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         console.log('DEBUG: Form submission allowed - email verified');
-        // Form will submit normally
+
+        // Prevent default form submission to handle with AJAX
+        e.preventDefault();
+
+        // Get form data
+        const formData = new FormData(this);
+
+        // Submit form via AJAX
+        const actionUrl = this.getAttribute('action');
+        console.log('DEBUG: Form action URL:', actionUrl);
+
+        fetch(actionUrl, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => {
+            console.log('DEBUG: Signup response received:', response);
+
+            if (response.redirected) {
+                // Successful signup - redirect to dashboard
+                console.log('DEBUG: Signup successful, redirecting to:', response.url);
+                window.location.href = response.url;
+                return;
+            }
+
+            return response.text();
+        })
+        .then(html => {
+            if (html) {
+                // Parse response to check for error messages
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const errorMessages = doc.querySelectorAll('.alert-danger, .error, .django-message[data-type="error"]');
+
+                if (errorMessages.length > 0) {
+                    // Collect all error messages
+                    const errorTexts = Array.from(errorMessages).map(msg => msg.textContent.trim());
+                    const errorText = errorTexts.join('. ');
+                    console.log('DEBUG: Signup error:', errorText);
+                    console.log('DEBUG: showToast function available:', typeof window.showToast);
+
+                    // Always use showToast if available, otherwise fallback
+                    if (typeof window.showToast === 'function') {
+                        window.showToast('error', 'Signup Failed', errorText);
+                    } else {
+                        console.log('DEBUG: showToast not available, trying with delay');
+                        // Try again after a short delay in case toast system is still loading
+                        setTimeout(() => {
+                            if (typeof window.showToast === 'function') {
+                                window.showToast('error', 'Signup Failed', errorText);
+                            } else {
+                                console.log('DEBUG: showToast still not available, using fallback');
+                                showStatus(errorText, 'error');
+                            }
+                        }, 100);
+                    }
+                } else {
+                    // Check for success messages
+                    const successMessages = doc.querySelectorAll('.alert-success, .success, .django-message[data-type="success"]');
+                    if (successMessages.length > 0) {
+                        const successText = successMessages[0].textContent.trim();
+                        console.log('DEBUG: Signup success:', successText);
+
+                        if (typeof window.showToast === 'function') {
+                            window.showToast('success', 'Welcome!', successText);
+                        } else {
+                            setTimeout(() => {
+                                if (typeof window.showToast === 'function') {
+                                    window.showToast('success', 'Welcome!', successText);
+                                }
+                            }, 100);
+                        }
+
+                        // Redirect to dashboard after showing success message
+                        setTimeout(() => {
+                            window.location.href = '/app/';
+                        }, 1500);
+                    }
+                }
+
+                // Re-enable signup button
+                signupBtn.disabled = false;
+                signupBtn.innerHTML = '<i class="bx bx-user-plus"></i> Sign Up';
+            }
+        })
+        .catch(error => {
+            console.error('DEBUG: Signup error:', error);
+
+            if (typeof window.showToast === 'function') {
+                window.showToast('error', 'Signup Failed', 'An error occurred during signup. Please try again.');
+            } else {
+                setTimeout(() => {
+                    if (typeof window.showToast === 'function') {
+                        window.showToast('error', 'Signup Failed', 'An error occurred during signup. Please try again.');
+                    } else {
+                        showStatus('An error occurred during signup. Please try again.', 'error');
+                    }
+                }, 100);
+            }
+
+            // Re-enable signup button
+            signupBtn.disabled = false;
+            signupBtn.innerHTML = '<i class="bx bx-user-plus"></i> Sign Up';
+        });
     });
 
     // Helper functions
@@ -428,6 +758,158 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Debug: OTP section not found!');
         }
     };
+
+    // Add debugging for login form
+    const loginForm = document.querySelector('.form-box.login form');
+    if (loginForm) {
+        console.log('DEBUG: Login form found, adding event listeners');
+
+        // Check if login button is being disabled by something
+        const loginButton = loginForm.querySelector('button[type="submit"]');
+        if (loginButton) {
+            console.log('DEBUG: Initial login button state - disabled:', loginButton.disabled);
+
+            // Monitor for changes to the disabled property
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'disabled') {
+                        console.log('DEBUG: Login button disabled state changed to:', loginButton.disabled);
+                        console.trace('DEBUG: Stack trace for button disable:');
+                    }
+                });
+            });
+            observer.observe(loginButton, { attributes: true });
+
+            // Force enable the button
+            loginButton.disabled = false;
+            console.log('DEBUG: Forced login button to enabled state');
+        }
+
+        loginForm.addEventListener('submit', function(e) {
+            console.log('DEBUG: Login form submitted');
+            console.log('DEBUG: Form action:', this.action);
+            console.log('DEBUG: Form method:', this.method);
+            console.log('DEBUG: Event defaultPrevented:', e.defaultPrevented);
+            console.log('DEBUG: Event cancelable:', e.cancelable);
+
+            const formData = new FormData(this);
+            console.log('DEBUG: Form data:');
+            for (let [key, value] of formData.entries()) {
+                console.log(`  ${key}: ${value}`);
+            }
+
+            // Check if something else prevented the default
+            if (e.defaultPrevented) {
+                console.log('DEBUG: Form submission was prevented by another handler');
+                console.log('DEBUG: Forcing form submission');
+                e.preventDefault = function() { console.log('DEBUG: Prevented preventDefault call'); };
+                this.submit();
+                return false;
+            }
+
+            // Let the form submit normally - don't prevent default
+            console.log('DEBUG: Allowing normal form submission');
+        });
+
+        const loginButton = loginForm.querySelector('button[type="submit"]');
+        if (loginButton) {
+            console.log('DEBUG: Login button found, initial state - disabled:', loginButton.disabled);
+
+            loginButton.addEventListener('click', function(e) {
+                console.log('DEBUG: Login button clicked');
+                console.log('DEBUG: Button type:', this.type);
+                console.log('DEBUG: Button disabled:', this.disabled);
+                console.log('DEBUG: Event default prevented?', e.defaultPrevented);
+
+                // Check if button is disabled and re-enable it
+                if (this.disabled) {
+                    console.log('DEBUG: Button was disabled, re-enabling it');
+                    this.disabled = false;
+                }
+
+                // Force form submission if needed
+                console.log('DEBUG: Attempting to submit form manually');
+                setTimeout(() => {
+                    if (!e.defaultPrevented) {
+                        console.log('DEBUG: Manually triggering form submit');
+                        loginForm.submit();
+                    }
+                }, 100);
+            });
+        }
+    } else {
+        console.error('DEBUG: Login form not found!');
+    }
+
+    // Add event listener for login button
+    const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+    console.log('DEBUG: Looking for login button with ID "loginSubmitBtn"');
+    console.log('DEBUG: Button found:', !!loginSubmitBtn);
+
+    if (loginSubmitBtn) {
+        console.log('DEBUG: Login submit button found, adding event listener');
+        console.log('DEBUG: Button element:', loginSubmitBtn);
+
+        // Add visual indicator that the button is ready
+        loginSubmitBtn.style.border = '2px solid green';
+        setTimeout(() => {
+            loginSubmitBtn.style.border = '';
+        }, 3000);
+
+        loginSubmitBtn.addEventListener('click', function(e) {
+            console.log('DEBUG: Login button clicked via event listener');
+            console.log('DEBUG: Event:', e);
+            console.log('DEBUG: Button:', this);
+
+            if (typeof window.forceLoginSubmit === 'function') {
+                console.log('DEBUG: Calling forceLoginSubmit function');
+                window.forceLoginSubmit(this);
+            } else {
+                console.error('DEBUG: forceLoginSubmit function not found!');
+                console.log('DEBUG: Available functions:', Object.keys(window).filter(key => key.includes('force')));
+                alert('Login function not available. Please refresh the page.');
+            }
+        });
+
+        // Also add a backup onclick handler
+        loginSubmitBtn.onclick = function() {
+            console.log('DEBUG: Login button clicked via onclick backup');
+            if (typeof window.forceLoginSubmit === 'function') {
+                window.forceLoginSubmit(this);
+            }
+        };
+
+    } else {
+        console.error('DEBUG: Login submit button not found!');
+        console.log('DEBUG: Available elements with "login" in ID:');
+        const allElements = document.querySelectorAll('[id*="login"], [class*="login"]');
+        allElements.forEach(el => {
+            console.log('  -', el.tagName, el.id, el.className);
+        });
+    }
+
+    // Backup: Add click handler to any button in login form
+    const loginFormButtons = document.querySelectorAll('.form-box.login button');
+    console.log('DEBUG: Found login form buttons:', loginFormButtons.length);
+
+    loginFormButtons.forEach((button, index) => {
+        console.log(`DEBUG: Login button ${index}:`, button.textContent.trim(), button.id, button.type);
+
+        if (!button.id) {
+            console.log('DEBUG: Adding backup click handler to button without ID');
+            button.addEventListener('click', function(e) {
+                console.log('DEBUG: Backup login button clicked');
+                e.preventDefault();
+
+                if (typeof window.forceLoginSubmit === 'function') {
+                    console.log('DEBUG: Calling forceLoginSubmit from backup handler');
+                    window.forceLoginSubmit(this);
+                } else {
+                    console.error('DEBUG: forceLoginSubmit not available in backup handler');
+                }
+            });
+        }
+    });
 });
 </script>
 
