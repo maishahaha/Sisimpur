@@ -6,6 +6,9 @@ Django==5.0.9
 django_browser_reload
 python-dotenv
 
+# Discord webhook integration
+discord-webhook
+
 # Google APIs and AI
 google_api_python_client
 google_auth_oauthlib

@@ -342,13 +342,41 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Add signup button click handler for debugging
+    if (signupBtn) {
+        signupBtn.addEventListener('click', function(e) {
+            console.log('DEBUG: Signup button clicked');
+            console.log('DEBUG: Button disabled?', this.disabled);
+            console.log('DEBUG: emailVerifiedStatus =', emailVerifiedStatus);
+
+            if (!emailVerifiedStatus) {
+                console.log('DEBUG: Preventing click - email not verified');
+                e.preventDefault();
+                showStatus('Please verify your email first', 'error');
+                return false;
+            }
+
+            console.log('DEBUG: Button click allowed - email verified');
+            // Show loading state ONLY after validation passes
+            this.disabled = true;
+            this.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Creating Account...';
+        });
+    }
+
     // Prevent form submission if email not verified
     document.querySelector('form').addEventListener('submit', function(e) {
+        console.log('DEBUG: Form submission attempted');
+        console.log('DEBUG: emailVerifiedStatus =', emailVerifiedStatus);
+
         if (!emailVerifiedStatus) {
+            console.log('DEBUG: Preventing form submission - email not verified');
             e.preventDefault();
             showStatus('Please verify your email first', 'error');
             return false;
         }
+
+        console.log('DEBUG: Form submission allowed - email verified');
+        // Form will submit normally
     });
 
     // Helper functions

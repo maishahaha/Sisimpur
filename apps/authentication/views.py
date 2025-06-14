@@ -12,6 +12,13 @@ from googleapiclient.discovery import build
 import os
 import re
 import json
+from apps.utils import (
+    send_webhook,
+    send_user_signup_webhook,
+    send_user_login_webhook,
+    send_normal_signin_webhook,
+    send_google_signin_webhook
+)
 
 # Get the User model
 User = get_user_model()
@@ -65,6 +72,7 @@ def signupin(request):
 
     return render(request, "signupin.html")
 
+
 def handle_login(request):
     """Handle user login"""
     email = request.POST.get('email', '').strip()
@@ -90,6 +98,10 @@ def handle_login(request):
     if user is not None:
         if user.is_active:
             login(request, user)
+
+            # Send Discord webhook notification for normal sign in
+            send_normal_signin_webhook(user)
+
             messages.success(request, f"Welcome back, {user.get_full_name() or user.email}!")
 
             # Redirect to next page if specified, otherwise dashboard
@@ -104,13 +116,19 @@ def handle_login(request):
 
 def handle_signup(request):
     """Handle user registration - final step after OTP verification"""
+    print(f"DEBUG: handle_signup called")
+
     email = request.POST.get('email', '').strip()
     password = request.POST.get('password', '')
     password_confirm = request.POST.get('password_confirm', '')
     email_verified = request.POST.get('email_verified', 'false')
 
+    print(f"DEBUG: email={email}, email_verified={email_verified}")
+    print(f"DEBUG: session data - pending_user_id={request.session.get('pending_user_id')}, pending_email={request.session.get('pending_email')}")
+
     # Check if email is verified
     if email_verified != 'true':
+        print(f"DEBUG: Email not verified, email_verified={email_verified}")
         messages.error(request, "Please verify your email first.")
         return render(request, "signupin.html")
 
@@ -118,7 +136,10 @@ def handle_signup(request):
     pending_user_id = request.session.get('pending_user_id')
     pending_email = request.session.get('pending_email')
 
+    print(f"DEBUG: Retrieved from session - pending_user_id={pending_user_id}, pending_email={pending_email}")
+
     if not pending_user_id or pending_email != email:
+        print(f"DEBUG: Session validation failed - pending_user_id={pending_user_id}, pending_email={pending_email}, form_email={email}")
         messages.error(request, "Invalid verification session. Please start over.")
         return render(request, "signupin.html")
 
@@ -150,9 +171,12 @@ def handle_signup(request):
 
     # Update the user with the final password and activate
     try:
+        print(f"DEBUG: Looking for user with id={pending_user_id}, email={email}, is_active=True")
         user = User.objects.get(id=pending_user_id, email=email, is_active=True)
+        print(f"DEBUG: Found user: {user.username}, setting password")
         user.set_password(password)
         user.save()
+        print(f"DEBUG: Password set and user saved")
 
         # Clear session data
         request.session.pop('pending_user_id', None)
@@ -164,6 +188,15 @@ def handle_signup(request):
 
         # Log the user in
         login(request, user)
+
+        # Send Discord webhook notification
+        try:
+            print(f"DEBUG: Sending Discord webhook for user signup")
+            webhook_result = send_user_signup_webhook(user)
+            print(f"DEBUG: Webhook result: {webhook_result}")
+        except Exception as webhook_error:
+            print(f"DEBUG: Webhook error: {str(webhook_error)}")
+            # Don't let webhook errors break the signup process
         messages.success(request, f"Welcome to Sisimpur, {user.email}! Your account has been created successfully.")
         return redirect('dashboard:home')
 
@@ -211,7 +244,6 @@ def google_login(request):
         
         # Store state in session
         request.session['state'] = state
-        
         return redirect(authorization_url)
     except Exception as e:
         messages.error(request, f"Error initiating Google login: {str(e)}")
@@ -276,6 +308,9 @@ def google_callback(request):
         
         # Log the user in
         login(request, user)
+
+        # Send Discord webhook notification
+        send_google_signin_webhook(user)
         messages.success(request, f"Welcome {user.get_full_name() or user.username}!")
         return redirect('dashboard:home')
         
@@ -529,9 +564,13 @@ def verify_otp_ajax(request):
             ).latest('created_at')
 
             if otp.verify(otp_code):
-                # Activate the user
+                # Activate the user but keep session data for final signup step
                 user.is_active = True
                 user.save()
+
+                # DON'T clear session data here - keep it for final signup step
+                # Session data will be cleared in handle_signup after password is set
+
                 return JsonResponse({'success': True, 'message': 'Email verified successfully'})
             else:
                 if otp.is_expired():

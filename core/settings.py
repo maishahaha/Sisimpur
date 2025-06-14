@@ -44,13 +44,13 @@ WEBSITE_HOST = "defang.dev" # Set the website host [defang.dev, localhost]
 if WEBSITE_HOST == "defang.dev":
     WEBSITE_URL = "https://arpan8925-web--8000.prod1.defang.dev"
 elif WEBSITE_HOST == "localhost":
-    WEBSITE_URL = "http://127.0.0.1:8000"
+    WEBSITE_URL = "http://localhost:8000"
+
+GOOGLE_OAUTH2_REDIRECT_URI = f'{WEBSITE_URL}/auth/google-callback/'
 
 # Google OAuth2 settings
 GOOGLE_OAUTH2_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID')
 GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET')
-
-GOOGLE_OAUTH2_REDIRECT_URI = f'{WEBSITE_URL}/auth/google-callback/'
 
 # Allow insecure transport for OAuth in development
 if DEBUG:

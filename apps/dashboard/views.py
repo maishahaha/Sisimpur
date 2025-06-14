@@ -9,6 +9,7 @@ import uuid
 import random
 import json
 from .models import ExamSession
+from apps.utils import send_document_processing_success_webhook, send_document_processing_failed_webhook, send_exam_completion_webhook
 
 @login_required(login_url='auth:signupin')
 def home(request):
@@ -310,6 +311,10 @@ def api_process_document(request):
             # Mark job as completed
             job.mark_completed()
 
+            # Send Discord webhook for successful processing
+            questions_count = len(qa_data.get('questions', []))
+            send_document_processing_success_webhook(request.user, job, questions_count)
+
             # Prepare form settings and detected values for response
             form_settings = {
                 'selected_language': language,
@@ -330,7 +335,7 @@ def api_process_document(request):
                 'success': True,
                 'job_id': job.id,
                 'message': 'Document processed successfully',
-                'questions_generated': len(qa_data.get('questions', [])),
+                'questions_generated': questions_count,
                 'form_settings': form_settings,
                 'detected_values': detected_values,
             })
@@ -338,6 +343,10 @@ def api_process_document(request):
         except Exception as processing_error:
             # Mark job as failed
             job.mark_failed(str(processing_error))
+
+            # Send Discord webhook for failed processing
+            send_document_processing_failed_webhook(request.user, job, str(processing_error))
+
             return JsonResponse({
                 'success': False,
                 'error': f'Processing failed: {str(processing_error)}'
@@ -600,6 +609,10 @@ def exam_session(request, session_id):
             exam_session.completed_at = timezone.now()
             exam_session.calculate_score()
             exam_session.save()
+
+            # Send Discord webhook for exam completion
+            send_exam_completion_webhook(request.user, exam_session)
+
             return redirect('dashboard:exam_result', session_id=session_id)
 
         question_id = exam_session.questions_order[current_index]
@@ -665,6 +678,10 @@ def exam_session(request, session_id):
                 exam_session.completed_at = timezone.now()
                 exam_session.calculate_score()
                 exam_session.save()
+
+                # Send Discord webhook for exam completion
+                send_exam_completion_webhook(request.user, exam_session)
+
                 return redirect('dashboard:exam_result', session_id=session_id)
 
             return redirect('dashboard:exam_session', session_id=session_id)
@@ -711,6 +728,9 @@ def submit_exam(request, session_id):
             exam_session.completed_at = timezone.now()
             exam_session.calculate_score()
             exam_session.save()
+
+            # Send Discord webhook for exam completion
+            send_exam_completion_webhook(request.user, exam_session)
 
         return redirect('dashboard:exam_result', session_id=session_id)
 
