@@ -180,7 +180,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Coming soon mode
-COMING_SOON = False
+COMING_SOON = True
 
 # Add SITE_ID setting
 SITE_ID = 1
