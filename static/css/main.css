@@ -9,6 +9,8 @@
   --glass-border: rgba(255, 255, 255, 0.1);
 }
 
+
+
 body {
   background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
   color: var(--light);
