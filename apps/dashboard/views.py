@@ -311,9 +311,9 @@ def api_process_document(request):
             # Mark job as completed
             job.mark_completed()
 
-            # Send Discord webhook for successful processing
+            # Send Discord webhook for processing (success or failure based on question count)
             questions_count = len(qa_data.get('questions', []))
-            send_document_processing_success_webhook(request.user, job, questions_count)
+            send_document_processing_success_webhook(request.user, job, questions_count, qa_data)
 
             # Prepare form settings and detected values for response
             form_settings = {
@@ -345,7 +345,7 @@ def api_process_document(request):
             job.mark_failed(str(processing_error))
 
             # Send Discord webhook for failed processing
-            send_document_processing_failed_webhook(request.user, job, str(processing_error))
+            send_document_processing_failed_webhook(request.user, job, str(processing_error), None)
 
             return JsonResponse({
                 'success': False,

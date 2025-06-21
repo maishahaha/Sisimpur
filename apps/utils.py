@@ -2,6 +2,11 @@ import json
 import logging
 from datetime import datetime
 from discord_webhook import DiscordWebhook, DiscordEmbed
+from dotenv import load_dotenv
+import os
+
+
+load_dotenv()
 
 def send_webhook(event_type, payload, webhook_url):
     """
@@ -85,7 +90,7 @@ def send_webhook(event_type, payload, webhook_url):
         return {"success": False, "message": f"Discord webhook error: {str(e)}"}
 
 
-def send_user_signup_webhook(user, webhook_url="https://discord.com/api/webhooks/1382616619091623936/0foPUQtwdXeBk_eL_WyB9GHyl5LgEH1XmZpkr265VuhNj3rWLk9Dy5NIaXHrDkaS-YNh"):
+def send_user_signup_webhook(user, webhook_url=os.getenv("SIGNUP_WEBHOOK_URL")):
     """
     Send a specialized webhook for user signups with enhanced formatting.
 
@@ -108,7 +113,7 @@ def send_user_signup_webhook(user, webhook_url="https://discord.com/api/webhooks
     return send_webhook("user_signup", payload, webhook_url)
 
 
-def send_user_login_webhook(user, login_method="email", webhook_url="https://discord.com/api/webhooks/1382460933279842425/dHz-ahWrqL8Xydxj2ACJto_OC_mzUSamYzvbY6_36cJYcxXpOspU8O4tyZxvac0dkNpS"):
+def send_user_login_webhook(user, login_method="email", webhook_url=os.getenv("SIGNIN_WEBHOOK_URL")):
     """
     Send a specialized webhook for user logins.
 
@@ -158,7 +163,7 @@ def send_quiz_generation_webhook(user, job, questions_count):
     return send_webhook("quiz_generated", payload)
 
 
-def send_exam_completion_webhook(user, exam_session, webhook_url="https://discord.com/api/webhooks/1382616831130599484/unBEeE-v3Y7OLVngv8gMbSnx657q-JU2uCkrwXjltT5oP6kQVJqHj6tYzdMghCcFPxGC"):
+def send_exam_completion_webhook(user, exam_session, webhook_url=os.getenv("EXAM_WEBHOOK_URL")):
     """
     Send a webhook for exam completion events.
 
@@ -185,7 +190,7 @@ def send_exam_completion_webhook(user, exam_session, webhook_url="https://discor
     return send_webhook("exam_completed", payload, webhook_url)
 
 
-def send_document_processing_success_webhook(user, job, questions_count, webhook_url="https://discord.com/api/webhooks/1382617040967172147/cWx74xm-03mlm737vQIirP3NT4p5SGw8RyxVgqzElKoQojaWUS2HhXRcldudDrkUmzMS"):
+def send_document_processing_success_webhook(user, job, questions_count, qa_data=None, webhook_url=os.getenv("DOC_PROCESS_WEBHOOK_URL")):
     """
     Send a webhook for successful document processing.
 
@@ -193,29 +198,92 @@ def send_document_processing_success_webhook(user, job, questions_count, webhook
         user: Django User instance
         job: ProcessingJob instance
         questions_count: Number of questions generated
+        qa_data: Generated questions JSON data (optional)
         webhook_url: Discord webhook URL (default: placeholder)
 
     Returns:
         dict: Contains 'success' (bool) and 'message' (str).
     """
-    payload = {
-        "user_id": user.id,
-        "username": user.username,
-        "email": user.email,
-        "job_id": job.id,
-        "document_name": job.document_name,
-        "language": job.language,
-        "question_type": job.question_type,
-        "questions_generated": questions_count,
-        "processing_time": (job.completed_at - job.created_at).total_seconds() if job.completed_at else None,
-        "document_type": job.document_type,
-        "is_question_paper": job.is_question_paper,
-    }
+    # If no questions generated, treat as failure
+    if questions_count == 0:
+        return send_document_processing_failed_webhook(
+            user, job, "No questions were generated from the document", qa_data, webhook_url
+        )
 
-    return send_webhook("document_processing_success", payload, webhook_url)
+    try:
+        # Check if webhook URL is a placeholder
+        if webhook_url.startswith("PLACEHOLDER_"):
+            logging.warning(f"Webhook URL is a placeholder: {webhook_url}")
+            return {"success": False, "message": f"Webhook URL not configured: {webhook_url}"}
+
+        # Create webhook instance
+        webhook = DiscordWebhook(
+            url=webhook_url,
+            username="Sisimpur Bot",
+            rate_limit_retry=True
+        )
+
+        # Create embed with success formatting
+        embed = DiscordEmbed(
+            title="📡 Document Processing Success",
+            color="00ff00"  # Green color for success
+        )
+
+        # Add timestamp
+        embed.set_timestamp()
+
+        # Add footer
+        embed.set_footer(text="Sisimpur Platform", icon_url="https://cdn.discordapp.com/embed/avatars/0.png")
+
+        # Add user and job information
+        embed.add_embed_field(name="User Id", value=str(user.id), inline=True)
+        embed.add_embed_field(name="Username", value=user.username, inline=True)
+        embed.add_embed_field(name="Email", value=user.email, inline=True)
+        embed.add_embed_field(name="Job Id", value=str(job.id), inline=True)
+        embed.add_embed_field(name="Document Name", value=job.document_name, inline=True)
+        embed.add_embed_field(name="Language", value=job.language, inline=True)
+        embed.add_embed_field(name="Question Type", value=job.question_type, inline=True)
+        embed.add_embed_field(name="Questions Generated", value=str(questions_count), inline=True)
+
+        processing_time = (job.completed_at - job.created_at).total_seconds() if job.completed_at else None
+        embed.add_embed_field(name="Processing Time", value=f"{processing_time:.6f}s" if processing_time else "N/A", inline=True)
+        embed.add_embed_field(name="Document Type", value=job.document_type or "unknown", inline=True)
+        embed.add_embed_field(name="Is Question Paper", value=str(job.is_question_paper), inline=True)
+
+        # Add embed to webhook
+        webhook.add_embed(embed)
+
+        # Add JSON output as file if available
+        if qa_data:
+            json_content = json.dumps(qa_data, indent=2, ensure_ascii=False)
+            webhook.add_file(file=json_content.encode('utf-8'), filename=f"questions_job_{job.id}.json")
+
+        # Add uploaded document as file if available
+        if job.document_file:
+            try:
+                from django.core.files.storage import default_storage
+                if default_storage.exists(job.document_file.name):
+                    with default_storage.open(job.document_file.name, 'rb') as f:
+                        file_content = f.read()
+                        webhook.add_file(file=file_content, filename=job.document_name)
+            except Exception as file_error:
+                logging.warning(f"Could not attach document file: {file_error}")
+
+        # Execute webhook
+        response = webhook.execute()
+
+        if response.status_code in [200, 204]:
+            return {"success": True, "message": "Discord webhook sent successfully."}
+        else:
+            logging.error(f"Discord webhook failed with status {response.status_code}: {response.text}")
+            return {"success": False, "message": f"Failed to send Discord webhook: {response.status_code}"}
+
+    except Exception as e:
+        logging.exception("Exception while sending Discord webhook:")
+        return {"success": False, "message": f"Discord webhook error: {str(e)}"}
 
 
-def send_document_processing_failed_webhook(user, job, error_message, webhook_url="https://discord.com/api/webhooks/1382617040967172147/cWx74xm-03mlm737vQIirP3NT4p5SGw8RyxVgqzElKoQojaWUS2HhXRcldudDrkUmzMS"):
+def send_document_processing_failed_webhook(user, job, error_message, qa_data=None, webhook_url=os.getenv("DOC_PROCESS_WEBHOOK_URL")):
     """
     Send a webhook for failed document processing.
 
@@ -223,28 +291,92 @@ def send_document_processing_failed_webhook(user, job, error_message, webhook_ur
         user: Django User instance
         job: ProcessingJob instance
         error_message: Error message string
+        qa_data: Generated questions JSON data (optional, for partial failures)
         webhook_url: Discord webhook URL (default: placeholder)
 
     Returns:
         dict: Contains 'success' (bool) and 'message' (str).
     """
-    payload = {
-        "user_id": user.id,
-        "username": user.username,
-        "email": user.email,
-        "job_id": job.id,
-        "document_name": job.document_name,
-        "language": job.language,
-        "question_type": job.question_type,
-        "error_message": error_message,
-        "processing_time": (job.completed_at - job.created_at).total_seconds() if job.completed_at else None,
-        "document_type": job.document_type,
-    }
+    try:
+        # Check if webhook URL is a placeholder
+        if webhook_url.startswith("PLACEHOLDER_"):
+            logging.warning(f"Webhook URL is a placeholder: {webhook_url}")
+            return {"success": False, "message": f"Webhook URL not configured: {webhook_url}"}
 
-    return send_webhook("document_processing_failed", payload, webhook_url)
+        # Create webhook instance
+        webhook = DiscordWebhook(
+            url=webhook_url,
+            username="Sisimpur Bot",
+            rate_limit_retry=True
+        )
+
+        # Create embed with failure formatting
+        embed = DiscordEmbed(
+            title="📡 Document Processing Failed",
+            color="ff0000"  # Red color for failure
+        )
+
+        # Add timestamp
+        embed.set_timestamp()
+
+        # Add footer
+        embed.set_footer(text="Sisimpur Platform", icon_url="https://cdn.discordapp.com/embed/avatars/0.png")
+
+        # Add user and job information
+        embed.add_embed_field(name="User Id", value=str(user.id), inline=True)
+        embed.add_embed_field(name="Username", value=user.username, inline=True)
+        embed.add_embed_field(name="Email", value=user.email, inline=True)
+        embed.add_embed_field(name="Job Id", value=str(job.id), inline=True)
+        embed.add_embed_field(name="Document Name", value=job.document_name, inline=True)
+        embed.add_embed_field(name="Language", value=job.language, inline=True)
+        embed.add_embed_field(name="Question Type", value=job.question_type, inline=True)
+
+        # Show 0 questions generated for failures
+        questions_count = len(qa_data.get('questions', [])) if qa_data else 0
+        embed.add_embed_field(name="Questions Generated", value=str(questions_count), inline=True)
+
+        processing_time = (job.completed_at - job.created_at).total_seconds() if job.completed_at else None
+        embed.add_embed_field(name="Processing Time", value=f"{processing_time:.6f}s" if processing_time else "N/A", inline=True)
+        embed.add_embed_field(name="Document Type", value=job.document_type or "unknown", inline=True)
+        embed.add_embed_field(name="Is Question Paper", value=str(job.is_question_paper), inline=True)
+
+        # Add error message
+        embed.add_embed_field(name="Error Message", value=error_message[:1024], inline=False)
+
+        # Add embed to webhook
+        webhook.add_embed(embed)
+
+        # Add JSON output as file if available (even for failures, might have partial data)
+        if qa_data:
+            json_content = json.dumps(qa_data, indent=2, ensure_ascii=False)
+            webhook.add_file(file=json_content.encode('utf-8'), filename=f"failed_questions_job_{job.id}.json")
+
+        # Add uploaded document as file if available
+        if job.document_file:
+            try:
+                from django.core.files.storage import default_storage
+                if default_storage.exists(job.document_file.name):
+                    with default_storage.open(job.document_file.name, 'rb') as f:
+                        file_content = f.read()
+                        webhook.add_file(file=file_content, filename=job.document_name)
+            except Exception as file_error:
+                logging.warning(f"Could not attach document file: {file_error}")
+
+        # Execute webhook
+        response = webhook.execute()
+
+        if response.status_code in [200, 204]:
+            return {"success": True, "message": "Discord webhook sent successfully."}
+        else:
+            logging.error(f"Discord webhook failed with status {response.status_code}: {response.text}")
+            return {"success": False, "message": f"Failed to send Discord webhook: {response.status_code}"}
+
+    except Exception as e:
+        logging.exception("Exception while sending Discord webhook:")
+        return {"success": False, "message": f"Discord webhook error: {str(e)}"}
 
 
-def send_normal_signin_webhook(user, webhook_url="https://discord.com/api/webhooks/1382460933279842425/dHz-ahWrqL8Xydxj2ACJto_OC_mzUSamYzvbY6_36cJYcxXpOspU8O4tyZxvac0dkNpS"):
+def send_normal_signin_webhook(user, webhook_url=os.getenv("SIGNIN_WEBHOOK_URL")):
     """
     Send a webhook for normal email/password sign in.
 
@@ -268,7 +400,7 @@ def send_normal_signin_webhook(user, webhook_url="https://discord.com/api/webhoo
     return send_webhook("normal_signin", payload, webhook_url)
 
 
-def send_google_signin_webhook(user, webhook_url="https://discord.com/api/webhooks/1382460933279842425/dHz-ahWrqL8Xydxj2ACJto_OC_mzUSamYzvbY6_36cJYcxXpOspU8O4tyZxvac0dkNpS"):
+def send_google_signin_webhook(user, webhook_url=os.getenv("SIGNIN_WEBHOOK_URL")):
     """
     Send a webhook for Google OAuth sign in.
 

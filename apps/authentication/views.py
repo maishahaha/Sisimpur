@@ -293,17 +293,40 @@ def google_callback(request):
         credentials = flow.credentials
         service = build('oauth2', 'v2', credentials=credentials)
         user_info = service.userinfo().get().execute()
-        
+
+        print(f"DEBUG: Google user info received: {user_info}")
+
         # Get or create user
-        
         email = user_info.get('email')
         if not email:
             messages.error(request, "Could not get email from Google account.")
             return redirect('auth:signupin')
-            
+
+        # Extract user information
+        first_name = user_info.get('given_name', '')
+        last_name = user_info.get('family_name', '')
+        picture_url = user_info.get('picture', '')
+
+        print(f"DEBUG: User details - email: {email}, name: {first_name} {last_name}, picture: {picture_url}")
+
         try:
             user = User.objects.get(email=email)
+            print(f"DEBUG: Existing user found: {user.username}")
+
+            # Update user info if changed
+            updated = False
+            if first_name and user.first_name != first_name:
+                user.first_name = first_name
+                updated = True
+            if last_name and user.last_name != last_name:
+                user.last_name = last_name
+                updated = True
+            if updated:
+                user.save()
+                print(f"DEBUG: Updated existing user info")
+
         except User.DoesNotExist:
+            print(f"DEBUG: Creating new user for email: {email}")
             # Create new user
             username = email.split('@')[0]
             # Ensure username is unique
@@ -312,13 +335,44 @@ def google_callback(request):
             while User.objects.filter(username=username).exists():
                 username = f"{base_username}{counter}"
                 counter += 1
-                
+
             user = User.objects.create_user(
                 username=username,
                 email=email,
-                first_name=user_info.get('given_name', ''),
-                last_name=user_info.get('family_name', '')
+                first_name=first_name,
+                last_name=last_name
             )
+            print(f"DEBUG: Created new user: {user.username}")
+
+        # Handle profile picture
+        if picture_url:
+            print(f"DEBUG: Processing profile picture: {picture_url}")
+            from .utils import download_google_profile_picture, ensure_media_directories
+            try:
+                # Ensure media directories exist
+                ensure_media_directories()
+
+                # Download and save profile picture
+                success = download_google_profile_picture(user, picture_url)
+                print(f"DEBUG: Profile picture download result: {success}")
+
+                if success:
+                    print(f"DEBUG: Profile picture saved successfully for {user.username}")
+                else:
+                    print(f"DEBUG: Profile picture download failed, but Google URL saved as fallback")
+
+            except Exception as e:
+                print(f"DEBUG: Error downloading profile picture: {e}")
+                # Still save the Google URL as fallback
+                try:
+                    if hasattr(user, 'profile'):
+                        user.profile.google_picture_url = picture_url
+                        user.profile.save()
+                        print(f"DEBUG: Saved Google picture URL as fallback")
+                except Exception as fallback_error:
+                    print(f"DEBUG: Failed to save Google URL fallback: {fallback_error}")
+        else:
+            print(f"DEBUG: No profile picture URL provided")
         
         # Log the user in
         login(request, user)
