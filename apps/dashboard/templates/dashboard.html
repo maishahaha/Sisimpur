@@ -159,8 +159,8 @@
               <div class="jobs-list">
                 {% for job in recent_jobs %}
                 <div class="job-item">
-                  <div class="job-info">
-                    <h4>{{ job.document_name }}</h4>
+                  <div class="job-info" style="flex: 1 1 0; min-width: 0;">
+                    <h4 class="job-filename" title="{{ job.document_name }}">{{ job.document_name }}</h4>
                     <p class="job-status status-{{ job.status }}">{{ job.get_status_display }}</p>
                     <small>{{ job.created_at|date:"M d, Y H:i" }}</small>
                   </div>
@@ -1400,11 +1400,20 @@ function showNotification(message, type = 'info') {
     padding: 15px;
     border-radius: 8px;
     border-left: 4px solid #007bff;
+    min-width: 0;
 }
 
-.job-info h4 {
-    margin: 0 0 5px 0;
-    font-size: 1em;
+.job-info {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.job-filename {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
 }
 
 .job-status {
