@@ -3,9 +3,12 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.hashers import make_password, check_password
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 import random
 import string
 import hashlib
+import os
 
 class EmailOTP(models.Model):
     """Model to store email OTP for verification with security best practices"""
@@ -177,3 +180,85 @@ class OTPRateLimit(models.Model):
             is_blocked=False
         ).delete()[0]
         return deleted_count
+
+
+def user_avatar_path(instance, filename):
+    """Generate upload path for user avatars"""
+    # Get file extension
+    ext = filename.split('.')[-1]
+    # Create filename: user_id_avatar.ext
+    filename = f"user_{instance.user.id}_avatar.{ext}"
+    # Return path: media/avatars/user_id_avatar.ext
+    return os.path.join('avatars', filename)
+
+
+class UserProfile(models.Model):
+    """Extended user profile with additional fields"""
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    avatar = models.ImageField(
+        upload_to=user_avatar_path,
+        null=True,
+        blank=True,
+        help_text="User profile picture"
+    )
+    google_picture_url = models.URLField(
+        null=True,
+        blank=True,
+        help_text="Original Google profile picture URL"
+    )
+    bio = models.TextField(
+        max_length=500,
+        null=True,
+        blank=True,
+        help_text="User biography"
+    )
+    location = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        help_text="User location"
+    )
+    website = models.URLField(
+        null=True,
+        blank=True,
+        help_text="User website"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'User Profile'
+        verbose_name_plural = 'User Profiles'
+
+    def __str__(self):
+        return f"{self.user.username}'s Profile"
+
+    def get_avatar_url(self):
+        """Get avatar URL with fallback to default"""
+        if self.avatar:
+            return self.avatar.url
+        elif self.google_picture_url:
+            return self.google_picture_url
+        else:
+            return '/static/images/default-avatar.png'
+
+    def has_avatar(self):
+        """Check if user has an avatar"""
+        return bool(self.avatar or self.google_picture_url)
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    """Create UserProfile when User is created"""
+    if created:
+        UserProfile.objects.create(user=instance)
+
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    """Save UserProfile when User is saved"""
+    if hasattr(instance, 'profile'):
+        instance.profile.save()
+    else:
+        UserProfile.objects.create(user=instance)

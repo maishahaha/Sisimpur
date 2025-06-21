@@ -112,8 +112,10 @@
                         <button class="profile-btn" id="profile-toggle">
                             {% if user.profile.avatar %}
                                 <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name|default:user.username }}" />
+                            {% elif user.profile.google_picture_url %}
+                                <img src="{{ user.profile.google_picture_url }}" alt="{{ user.get_full_name|default:user.username }}" />
                             {% else %}
-                                <img src="{% static 'images/default-avatar.png' %}" alt="{{ user.get_full_name|default:user.username }}" />
+                                <img src="{% static 'images/default-avatar.svg' %}" alt="{{ user.get_full_name|default:user.username }}" />
                             {% endif %}
                             <span class="profile-name">{{ user.get_full_name|default:user.username }}</span>
                             <i class="ri-arrow-down-s-line"></i>
@@ -122,8 +124,10 @@
                             <div class="profile-header">
                                 {% if user.profile.avatar %}
                                     <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name|default:user.username }}" />
+                                {% elif user.profile.google_picture_url %}
+                                    <img src="{{ user.profile.google_picture_url }}" alt="{{ user.get_full_name|default:user.username }}" />
                                 {% else %}
-                                    <img src="{% static 'images/default-avatar.png' %}" alt="{{ user.get_full_name|default:user.username }}" />
+                                    <img src="{% static 'images/default-avatar.svg' %}" alt="{{ user.get_full_name|default:user.username }}" />
                                 {% endif %}
                                 <div>
                                     <h4>{{ user.get_full_name|default:user.username }}</h4>
