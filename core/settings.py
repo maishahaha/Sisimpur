@@ -39,7 +39,7 @@ CSRF_TRUSTED_ORIGINS = [
 DEBUG = True  # Temporarily enable for debugging
 
 ALLOWED_HOSTS = ["*"]
-WEBSITE_HOST = "defang.dev" # Set the website host [defang.dev, localhost]
+WEBSITE_HOST = "localhost" # Set the website host [defang.dev, localhost]
 
 if WEBSITE_HOST == "defang.dev":
     WEBSITE_URL = "https://arpan8925-web--8000.prod1.defang.dev"
@@ -180,7 +180,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Coming soon mode
-COMING_SOON = True
+COMING_SOON = False
 
 # Add SITE_ID setting
 SITE_ID = 1
