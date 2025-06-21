@@ -408,9 +408,9 @@
                             <div class="user-answer {% if answer.is_correct %}correct{% endif %}">
                                 <strong>Your Answer:</strong>
                                 {% if answer.question.question_type == 'MULTIPLECHOICE' and answer.user_answer %}
-                                    {% for option in answer.question.options %}
-                                        {% if option|slice:":1" == answer.user_answer %}
-                                            {{ option }}
+                                    {% for option in answer.question.get_formatted_options %}
+                                        {% if option.key == answer.user_answer %}
+                                            {{ option.key }}) {{ option.text }}
                                         {% endif %}
                                     {% endfor %}
                                     {% if not answer.user_answer %}Not answered{% endif %}
@@ -422,9 +422,9 @@
                                 <strong>Correct Answer:</strong>
                                 {% if answer.question.question_type == 'MULTIPLECHOICE' %}
                                     {% if answer.question.correct_option %}
-                                        {% for option in answer.question.options %}
-                                            {% if option|slice:":1" == answer.question.correct_option %}
-                                                {{ option }}
+                                        {% for option in answer.question.get_formatted_options %}
+                                            {% if option.key == answer.question.correct_option %}
+                                                {{ option.key }}) {{ option.text }}
                                             {% endif %}
                                         {% endfor %}
                                     {% else %}
